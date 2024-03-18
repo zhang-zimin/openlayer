@@ -3,8 +3,9 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import App from './components/WmsMap2.vue'
-//import App from './components/WmsTest.vue'
+//import App from './components/WmsMap2.vue'
+//import App from './components/WmsMap3.vue'
+import App from './components/WmsMap4.vue'
 //import App from './App.vue'
 //import router from './router'
 
