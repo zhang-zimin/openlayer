@@ -12,11 +12,15 @@ onMounted(() => {
   console.log(baseURL) // baseURL
 })
 
-import { Get, Post } from "../axios/api"; 
+import { Get, Post,Put } from "../axios/api"; 
 const url=ref('/plantInfo/list')
 const loginForm = ref({
   username: 'admin',
   password: '123456',
+})
+const pageInfo = ref({
+  pageNum: 1,
+  pageSize: 10
 })
 const modelSatus = reactive({
       status: false,
@@ -29,16 +33,40 @@ const modelSatus = reactive({
 const showrows=ref([])
 const showtotal = ref(0);
 
+
+defineProps<{ msg: string }>()
+
+const currentPage4 = ref(1)
+const pageSize4 = ref(10)
+const small = ref(false)
+const background = ref(false)
+const disabled = ref(false)
+currentPage4.value=Math.floor(showrows.value/pageSize4.value);
+
+const handleSizeChange = (val: number) => {
+  pageSize4.value=val;
+  console.log(`${val} items per page`)
+  GetAll();
+}
+const handleCurrentChange = (val: number) => {
+  currentPage4.value=val;
+  console.log(`current page: ${val}`)
+  GetAll();
+}
+
+let username = ref('')
+let email = ref('')
+
 function GetAll() {
 //Pollution/GetAll
 //plantInfo/list
  // axios接口
- Get('/Pollution/GetAll',{}).then((response) => {
-        const { code, msg, data,rows,total: res } = response.data;
+ Get('/Pollution/GetAll',{  pageNum: currentPage4.value,pageSize: pageSize4.value}).then((response) => {
+        const { code, msg, rows,total,data: res } = response.data;
         if (code === 200) {
-          //showrows.value=rows;
-          showrows.value=data;
-          showtotal.value = 100;
+          showrows.value=rows;
+          //showrows.value=data;
+          showtotal.value = total;
           console.log(showrows.value);
           //console.log(total);
           ElMessage.success(msg ?? "Submitted!");
@@ -57,25 +85,6 @@ function GetAll() {
       });
     }
     GetAll();     
-
-defineProps<{ msg: string }>()
-
-const currentPage4 = ref(4)
-const pageSize4 = ref(10)
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-currentPage4.value=Math.floor(showrows.value/pageSize4.value);
-
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
-}
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
-}
-
-let username = ref('')
-let email = ref('')
 
 const query = () => {}
 const query2 = () => {
@@ -155,6 +164,139 @@ function calculation() {
       });
 }
 
+function UpdateWry() {
+    console.log("UpdateWry");
+    Post('/Pollution/UpdateWry',{}).then((response) => {
+        const { code, msg, data,rows,total: res } = response.data;
+        if (code === 200) {
+           console.log("更新后重新获取数据");
+          ElMessage.success(msg ?? "Submitted!");
+          
+          GetAll();   
+
+          /*localStorage.setItem("token", res.token);
+          ElMessage.success(msg ?? "Submitted!");
+          router.push({
+            path: "/", // HelloWorld.vue在路由配置文件中定义的路径
+            params: {
+              isLogged: true,
+            },
+          });*/
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+}
+
+
+function alterTableData(id,codstandard,nh3standard,tpstandard,inflowcoefficient) {
+    console.log("alterTableData"+id+"-"+codstandard);
+    if(id!=""){
+      Put('/Pollution/alterTableData',{"id":id,"codstandard":codstandard,"nh3standard":nh3standard,"tpstandard":tpstandard,"inflowcoefficient":inflowcoefficient}).then((response) => {
+        const { code, msg, data,rows,total: res } = response.data;
+        if (code === 200) {
+           //console.log("修改后重新获取数据");
+          ElMessage.success(msg ?? "Submitted!");
+          
+          //GetAll();   
+
+          /*localStorage.setItem("token", res.token);
+          ElMessage.success(msg ?? "Submitted!");
+          router.push({
+            path: "/", // HelloWorld.vue在路由配置文件中定义的路径
+            params: {
+              isLogged: true,
+            },
+          });*/
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+    }
+}
+
+function alterTableData2(id,nh3standard) {
+    console.log("alterTableData"+id+"-"+nh3standard);
+    if(id!=""){
+      Put('/Pollution/alterTableData',{"id":id,"nh3standard":nh3standard}).then((response) => {
+        const { code, msg, data,rows,total: res } = response.data;
+        if (code === 200) {
+           //console.log("修改后重新获取数据");
+          ElMessage.success(msg ?? "Submitted!");
+          
+          //GetAll();   
+ 
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+    }
+}
+
+function alterTableData3(id,tpstandard) {
+    console.log("alterTableData"+id+"-"+tpstandard);
+    if(id!=""){
+      Put('/Pollution/alterTableData',{"id":id,"tpstandard":tpstandard}).then((response) => {
+        const { code, msg, data,rows,total: res } = response.data;
+        if (code === 200) {
+           //console.log("修改后重新获取数据");
+          ElMessage.success(msg ?? "Submitted!");
+          
+          //GetAll();   
+ 
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+    }
+}
+
+function alterTableData4(id,inflowcoefficient) {
+    console.log("alterTableData"+id+"-"+inflowcoefficient);
+    if(id!=""){
+      Put('/Pollution/alterTableData',{"id":id,"inflowcoefficient":inflowcoefficient}).then((response) => {
+        const { code, msg, data,rows,total: res } = response.data;
+        if (code === 200) {
+           //console.log("修改后重新获取数据");
+          ElMessage.success(msg ?? "Submitted!");
+          
+          //GetAll();   
+ 
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+    }
+}
+const currentCell = ref(null)
+// 给单元格绑定横向和竖向的index，这样就能确定是哪一个单元格
+function tableCellClassName({ row, column, rowIndex, columnIndex }) {
+      row.index = rowIndex
+      column.index = columnIndex
+      //console.log(rowIndex, columnIndex)
+}
+    // 获得当前双击的单元格的横竖index，然后拼接成一个唯一字符串用于判断，并赋给currentCell
+    // 拼接后类似这样："1,0","1,1",
+    function dbclick(row, column) {
+      console.log(row, column)
+      currentCell.value = row.index + ',' + column.index
+      console.log(currentCell)
+      // input 自动获取焦点
+      if (column.property === 'processid_name' || column.property === 'processmoudel_name') {
+        // 双击后自动获得焦点
+        this.$nextTick(() => {
+          this.$refs[row.index + ',' + column.index].focus()
+        })
+      }
+    }
+    // 关闭编辑状态
+    function hideInput(row) {
+      this.currentCell = null
+    }
+    
+    function sortChange(){
+      console.log('sortChange');  
+    }
 </script>
 
 <template>
@@ -163,6 +305,7 @@ function calculation() {
       <div class="flexbox">-->
         <!--<el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />-->
         <el-button type="primary" @click="calculation">计算</el-button>
+        <el-button type="primary" @click="UpdateWry">更新</el-button>
       <!-- </div>
  <el-card>
     <div class="query-input">
@@ -215,7 +358,11 @@ function calculation() {
   </div>
   </el-card>-->
   <el-card>
-    <el-table :data="showrows" stripe style="width: 100%">
+    <el-table :data="showrows" stripe style="width: 100%" row-key="id"
+          :has-n-o="false"
+          :cell-class-name="tableCellClassName"
+          @sort-change="sortChange"
+          @row-dblclick="dbclick">
    
       <el-table-column prop="id" label="id" width="80" />
       <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" />
@@ -225,9 +372,54 @@ function calculation() {
       <el-table-column prop="username" label="username" width="80" />
       <el-table-column prop="useraddress" label="useraddress" width="80" />
       <el-table-column prop="codinflow" label="codinflow" width="80" />
-      <el-table-column prop="codstandard" label="codstandard" width="80" />
-      <el-table-column prop="nh3standard" label="nh3standard" width="80" />
-      <el-table-column prop="tpstandard" label="tpstandard" width="80" />
+      <el-table-column prop="codstandard" label="codstandard" width="80" editable>
+        <template v-slot="scope">
+              <el-input
+                v-if="scope.row.index + ',' + scope.column.index == currentCell"
+                :ref="scope.row.index + ',' + scope.column.index"
+                v-model="scope.row.codstandard"
+                @blur="hideInput(scope.row)"
+                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              />
+              <span v-else>{{ scope.row.codstandard }}</span>
+            </template>
+      </el-table-column>
+      <el-table-column prop="nh3standard" label="nh3standard" width="80" editable>
+        <template v-slot="scope">
+              <el-input
+                v-if="scope.row.index + ',' + scope.column.index == currentCell"
+                :ref="scope.row.index + ',' + scope.column.index"
+                v-model="scope.row.nh3standard"
+                @blur="hideInput(scope.row)"
+                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              />
+              <span v-else>{{ scope.row.nh3standard }}</span>
+            </template>
+      </el-table-column>
+      <el-table-column prop="tpstandard" label="tpstandard" width="80" editable>
+        <template v-slot="scope">
+              <el-input
+                v-if="scope.row.index + ',' + scope.column.index == currentCell"
+                :ref="scope.row.index + ',' + scope.column.index"
+                v-model="scope.row.tpstandard"
+                @blur="hideInput(scope.row)"
+                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              />
+              <span v-else>{{ scope.row.tpstandard }}</span>
+            </template>
+      </el-table-column>
+      <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable>
+        <template v-slot="scope">
+              <el-input
+                v-if="scope.row.index + ',' + scope.column.index == currentCell"
+                :ref="scope.row.index + ',' + scope.column.index"
+                v-model="scope.row.inflowcoefficient"
+                @blur="hideInput(scope.row)"
+                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              />
+              <span v-else>{{ scope.row.inflowcoefficient }}</span>
+            </template>
+      </el-table-column>
       <el-table-column prop="coddischarge" label="coddischarge" width="80" />
       <el-table-column prop="nh3discharge" label="nh3discharge" width="80" />
       <el-table-column prop="tpdischarge" label="tpdischarge" width="80" />
