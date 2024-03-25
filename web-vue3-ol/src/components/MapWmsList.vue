@@ -1,12 +1,13 @@
 <template>
    <div class="MonitoringData">
+    <!-- style="width: 1200px;height: 600px;"-->
   <ol-map
+    ref="map" 
     id="map"
     :loadTilesWhileAnimating="true"
     :loadTilesWhileInteracting="true"
-    style="width: 1200px;
-    height: 600px;"
-    
+    :style="mapstyle"
+    @click="mapclick"
   >
   <ol-view
       ref="view"
@@ -45,12 +46,35 @@
       </ol-style>
     </ol-interaction-select>
 
-    <!---->
+    <!--url="http://192.168.0.107:8010/geoserver/zzmserver/wms"-->
+    <!--url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"-->
     <ol-layer-group :opacity="0.4">
       <ol-tile-layer>
         <ol-source-tile-wms
-          url="http://192.168.0.107:8010/geoserver/zzmserver/wms"
-           
+          :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+          layers="zzmserver:shunde"
+          serverType="geoserver"
+          :transition="0"
+          :params="{
+            SERVICE: 'WMS',
+        VERSION: '1.3.0',
+        REQUEST: 'GetMap',
+        FORMAT: 'image/png',
+        TRANSPARENT: true,
+        tiled: true,
+        STYLES: '',
+        exceptions: 'application/vnd.ogc.se_inimage',
+        CRS: 'EPSG:3857',
+        WIDTH: 256,
+        HEIGHT: 256,
+        BBOX: '12590050.499757469,2606944.281630356,12592493.746506888,2609387.528379775'
+        }"
+        />
+      </ol-tile-layer>
+
+      <ol-tile-layer>
+        <ol-source-tile-wms
+          :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
           layers="zzmserver:PS_LINE-3857"
           serverType="geoserver"
           :transition="0"
@@ -79,10 +103,11 @@
           crossOrigin="anonymous"
         />
       </ol-tile-layer>-->
+      <!--url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"-->
       <ol-vector-layer title="AIRPORTS">
         <ol-source-vector
           ref="cities"
-          url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"
+          :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
           :format="geoJson"
           :projection="projection"
         >
@@ -132,8 +157,8 @@
      
     <el-button type="primary" v-show="!modelSatus.status" @click="modelSatus.status=true"><<</el-button>
     <div class="map-left" v-show="modelSatus.status"><el-button type="primary" @click="modelSatus.status=false">X</el-button>
-     
-      <PlantInfoList msg="计算结果展示"/>
+     <!--msg="计算结果展示"-->
+      <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
       <!--<div class="text"> 信息展示</div>
       <div class="flexbox">
         <el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />
@@ -162,9 +187,22 @@
 <script setup>
 
 import { ref, reactive, inject, onMounted  } from "vue";
-
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
+
+import {getCurrentInstance} from "vue";
+const {proxy} = getCurrentInstance()
+console.log(proxy.$baseUrl)
+//console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 
+//const wmsUrl=proxy.$getFullUrl('/geoserver/zzmserver/wms')
+
+//const screenWidth = ref(window.innerWidth);
+//const screenHeight = ref(window.innerHeight);
+const screenWidth = ref(document.documentElement.clientWidth);//实时屏幕宽度
+const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕高度
+
+const mapstyle=ref("width: "+(screenWidth.value-16)+"px;height: "+(screenHeight.value-50)+"px")  
+console.log(mapstyle.value)
 
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);
@@ -191,7 +229,10 @@ const form = reactive({
       input: "",
       list: {},
     });
-   
+    const mapClickData = reactive({
+      input: "",
+      list: {},
+    });
    
 //const center = ref([40, 40]);
 const projection = ref("EPSG:3857");
@@ -230,7 +271,34 @@ function featureClicked(event) {
     console.log(event);
     console.log(event.target.value)
 }
+const zone_name=ref("");
+const childRef = ref(null);
+function mapclick(event){
+    console.log("mapclick");
+    console.log(event);
+    var feature = event.map.forEachFeatureAtPixel(event.pixel, function (feature) {
+      return feature;
+        });
+    console.log(feature);
+    if(feature){
+        console.log(feature.values_.burytype);
+        //mapClickData.input=feature.values_.burytype;
+        mapClickData.list=feature.values_;
+        console.log(mapClickData.list);
+        //console.log(mapClickData.list.zone_name);
+        zone_name.value=feature.values_.zone_name;
+        //if (childRef.value) {
+          childRef.value.childMethod(zone_name.value);
+          childRef.value.childSelMethod(mapClickData.list);
+        //}
+    } 
+}
 
+const map = ref(null);
+onMounted(() => {
+  console.log(map.value); // 在组件挂载后也可以访问
+});
+console.log("end map:"+map);
 
 </script>
 
@@ -248,13 +316,13 @@ function featureClicked(event) {
     text-align: center;
   }
   .map-left {
-    width: 100%;
+    width: 98%;
     height: 40%;
     position: absolute;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
-    bottom: 20px;
+    bottom: 0px;
     overflow: auto;
     padding: 10px;
     .text {

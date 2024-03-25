@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,reactive } from 'vue'
+import { ref,reactive,watch } from 'vue'
 import { Search } from '@element-plus/icons-vue';
 import { Refresh } from '@element-plus/icons-vue';
 
@@ -11,6 +11,10 @@ const { baseURL } = getCurrentInstance().appContext.config.globalProperties
 onMounted(() => {
   console.log(baseURL) // baseURL
 })
+
+const {proxy} = getCurrentInstance()
+console.log(proxy.$baseUrl)
+
 
 import { Get, Post,Put } from "../axios/api"; 
 const url=ref('/plantInfo/list')
@@ -34,7 +38,49 @@ const showrows=ref([])
 const showtotal = ref(0);
 
 
-defineProps<{ msg: string }>()
+//defineProps<{ msg: string ,selData:{} }>()
+/*const props2 = defineProps({
+  config: Object,
+  msg: string
+});
+console.log("child")
+console.log(props2.config)
+if(props2.config){
+  console.log("1")
+  //showrows.value=props.config
+}else{
+  console.log("0")
+}
+*/
+
+const props2 = defineProps<{ msg: string ,selData:{} }>()
+/*var selList = [];//定义一个空数组
+if(props2.selData.hasOwnProperty("OBJECTID")){
+  selList.push(props2.selData);
+  showrows.value=selList;
+  console.log("push:"+showrows.value);
+}*/
+const childSelMethod = (childSelData: {}) => {
+  console.log('childSelData method called：'+childSelData);
+  var selList = [];//定义一个空数组
+  if(childSelData.hasOwnProperty("OBJECTID")){
+    selList.push(childSelData);
+    showrows.value=selList;
+    showtotal.value = 1;
+    console.log("push:"+showrows.value);
+  }else{
+    console.log("push:"+"no OBJECTID");
+  }
+};
+const childMethod = (str: string) => {
+  console.log('Child method called：'+str);
+};
+defineExpose({
+  childMethod,childSelMethod
+});
+watch(props2.selData, (newData) => {
+  console.log(`new newData is: ${newData}`)
+})
 
 const currentPage4 = ref(1)
 const pageSize4 = ref(10)
@@ -86,7 +132,9 @@ function GetAll() {
     }
     GetAll();     
 
-const query = () => {}
+const query = () => {
+  GetAll();   
+}
 const query2 = () => {
   //console.log('2222:')
   console.log(username.value)
@@ -163,7 +211,7 @@ function calculation() {
         }
       });
 }
-
+ 
 function UpdateWry() {
     console.log("UpdateWry");
     Post('/Pollution/UpdateWry',{}).then((response) => {
@@ -297,16 +345,75 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
     function sortChange(){
       console.log('sortChange');  
     }
+
+    function downloadFile(fileUrl) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      //link.setAttribute('download', fileName);
+      link.click();
+    }
+ 
+    const handleSortChange = ({ column, prop, order }) => {
+      showrows.value.sort((a, b) => {
+        if (order === 'ascending') {
+          return a[prop] > b[prop] ? 1 : -1;
+        } else if (order === 'descending') {
+          return a[prop] < b[prop] ? 1 : -1;
+        }
+        return 0;
+      });
+    };
+ 
+
+/*const typeSelect = document.getElementById('typeSelect');
+console.log("typeSelect:"+typeSelect);
+*/
+const typeSelect = ref(null);
+onMounted(() => {
+  console.log(typeSelect.value); // 在组件挂载后也可以访问
+});
+console.log("end typeSelect:"+typeSelect);
+  typeSelect.onchange = function () {
+    console.log(typeSelect.value+":onchange:"+this.value);
+    //map.removeInteraction(draw);
+    //addInteraction();
+  };
+function typeSelectChange() {
+  console.log(typeSelect.value+":onchange:");
+}
+
 </script>
 
-<template>
-    <!--<h3>{{ msg }}</h3>
-    <div class="text">信息列表</div>
+<template><!--{{ msg }}-
+<h1 v-if="selData.hasOwnProperty('OBJECTID')">Vue is awesome! {{ selData }}</h1>
+<h1 v-else>Oh no 😢</h1>-->
+
+     <!--<h3>{{ msg }}</h3>
+   <div class="text">信息列表</div>
       <div class="flexbox">-->
         <!--<el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />-->
+       
         <el-button type="primary" @click="calculation">计算</el-button>
         <el-button type="primary" @click="UpdateWry">更新</el-button>
-      <!-- </div>
+        <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">csv下载</el-button>
+        <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">shp下载</el-button>
+        <el-input v-model="username" placeholder="填写查询信息"/>
+        <el-button type="primary" @click="query"> 
+        <el-icon><Search /></el-icon>
+         查询
+        </el-button>
+        <span class="input-group">
+          <label class="input-group-text" for="typeSelect">绘制多边形:</label>
+          <select class="form-select" id="typeSelect" ref="typeSelect" @change="typeSelectChange">
+             
+            <option value="Polygon">多边形</option>
+            
+            <option value="None">取消</option>
+          </select>
+          <input class="form-control" type="button" value="Undo" id="undo">
+        </span> 
+
+        <!-- </div>
  <el-card>
     <div class="query-input">
       <el-input v-model="username" placeholder="请输入用户名"/>
@@ -357,22 +464,25 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
     />
   </div>
   </el-card>-->
+  <!--@sort-change="sortChange"-->
   <el-card>
     <el-table :data="showrows" stripe style="width: 100%" row-key="id"
           :has-n-o="false"
           :cell-class-name="tableCellClassName"
-          @sort-change="sortChange"
-          @row-dblclick="dbclick">
-   
-      <el-table-column prop="id" label="id" width="80" />
-      <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" />
-      <el-table-column prop="draintype" label="draintype" width="80" />
-      <el-table-column prop="drainsubtype" label="drainsubtype" width="80" />
-      <el-table-column prop="agriculturetype" label="agriculturetype" width="80" />
-      <el-table-column prop="username" label="username" width="80" />
-      <el-table-column prop="useraddress" label="useraddress" width="80" />
-      <el-table-column prop="codinflow" label="codinflow" width="80" />
-      <el-table-column prop="codstandard" label="codstandard" width="80" editable>
+          
+          @row-dblclick="dbclick"
+          @sort-change="handleSortChange"
+          v-sticky="{ top: '50px', parent: '.table-box', zIndex: 996 }">
+          <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
+      <el-table-column prop="id" label="id" width="80" sortable="custom"/>
+      <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>
+      <el-table-column prop="draintype" label="draintype" width="80" sortable="custom"/>
+      <el-table-column prop="drainsubtype" label="drainsubtype" width="80" sortable="custom"/>
+      <el-table-column prop="agriculturetype" label="agriculturetype" width="80" sortable="custom"/>
+      <el-table-column prop="username" label="username" width="80" sortable="custom"/>
+      <el-table-column prop="useraddress" label="useraddress" width="80" sortable="custom"/>
+      <el-table-column prop="codinflow" label="codinflow" width="80" sortable="custom"/>
+      <el-table-column prop="codstandard" label="codstandard" width="80" editable sortable="custom">
         <template v-slot="scope">
               <el-input
                 v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -384,7 +494,7 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
               <span v-else>{{ scope.row.codstandard }}</span>
             </template>
       </el-table-column>
-      <el-table-column prop="nh3standard" label="nh3standard" width="80" editable>
+      <el-table-column prop="nh3standard" label="nh3standard" width="80" editable sortable="custom">
         <template v-slot="scope">
               <el-input
                 v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -396,7 +506,7 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
               <span v-else>{{ scope.row.nh3standard }}</span>
             </template>
       </el-table-column>
-      <el-table-column prop="tpstandard" label="tpstandard" width="80" editable>
+      <el-table-column prop="tpstandard" label="tpstandard" width="80" editable sortable="custom">
         <template v-slot="scope">
               <el-input
                 v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -408,7 +518,7 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
               <span v-else>{{ scope.row.tpstandard }}</span>
             </template>
       </el-table-column>
-      <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable>
+      <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable sortable="custom">
         <template v-slot="scope">
               <el-input
                 v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -420,11 +530,11 @@ function tableCellClassName({ row, column, rowIndex, columnIndex }) {
               <span v-else>{{ scope.row.inflowcoefficient }}</span>
             </template>
       </el-table-column>
-      <el-table-column prop="coddischarge" label="coddischarge" width="80" />
-      <el-table-column prop="nh3discharge" label="nh3discharge" width="80" />
-      <el-table-column prop="tpdischarge" label="tpdischarge" width="80" />
-      <el-table-column prop="nh3inflow" label="nh3inflow" width="80" />
-      <el-table-column prop="tpinflow" label="tpinflow" width="80" />
+      <el-table-column prop="coddischarge" label="coddischarge" width="80" sortable="custom"/>
+      <el-table-column prop="nh3discharge" label="nh3discharge" width="80" sortable="custom"/>
+      <el-table-column prop="tpdischarge" label="tpdischarge" width="80" sortable="custom"/>
+      <el-table-column prop="nh3inflow" label="nh3inflow" width="80" sortable="custom"/>
+      <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
      </el-table>
       
 
