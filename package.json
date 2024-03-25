@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "esri-loader": "^3.7.0",
+    "jszip": "^3.10.1",
+    "ol": "^9.1.0",
+    "shapefile": "^0.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/ol": "^7.0.0"
+  }
+}

@@ -396,6 +396,7 @@ function typeSelectChange() {
         <el-button type="primary" @click="calculation">计算</el-button>
         <el-button type="primary" @click="UpdateWry">更新</el-button>
         <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">csv下载</el-button>
+        <el-input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" />
         <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">shp下载</el-button>
         <el-input v-model="username" placeholder="填写查询信息"/>
         <el-button type="primary" @click="query"> 
