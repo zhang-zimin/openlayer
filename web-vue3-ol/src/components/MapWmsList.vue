@@ -1,21 +1,14 @@
 <template>
   <div class="MonitoringData">
    <!-- style="width: 1200px;height: 600px;"-->
-
-   <!-- 文件上传区域 -->
-   <input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" />
-   
-   <!-- 文件上传组件 -->
-   <!-- <input type="file" @change="handleFileUpload" accept=".zip"> -->
-   <!-- <el-button type="promary" size="mini" @click="addFile()">加载SHP文件</el-button> -->
-
+<!--@click="mapclick"-->
  <ol-map
    ref="map" 
    id="map"
    :loadTilesWhileAnimating="true"
    :loadTilesWhileInteracting="true"
    :style="mapstyle"
-   @click="mapclick"
+   
  >
  <ol-view
      ref="view"
@@ -171,7 +164,40 @@
     
    <el-button type="primary" v-show="!modelSatus.status" @click="modelSatus.status=true">
   </el-button>
-   <div class="map-left" v-show="modelSatus.status"><el-button type="primary" @click="modelSatus.status=false">关闭</el-button>
+  <div class="map-left">
+
+    <el-button type="primary" @click="drawPolygon">绘制多边形</el-button>
+    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
+    <el-button type="primary" @click="removeDrawLayer">清除</el-button>
+    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
+ 
+    <el-upload
+   class="upload"
+   ref="upload"
+   action="string"
+   :file-list="uploadFiles"
+   :auto-upload="true"
+   :on-progress="importSubmit" 
+   multiple="multiple"
+ >
+  <div class="upfile">
+   <el-button
+     size="small"
+     type="success"
+     class="chaxuns fontSizes"
+   >上传文件</el-button>
+  </div>
+ </el-upload>  
+
+    <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
+       <!-- 文件上传区域 -->
+   <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
+   
+   <!-- 文件上传组件 -->
+   <!-- <input type="file" @change="handleFileUpload" accept=".zip"> -->
+   <!-- <el-button type="promary" size="mini" @click="addFile()">加载SHP文件</el-button> -->
+    </div>
+   <div class="map-bottom" v-show="modelSatus.status"><el-button type="primary" @click="modelSatus.status=false">关闭</el-button>
     <!--msg="计算结果展示"-->
      <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
      <!--<div class="text"> 信息展示</div>
@@ -215,15 +241,17 @@ import { Polygon, MultiPolygon } from 'ol/geom';
 import TileLayer from 'ol/layer/Tile';
 import { XYZ } from "ol/source";
 import { Fill } from "ol/style";
-import Stroke from "ol/style";
-import Style from "ol/style";
-import Circle from "ol/geom";
-import Text from "ol/style";
-import Icon from "ol/style";
+import { Stroke } from "ol/style";
+import { Style } from "ol/style";
+import { Circle } from "ol/geom";
+import { Text } from "ol/style";
+import { Icon } from "ol/style";
 import { fromLonLat } from "ol/proj";
 import JSZip from 'jszip';
-
-
+import Draw from 'ol/interaction/Draw.js';
+import {OSM, Vector as VectorSource2} from 'ol/source.js';
+import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
+import { Get, Post,Put } from "../axios/api"; 
 
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
@@ -283,9 +311,9 @@ const extent = inject("ol-extent");
  units: "pixels",
  extent: extent,
 });*/
-const imgUrl=ref("http://192.168.0.107:8010/geoserver/zzmserver/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS=zzmserver%3APS_LINE-3857&exceptions=application%2Fvnd.ogc.se_inimage&CRS=EPSG%3A3857&WIDTH=769&HEIGHT=470&BBOX=12594707.938873548%2C2600912.5162177263%2C12624026.899866581%2C2618855.1095337737");
+//const imgUrl=ref("http://192.168.0.107:8010/geoserver/zzmserver/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS=zzmserver%3APS_LINE-3857&exceptions=application%2Fvnd.ogc.se_inimage&CRS=EPSG%3A3857&WIDTH=769&HEIGHT=470&BBOX=12594707.938873548%2C2600912.5162177263%2C12624026.899866581%2C2618855.1095337737");
 //const imgUrl = ref("https://imgs.xkcd.com/comics/online_communities.png");
-const imgCopyright = ref('© <a href="http://xkcd.com/license.html">xkcd</a>');
+//const imgCopyright = ref('© <a href="http://xkcd.com/license.html">xkcd</a>');
 
 const featureSelected = (event) => {
  console.log(event);
@@ -330,16 +358,108 @@ function mapclick(event){
 
 // const shapefile = require("shapefile");
 
-
-
-
 const map = ref(null);
 onMounted(() => {
- console.log(map.value); // 在组件挂载后也可以访问
+  map.value.map.addLayer(vectorDraw);
+  const mapvalue=map.value;
+ /*console.log("onMounted map value:"+map.value); // 在组件挂载后也可以访问
+ console.log("mapvalue map:"+mapvalue.map); 
+ console.log("onMounted map:"+map.map); 
+ console.log("onMounted map:"+map.id); 
+ console.log("layers:"+mapvalue.layers);*/
 });
-console.log("end map:"+map);
+
+const source = new VectorSource2({wrapX: false});
+
+const vectorDraw = new VectorLayer2({
+  source: source,
+});
+
+let draw; // global so we can remove it later
+function addInteraction() {
+  
+  //const value = typeSelect.value;
+  //if (value !== 'None') {
+    draw = new Draw({
+      source: source,
+      type: 'Polygon',
+      /*style: new Style({
+					fill: new Fill({               //填充样式
+						color: 'rgba(255, 255, 255, 0.2)'
+					}),
+					stroke: new Stroke({           //线样式
+						color: '#ffcc33',
+						width: 2
+					}),
+					image: new Circle({            //点样式
+						radius: 7, 
+						fill: new Fill({
+							color: '#2d98da'
+						})
+					}),
+					text: new Text({
+						font: '16px Calibri,sans-serif',
+						text: "未保存地块",
+						fill: new Fill({
+						  color: "#c0392b"
+						}),
+						backgroundFill: new Fill({      // 填充背景
+							color: 'rgba(0,0,0,1)',
+						}),
+					})
+        })*/
+    });
+    
+    map.value.map.addInteraction(draw);
+    const maptemp=map.value.map;
+    const mapValues=map.value.map.values_;
+    const mapLyaerGruop=mapValues.layergroup;
+    console.log("layers:"+mapLyaerGruop);
+    const mapLayers=mapValues.layergroup.values_.layers;
+    console.log("layers:"+mapLayers);
+    const layersArray=mapLayers.array_;
+    console.log("layers:"+mapLayers.array_);
+     
+  //}
+  draw.on('drawend', ()  => {
+    console.log('绘制完成');
+
+    const sketchCoords_=draw.sketchCoords_;
+    console.log("sketchCoords_:"+sketchCoords_);
+
+    const coordinates = draw.coordinates;
+    console.log("coordinates:"+coordinates);
+
+  });
+
+}
+
+function drawPolygon(){
+  addInteraction();
+}
+function cancelDraw(){
+  map.value.map.removeInteraction(draw);
+  //addInteraction();
+}
+function removeDrawLayer(){
+  const source = vectorDraw.getSource();
+  const lastFeature = source.getFeatures().pop(); // 获取最后一个特征
+  if (lastFeature) {
+    source.removeFeature(lastFeature); // 将其删除
+  }
+
+  //draw.abortDrawing();
+  //map.value.map.removeLayer(vectorDraw);
+}
 
 
+function getPolygon(){
+  //console.log("getPolygon:"+draw);
+  //const geojson= {"type":"Polygon","coordinates":draw.sketchCoords_[0]}
+  //console.log("geojson:"+geojson);
+  storeGeoJSON(draw.sketchCoords_[0]);
+}
+//console.log("end map:"+map);
 
 onMounted(async () => {
  // const [MapModule, OSMModule] = await loadModules([
@@ -348,6 +468,44 @@ onMounted(async () => {
 
  // ]);
 });
+
+
+function importSubmit (e,filerow,fileList) {
+//  const inputEl = fileInput.value!;
+ //const file = (event.target as HTMLInputElement).files?.[0];
+   const file=filerow.raw;
+ if (file && file.type === 'application/zip') {
+
+   const zip =  JSZip.loadAsync(file);
+   const zipfiles=zip.files;
+   for (const filename of Object.keys(zip.files)) {
+     if (filename.endsWith('.shp')) {
+       const shpBlob =  zip.file(filename).async('arraybuffer');
+       
+       const shpReader = new FileReader();
+       shpReader.onloadend = async () => {
+         const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+         const vectorSource = new VectorSource({ features: shpSource });
+
+         // 创建矢量图层并添加到地图
+         const vectorLayer = new VectorLayer({
+           source: vectorSource,
+           // 设置样式
+         });
+
+         if (map) {
+          map.value.map.addLayer(vectorLayer);
+         }
+       };
+
+       shpReader.readAsArrayBuffer(shpBlob);
+       break; // 如果有多个SHP文件，此处决定是否只解析第一个
+     }
+   }
+ } else {
+   console.error('请选择类型为ZIP的文件进行上传。');
+ }
+};
 
 const handleFileUpload = async (event: Event) => {
 //  const inputEl = fileInput.value!;
@@ -372,7 +530,7 @@ const handleFileUpload = async (event: Event) => {
          });
 
          if (map) {
-           map.addLayer(vectorLayer);
+          map.value.map.addLayer(vectorLayer);
          }
        };
 
@@ -385,7 +543,56 @@ const handleFileUpload = async (event: Event) => {
  }
 };
 
+/*const raster = new TileLayer({
+  source: new OSM(),
+});
+*/
 
+/*const currentInstance = ref()
+    onMounted(() => {
+        currentInstance.value = getCurrentInstance()
+        const ctx=getCurrentInstance().ctx;
+        console.log("ctx:"+ctx);
+        const props=getCurrentInstance().ctx.$props;
+        console.log("props:"+props);
+        console.log("currentInstance.olmap:"+props);
+    });
+*/
+
+//http://192.168.0.102:9602/Pollution/storeGeoJSON
+function storeGeoJSON(coordinates) {
+    console.log("storeGeoJSON:"+coordinates);
+    // const geojson= {"type":"Polygon","coordinates":draw.sketchCoords_[0]}
+    let pointArray = "";
+    let stringsArray = [];
+    for(let i = 0; i < coordinates.length; i++) { 
+      console.log(coordinates[i]); 
+      //pointArray=pointArray+"["+coordinates[i]+"]";
+      if(i!=coordinates.length-1)
+       stringsArray.push("["+coordinates[i]+"],");
+      else
+        stringsArray.push("["+coordinates[i]+"]");
+      console.log("stringsArray:"+stringsArray);
+    }
+     pointArray=stringsArray.join('');
+    console.log("pointArray:"+pointArray);
+    let stringsArray1 = [];
+    /*stringsArray1.push(pointArray);
+    let stringsArray2 = [stringsArray1];
+    console.log("stringsArray2:"+stringsArray2);*/
+    //stringsArray1.push("[["+pointArray+"]]");
+
+    Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":"[["+pointArray+"]]"}).then((response) => {
+        const { code, msg: res } = response.data;
+        if (code === 200) {
+           console.log("计算结束");
+          ElMessage.success(msg ?? "Submitted!");
+           
+        } else {
+          ElMessage.error(msg);
+        }
+      });
+}
 
 </script>
 
@@ -404,6 +611,47 @@ const handleFileUpload = async (event: Event) => {
    text-align: center;
  }
  .map-left {
+   width: 10%;
+   height: 60%;
+   position: absolute;
+   background: #fff;
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+   position: absolute;
+   top: 6px;
+   overflow: auto;
+   padding: 10px;
+   .text {
+     font-size: 12px;
+     color: #cccccc;
+     padding-bottom: 10px;
+   }
+   .list {
+     width: 100%;
+     margin-top: 15px;
+     li {
+       border-bottom: 1px solid #e3e3e3;
+       padding: 5px 0;
+     }
+     .li {
+       width: 100%;
+       font-size: 16px;
+       color: #868585;
+       padding-bottom: 5px;
+     }
+     .text-li {
+       background: linear-gradient(red, green, blue);
+       -webkit-background-clip: text;
+       background-clip: text;
+       color: transparent;
+     }
+   }
+   button{
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0px;
+   }
+ }
+ .map-bottom {
    width: 98%;
    height: 40%;
    position: absolute;

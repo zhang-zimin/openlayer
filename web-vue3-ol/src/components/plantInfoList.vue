@@ -381,7 +381,6 @@ console.log("end typeSelect:"+typeSelect);
 function typeSelectChange() {
   console.log(typeSelect.value+":onchange:");
 }
-
 </script>
 
 <template><!--{{ msg }}-
@@ -403,7 +402,7 @@ function typeSelectChange() {
         <el-icon><Search /></el-icon>
          查询
         </el-button>
-        <span class="input-group">
+         <!--<span class="input-group">
           <label class="input-group-text" for="typeSelect">绘制多边形:</label>
           <select class="form-select" id="typeSelect" ref="typeSelect" @change="typeSelectChange">
              
@@ -411,8 +410,8 @@ function typeSelectChange() {
             
             <option value="None">取消</option>
           </select>
-          <input class="form-control" type="button" value="Undo" id="undo">
-        </span> 
+         <input class="form-control" type="button" value="Undo" id="undo">
+        </span> -->
 
         <!-- </div>
  <el-card>
