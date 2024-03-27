@@ -1,7 +1,6 @@
 <template>
   <div class="MonitoringData">
     <!-- style="width: 1200px;height: 600px;"-->
-    <!--@click="mapclick"-->
   
     <!-- 地图组件 -->
     <ol-map
@@ -10,6 +9,7 @@
     :loadTilesWhileAnimating="true"
     :loadTilesWhileInteracting="true"
     :style="mapstyle" 
+    @click="mapclick"
     >
 
     <!-- 视图 -->
@@ -174,46 +174,23 @@
     <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
     <!-- 上传文件组件 -->
-    <!-- <el-upload
+    <el-upload
       class="shapefile-upload"
       ref="upload"
       action="string"
       :file-list="uploadFiles"
       :auto-upload="true"
-      :on-progress="onProgress"
+      :on-progress="importSubmit"
       multiple="multiple"
       accept=".zip"
-      type="file"
-      name="file"
-      id="inFile"
-      @change="handleFileUpload"
     >
       <div class="upfile">
-        <el-button
-          size="small"
-          type="success"><el-icon><Upload /></el-icon>上传文件</el-button>
+      <el-button
+        size="small"
+        type="success"
+        class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件</el-button>
       </div>
-    </el-upload> -->
-
-
-
-    <div id="ShpUpload">
-      <!-- 用户选择文件部分 -->
-      <form enctype="multipart/form-data" method="post" id="uploadForm">
-        <div class="field">
-          <label class="file-upload">
-            <input type="file" name="file" id="inFile" accept=".zip" @change="handleFileUpload"/>
-          </label>
-        </div>
-      </form>
-      <span class="file-upload-status" style="opacity:1" id="upload-status"></span>
-      <div id="fileInfo"> </div>
-    </div>
-
-
-    <!-- <input type="file" id="fileInput" accept=".zip">
-    <button id="uploadButton">上传并解压</button> -->
-    <!-- <div id="status"></div> -->
+    </el-upload>  
 
     <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
     <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
@@ -257,6 +234,11 @@
         </li>
       </div>-->
     </div>
+
+    <div class="map-right">
+      <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
+    </div>
+
   </div>
 </template>
 
@@ -265,6 +247,7 @@
 import { ref, reactive, inject, onMounted  } from "vue";
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
+import RightInfoList from '@/components/rightInfoList.vue';
 import {getCurrentInstance} from "vue";
 import 'ol/ol.css';
 import {Map, View }from 'ol';
@@ -289,6 +272,8 @@ import {OSM, Vector as VectorSource2} from 'ol/source.js';
 import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
 import { Get, Post,Put } from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
+import {open} from 'shapefile'
+
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
 //console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 
@@ -328,6 +313,10 @@ const form = reactive({
   list: {},
 });
 const mapClickData = reactive({
+  input: "",
+  list: {},
+});
+const mapRightData = reactive({
   input: "",
   list: {},
 });
@@ -505,18 +494,119 @@ onMounted(async () => {
  // ]);
 });
 
+function doDownload (data, name) {
+        if (!data) {
+          return
+        }
+        let url = window.URL.createObjectURL(new Blob([data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', name)
 
+        document.body.appendChild(link)
+        link.click()
+      }
 
-// function importSubmit (e,filerow,fileList) {
-//  //const inputEl = fileInput.value!;
-//  //const file = (event.target as HTMLInputElement).files?.[0];
-//   const file=filerow.raw;
+function importSubmit (e,filerow,fileList) {
+ //const inputEl = fileInput.value!;
+ //const file = (event.target as HTMLInputElement).files?.[0];
+  const file=filerow.raw;
+  if (file && file.type === 'application/zip') {
+          // 读取zip压缩文件里面的文件内容
+          JSZip.loadAsync(file).then((zip) => {
+                for (let key in zip.files) {
+                  console.log(key, zip.files[key].name);
+                  const filename = zip.files[key].name; 
+                 if (filename.endsWith('.shp')) {
+                    let shpBlob =  zip.file(filename).async('arraybuffer');
+                    shpBlob.then(res => {
+                      //console.log(res);
+                      const resBlob=new Blob([res]);
+                      const shpReader = new FileReader();
+                       
+                      shpReader.readAsArrayBuffer(resBlob);
+                      shpReader.onload = function(e){
+                        let geometryArray = [];
+                        open(this.result).then(source => source.read()
+                                .then(function log(result) {
+                                    if (result.done) {
+                                      if(geometryArray.length>0)uploadShpGeoJSON(geometryArray);
+                                      return;
+                                    }
+                                    //console.log(result.value);
+                                    console.log(result.value.geometry);
+                                    geometryArray.push(result.value.geometry);
+                                    return source.read().then(log);
+                                }))
+                            .catch(error => console.error(error.stack));
+                    }
+/*
+                      shpReader.onloadend = async () => {
+                      const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+                      const vectorSource = new VectorSource({ features: shpSource });
+
+                    // 创建矢量图层并添加到地图
+                      const vectorLayer = new VectorLayer({
+                        source: vectorSource,
+                        // 设置样式
+                      });
+
+                      if (map) {
+                        map.value.map.addLayer(vectorLayer);
+                      }
+                    };
+
+                    
+                    //break; // 如果有多个SHP文件，此处决定是否只解析第一个
+*/
+                  })
+                  }
+
+                }
+              })
+            
+/*
+    const zip =  JSZip.loadAsync(file);
+    const zipfiles=zip.files;
+    for (const filename of Object.keys(zip.files)) {
+      if (filename.endsWith('.shp')) {
+        const shpBlob =  zip.file(filename).async('arraybuffer');
+        const shpReader = new FileReader();
+        shpReader.onloadend = async () => {
+          const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+          const vectorSource = new VectorSource({ features: shpSource });
+
+         // 创建矢量图层并添加到地图
+          const vectorLayer = new VectorLayer({
+            source: vectorSource,
+            // 设置样式
+          });
+
+          if (map) {
+            map.value.map.addLayer(vectorLayer);
+          }
+        };
+
+        shpReader.readAsArrayBuffer(shpBlob);
+        break; // 如果有多个SHP文件，此处决定是否只解析第一个
+      }
+    }*/
+  } else {
+    console.error('请选择类型为ZIP的文件进行上传。');
+  }
+};
+
+// const handleFileUpload = async (event: Event) => {
+// //  const inputEl = fileInput.value!;
+//   const file = (event.target as HTMLInputElement).files?.[0];
+
 //   if (file && file.type === 'application/zip') {
-//     const zip =  JSZip.loadAsync(file);
-//     const zipfiles=zip.files;
+//     const zip = await JSZip.loadAsync(file);
 //     for (const filename of Object.keys(zip.files)) {
 //       if (filename.endsWith('.shp')) {
-//         const shpBlob =  zip.file(filename).async('arraybuffer');
+//         const shpBlob = await zip.file(filename).async('arraybuffer');
+       
 //         const shpReader = new FileReader();
 //         shpReader.onloadend = async () => {
 //           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
@@ -542,7 +632,6 @@ onMounted(async () => {
 //   }
 // };
 
-
 /*const raster = new TileLayer({
   source: new OSM(),
 });
@@ -558,7 +647,7 @@ onMounted(async () => {
       console.log("currentInstance.olmap:"+props);
     });
 */
-
+const rightChildRef = ref(null);
 //http://192.168.0.102:9602/Pollution/storeGeoJSON
 function storeGeoJSON(coordinates) {
   console.log("storeGeoJSON:"+coordinates);
@@ -569,9 +658,9 @@ function storeGeoJSON(coordinates) {
     console.log(coordinates[i]); 
     //pointArray=pointArray+"["+coordinates[i]+"]";
     if(i!=coordinates.length-1)
-      stringsArray.push("["+coordinates[i]+"],");
+      stringsArray.push(""+coordinates[i]+",");
     else
-      stringsArray.push("["+coordinates[i]+"]");
+      stringsArray.push(""+coordinates[i]+"");
     console.log("stringsArray:"+stringsArray);
   }
   pointArray=stringsArray.join('');
@@ -582,18 +671,70 @@ function storeGeoJSON(coordinates) {
   console.log("stringsArray2:"+stringsArray2);*/
   //stringsArray1.push("[["+pointArray+"]]");
 
-  Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":"[["+pointArray+"]]"}).then((response) => {
-    const { code, msg: res } = response.data;
+  Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":pointArray}).then((response) => {
+    console.log("response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
     if (code === 200) {
-      console.log("计算结束");
+      console.log("计算结束:"+res);
+      mapRightData.list=res;
+      rightChildRef.value.childSelMethod(mapRightData.list);
       ElMessage.success(msg ?? "Submitted!");
         
     } else {
-      ElMessage.error(msg);
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
     }
   });
 }
 
+function uploadShpGeoJSON(geometryArray) {
+   let shpArray=geometryArray.join('');
+  //let shpArray=getGeometryJson(geometryArray);
+  console.log("shpArray:"+shpArray);
+Post('/Pollution/acceptShp',geometryArray).then((response) => {
+    console.log("response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("上传结束:"+res);
+      //mapRightData.list=res;
+      //rightChildRef.value.childSelMethod(mapRightData.list);
+      ElMessage.success(msg ?? "Submitted!");
+        
+    } else {
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
+    }
+  });
+}
+
+function getGeometryJson(geometryArray) {
+  let polygonStr = "";
+  let polygonArray = [];
+  for(let i = 0; i < getGeometryJson.length; i++) { 
+    console.log(geometryArray[i]);
+    polygonArray.push('{"type":"Polygon","coordinates":'+getPointStr(geometryArray[i].coordinates)+'}');
+  }
+  polygonStr=polygonArray.join('');
+  //console.log("polygonStr:"+polygonStr);
+  return polygonStr;
+}
+//解析一个coordinates为字符串 {type: 'Polygon', coordinates: Array(1)}
+function getPointStr(coordinates){
+  let pointArray = "";
+  let stringsArray = [];
+  for(let i = 0; i < coordinates.length; i++) { 
+    //console.log(coordinates[i]); 
+    //pointArray=pointArray+"["+coordinates[i]+"]";
+    if(i!=coordinates.length-1)
+      stringsArray.push(""+coordinates[i]+",");
+    else
+      stringsArray.push(""+coordinates[i]+"");
+    //console.log("stringsArray:"+stringsArray);
+  }
+  pointArray=stringsArray.join('');
+  //console.log("pointArray:"+pointArray);
+  return pointArray;
+}
 
 // shp上传
 // document.getElementById('shapefile-upload').addEventListener('change', function(e) {
@@ -656,6 +797,13 @@ function storeGeoJSON(coordinates) {
 
 
 
+// 处理文件上传
+// 先写一个parseShp函数 能返回GeoJSON
+
+
+
+
+
 
 
 
@@ -704,57 +852,10 @@ function storeGeoJSON(coordinates) {
 // function onProgress(ev) {
 //   // ...
 // }
+
+
+
 // --------------------------------------------------------------
-
-
-
-// function uploadZip(payload: Event | null, zip?: File) {
-//   const file = zip ? zip : Zip.value.files[0]
-//   if (file) {
-//     // 筛选压缩包不能超过1G
-//     let size = Number(file.size) / 1024 / 1024
-//     if (file.type != 'application/x-zip-compressed') {
-//       message.info(`有不是zip的文件夹-${file.name}，已过滤`)
-//       return
-//     } else if (size > 1024) {
-//       message.info(`有超过1G的压缩包-${file.name}，已过滤`)
-//       return
-//     }
-//     const reader = new FileReader();
-//     reader.onload = function () {
-//       const buffer = new Uint8Array(reader.result as ArrayBuffer);
-//       jszip.loadAsync(buffer).then((zip) => {
-//         const promises: Promise<void>[] = [];
-//         zip.forEach((relativePath, zipEntry) => {
-//           promises.push(new Promise((resolve, reject) => {
-//             zipEntry.async('blob').then((blob) => {
-//               const file = new File([blob], zipEntry.name);
-//               filtration(file)
-//               resolve();
-//             }).catch((err) => {
-//               reject(err);
-//             });
-//           }));
-//         });
-//         Promise.all(promises).then(() => {
-//           console.log(tableData.value, '解压出来的文件');
-//         }).catch((err) => {
-//           console.error(err);
-//         });
-//       }).catch((err) => {
-//         console.error(err);
-//       });
-//     };
-//     reader.readAsArrayBuffer(file);
-//   }
-// }
-
-
-
-
-var inFile = document.getElementById('inFile');
-console.log("inFile:" + inFile);
-
 
 
 </script>
@@ -824,6 +925,44 @@ console.log("inFile:" + inFile);
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
    position: absolute;
    bottom: 0px;
+   overflow: auto;
+   padding: 10px;
+   .text {
+     font-size: 12px;
+     color: #cccccc;
+     padding-bottom: 10px;
+   }
+   .list {
+     width: 100%;
+     margin-top: 15px;
+     li {
+       border-bottom: 1px solid #e3e3e3;
+       padding: 5px 0;
+     }
+     .li {
+       width: 100%;
+       font-size: 16px;
+       color: #868585;
+       padding-bottom: 5px;
+     }
+      .text-li {
+        background: linear-gradient(red, green, blue);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+    }
+  }
+
+  .map-right {
+   width: 28%;
+   height: 28%;
+   position: absolute;
+   background: #fff;
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+   position: absolute;
+   top: 6px;
+   right: 6px;
    overflow: auto;
    padding: 10px;
    .text {
