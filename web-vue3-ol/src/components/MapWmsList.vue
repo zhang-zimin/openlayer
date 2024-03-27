@@ -1,7 +1,6 @@
 <template>
   <div class="MonitoringData">
     <!-- style="width: 1200px;height: 600px;"-->
-    <!--@click="mapclick"-->
   
     <!-- 地图组件 -->
     <ol-map
@@ -10,6 +9,7 @@
     :loadTilesWhileAnimating="true"
     :loadTilesWhileInteracting="true"
     :style="mapstyle" 
+    @click="mapclick"
     >
 
     <!-- 视图 -->
@@ -180,10 +180,9 @@
       action="string"
       :file-list="uploadFiles"
       :auto-upload="true"
-      :on-progress="onProgress"
+      :on-progress="importSubmit"
       multiple="multiple"
       accept=".zip"
-      @change="handleFileUpload"
     >
       <div class="upfile">
       <el-button
@@ -235,6 +234,11 @@
         </li>
       </div>-->
     </div>
+
+    <div class="map-right">
+      <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
+    </div>
+
   </div>
 </template>
 
@@ -243,6 +247,7 @@
 import { ref, reactive, inject, onMounted  } from "vue";
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
+import RightInfoList from '@/components/rightInfoList.vue';
 import {getCurrentInstance} from "vue";
 import 'ol/ol.css';
 import {Map, View }from 'ol';
@@ -267,6 +272,8 @@ import {OSM, Vector as VectorSource2} from 'ol/source.js';
 import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
 import { Get, Post,Put } from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
+import {open} from 'shapefile'
+
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
 //console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 
@@ -306,6 +313,10 @@ const form = reactive({
   list: {},
 });
 const mapClickData = reactive({
+  input: "",
+  list: {},
+});
+const mapRightData = reactive({
   input: "",
   list: {},
 });
@@ -483,41 +494,108 @@ onMounted(async () => {
  // ]);
 });
 
+function doDownload (data, name) {
+        if (!data) {
+          return
+        }
+        let url = window.URL.createObjectURL(new Blob([data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', name)
 
-// function importSubmit (e,filerow,fileList) {
-//  //const inputEl = fileInput.value!;
-//  //const file = (event.target as HTMLInputElement).files?.[0];
-//   const file=filerow.raw;
-//   if (file && file.type === 'application/zip') {
-//     const zip =  JSZip.loadAsync(file);
-//     const zipfiles=zip.files;
-//     for (const filename of Object.keys(zip.files)) {
-//       if (filename.endsWith('.shp')) {
-//         const shpBlob =  zip.file(filename).async('arraybuffer');
-//         const shpReader = new FileReader();
-//         shpReader.onloadend = async () => {
-//           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-//           const vectorSource = new VectorSource({ features: shpSource });
+        document.body.appendChild(link)
+        link.click()
+      }
 
-//          // 创建矢量图层并添加到地图
-//           const vectorLayer = new VectorLayer({
-//             source: vectorSource,
-//             // 设置样式
-//           });
+function importSubmit (e,filerow,fileList) {
+ //const inputEl = fileInput.value!;
+ //const file = (event.target as HTMLInputElement).files?.[0];
+  const file=filerow.raw;
+  if (file && file.type === 'application/zip') {
+          // 读取zip压缩文件里面的文件内容
+          JSZip.loadAsync(file).then((zip) => {
+                for (let key in zip.files) {
+                  console.log(key, zip.files[key].name);
+                  const filename = zip.files[key].name; 
+                 if (filename.endsWith('.shp')) {
+                    let shpBlob =  zip.file(filename).async('arraybuffer');
+                    shpBlob.then(res => {
+                      //console.log(res);
+                      const resBlob=new Blob([res]);
+                      const shpReader = new FileReader();
+                       
+                      shpReader.readAsArrayBuffer(resBlob);
+                      shpReader.onload = function(e){
+                        let geometryArray = [];
+                        open(this.result).then(source => source.read()
+                                .then(function log(result) {
+                                    if (result.done) {
+                                      if(geometryArray.length>0)uploadShpGeoJSON(geometryArray);
+                                      return;
+                                    }
+                                    //console.log(result.value);
+                                    console.log(result.value.geometry);
+                                    geometryArray.push(result.value.geometry);
+                                    return source.read().then(log);
+                                }))
+                            .catch(error => console.error(error.stack));
+                    }
+/*
+                      shpReader.onloadend = async () => {
+                      const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+                      const vectorSource = new VectorSource({ features: shpSource });
 
-//           if (map) {
-//             map.value.map.addLayer(vectorLayer);
-//           }
-//         };
+                    // 创建矢量图层并添加到地图
+                      const vectorLayer = new VectorLayer({
+                        source: vectorSource,
+                        // 设置样式
+                      });
 
-//         shpReader.readAsArrayBuffer(shpBlob);
-//         break; // 如果有多个SHP文件，此处决定是否只解析第一个
-//       }
-//     }
-//   } else {
-//     console.error('请选择类型为ZIP的文件进行上传。');
-//   }
-// };
+                      if (map) {
+                        map.value.map.addLayer(vectorLayer);
+                      }
+                    };
+
+                    
+                    //break; // 如果有多个SHP文件，此处决定是否只解析第一个
+*/
+                  })
+                  }
+
+                }
+              })
+            
+/*
+    const zip =  JSZip.loadAsync(file);
+    const zipfiles=zip.files;
+    for (const filename of Object.keys(zip.files)) {
+      if (filename.endsWith('.shp')) {
+        const shpBlob =  zip.file(filename).async('arraybuffer');
+        const shpReader = new FileReader();
+        shpReader.onloadend = async () => {
+          const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+          const vectorSource = new VectorSource({ features: shpSource });
+
+         // 创建矢量图层并添加到地图
+          const vectorLayer = new VectorLayer({
+            source: vectorSource,
+            // 设置样式
+          });
+
+          if (map) {
+            map.value.map.addLayer(vectorLayer);
+          }
+        };
+
+        shpReader.readAsArrayBuffer(shpBlob);
+        break; // 如果有多个SHP文件，此处决定是否只解析第一个
+      }
+    }*/
+  } else {
+    console.error('请选择类型为ZIP的文件进行上传。');
+  }
+};
 
 // const handleFileUpload = async (event: Event) => {
 // //  const inputEl = fileInput.value!;
@@ -569,7 +647,7 @@ onMounted(async () => {
       console.log("currentInstance.olmap:"+props);
     });
 */
-
+const rightChildRef = ref(null);
 //http://192.168.0.102:9602/Pollution/storeGeoJSON
 function storeGeoJSON(coordinates) {
   console.log("storeGeoJSON:"+coordinates);
@@ -580,9 +658,9 @@ function storeGeoJSON(coordinates) {
     console.log(coordinates[i]); 
     //pointArray=pointArray+"["+coordinates[i]+"]";
     if(i!=coordinates.length-1)
-      stringsArray.push("["+coordinates[i]+"],");
+      stringsArray.push(""+coordinates[i]+",");
     else
-      stringsArray.push("["+coordinates[i]+"]");
+      stringsArray.push(""+coordinates[i]+"");
     console.log("stringsArray:"+stringsArray);
   }
   pointArray=stringsArray.join('');
@@ -593,18 +671,70 @@ function storeGeoJSON(coordinates) {
   console.log("stringsArray2:"+stringsArray2);*/
   //stringsArray1.push("[["+pointArray+"]]");
 
-  Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":"[["+pointArray+"]]"}).then((response) => {
-    const { code, msg: res } = response.data;
+  Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":pointArray}).then((response) => {
+    console.log("response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
     if (code === 200) {
-      console.log("计算结束");
+      console.log("计算结束:"+res);
+      mapRightData.list=res;
+      rightChildRef.value.childSelMethod(mapRightData.list);
       ElMessage.success(msg ?? "Submitted!");
         
     } else {
-      ElMessage.error(msg);
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
     }
   });
 }
 
+function uploadShpGeoJSON(geometryArray) {
+   let shpArray=geometryArray.join('');
+  //let shpArray=getGeometryJson(geometryArray);
+  console.log("shpArray:"+shpArray);
+Post('/Pollution/acceptShp',geometryArray).then((response) => {
+    console.log("response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("上传结束:"+res);
+      //mapRightData.list=res;
+      //rightChildRef.value.childSelMethod(mapRightData.list);
+      ElMessage.success(msg ?? "Submitted!");
+        
+    } else {
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
+    }
+  });
+}
+
+function getGeometryJson(geometryArray) {
+  let polygonStr = "";
+  let polygonArray = [];
+  for(let i = 0; i < getGeometryJson.length; i++) { 
+    console.log(geometryArray[i]);
+    polygonArray.push('{"type":"Polygon","coordinates":'+getPointStr(geometryArray[i].coordinates)+'}');
+  }
+  polygonStr=polygonArray.join('');
+  //console.log("polygonStr:"+polygonStr);
+  return polygonStr;
+}
+//解析一个coordinates为字符串 {type: 'Polygon', coordinates: Array(1)}
+function getPointStr(coordinates){
+  let pointArray = "";
+  let stringsArray = [];
+  for(let i = 0; i < coordinates.length; i++) { 
+    //console.log(coordinates[i]); 
+    //pointArray=pointArray+"["+coordinates[i]+"]";
+    if(i!=coordinates.length-1)
+      stringsArray.push(""+coordinates[i]+",");
+    else
+      stringsArray.push(""+coordinates[i]+"");
+    //console.log("stringsArray:"+stringsArray);
+  }
+  pointArray=stringsArray.join('');
+  //console.log("pointArray:"+pointArray);
+  return pointArray;
+}
 
 // shp上传
 // document.getElementById('shapefile-upload').addEventListener('change', function(e) {
@@ -795,6 +925,44 @@ function storeGeoJSON(coordinates) {
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
    position: absolute;
    bottom: 0px;
+   overflow: auto;
+   padding: 10px;
+   .text {
+     font-size: 12px;
+     color: #cccccc;
+     padding-bottom: 10px;
+   }
+   .list {
+     width: 100%;
+     margin-top: 15px;
+     li {
+       border-bottom: 1px solid #e3e3e3;
+       padding: 5px 0;
+     }
+     .li {
+       width: 100%;
+       font-size: 16px;
+       color: #868585;
+       padding-bottom: 5px;
+     }
+      .text-li {
+        background: linear-gradient(red, green, blue);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+    }
+  }
+
+  .map-right {
+   width: 28%;
+   height: 28%;
+   position: absolute;
+   background: #fff;
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+   position: absolute;
+   top: 6px;
+   right: 6px;
    overflow: auto;
    padding: 10px;
    .text {
