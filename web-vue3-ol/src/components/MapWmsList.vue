@@ -175,12 +175,12 @@
 
     <!-- 上传文件组件 -->
     <el-upload
-      class="upload"
+      class="shapefile-upload"
       ref="upload"
       action="string"
       :file-list="uploadFiles"
       :auto-upload="true"
-      :on-progress="importSubmit" 
+      :on-progress="onProgress"
       multiple="multiple"
       accept=".zip"
       @change="handleFileUpload"
@@ -260,6 +260,8 @@ import { Text } from "ol/style";
 import { Icon } from "ol/style";
 import { fromLonLat } from "ol/proj";
 import JSZip from 'jszip';
+import * as shp from 'shpjs';
+import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
 import {OSM, Vector as VectorSource2} from 'ol/source.js';
 import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
@@ -369,7 +371,7 @@ function mapclick(event){
 }
 
 // const shapefile = require("shapefile");
-
+const uploadFiles = ref([]);
 const map = ref(null);
 onMounted(() => {
   map.value.map.addLayer(vectorDraw);
@@ -482,75 +484,75 @@ onMounted(async () => {
 });
 
 
-function importSubmit (e,filerow,fileList) {
- //const inputEl = fileInput.value!;
- //const file = (event.target as HTMLInputElement).files?.[0];
-  const file=filerow.raw;
-  if (file && file.type === 'application/zip') {
-    const zip =  JSZip.loadAsync(file);
-    const zipfiles=zip.files;
-    for (const filename of Object.keys(zip.files)) {
-      if (filename.endsWith('.shp')) {
-        const shpBlob =  zip.file(filename).async('arraybuffer');
-        const shpReader = new FileReader();
-        shpReader.onloadend = async () => {
-          const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-          const vectorSource = new VectorSource({ features: shpSource });
+// function importSubmit (e,filerow,fileList) {
+//  //const inputEl = fileInput.value!;
+//  //const file = (event.target as HTMLInputElement).files?.[0];
+//   const file=filerow.raw;
+//   if (file && file.type === 'application/zip') {
+//     const zip =  JSZip.loadAsync(file);
+//     const zipfiles=zip.files;
+//     for (const filename of Object.keys(zip.files)) {
+//       if (filename.endsWith('.shp')) {
+//         const shpBlob =  zip.file(filename).async('arraybuffer');
+//         const shpReader = new FileReader();
+//         shpReader.onloadend = async () => {
+//           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+//           const vectorSource = new VectorSource({ features: shpSource });
 
-         // 创建矢量图层并添加到地图
-          const vectorLayer = new VectorLayer({
-            source: vectorSource,
-            // 设置样式
-          });
+//          // 创建矢量图层并添加到地图
+//           const vectorLayer = new VectorLayer({
+//             source: vectorSource,
+//             // 设置样式
+//           });
 
-          if (map) {
-            map.value.map.addLayer(vectorLayer);
-          }
-        };
+//           if (map) {
+//             map.value.map.addLayer(vectorLayer);
+//           }
+//         };
 
-        shpReader.readAsArrayBuffer(shpBlob);
-        break; // 如果有多个SHP文件，此处决定是否只解析第一个
-      }
-    }
-  } else {
-    console.error('请选择类型为ZIP的文件进行上传。');
-  }
-};
+//         shpReader.readAsArrayBuffer(shpBlob);
+//         break; // 如果有多个SHP文件，此处决定是否只解析第一个
+//       }
+//     }
+//   } else {
+//     console.error('请选择类型为ZIP的文件进行上传。');
+//   }
+// };
 
-const handleFileUpload = async (event: Event) => {
-//  const inputEl = fileInput.value!;
-  const file = (event.target as HTMLInputElement).files?.[0];
+// const handleFileUpload = async (event: Event) => {
+// //  const inputEl = fileInput.value!;
+//   const file = (event.target as HTMLInputElement).files?.[0];
 
-  if (file && file.type === 'application/zip') {
-    const zip = await JSZip.loadAsync(file);
-    for (const filename of Object.keys(zip.files)) {
-      if (filename.endsWith('.shp')) {
-        const shpBlob = await zip.file(filename).async('arraybuffer');
+//   if (file && file.type === 'application/zip') {
+//     const zip = await JSZip.loadAsync(file);
+//     for (const filename of Object.keys(zip.files)) {
+//       if (filename.endsWith('.shp')) {
+//         const shpBlob = await zip.file(filename).async('arraybuffer');
        
-        const shpReader = new FileReader();
-        shpReader.onloadend = async () => {
-          const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-          const vectorSource = new VectorSource({ features: shpSource });
+//         const shpReader = new FileReader();
+//         shpReader.onloadend = async () => {
+//           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+//           const vectorSource = new VectorSource({ features: shpSource });
 
-         // 创建矢量图层并添加到地图
-          const vectorLayer = new VectorLayer({
-            source: vectorSource,
-            // 设置样式
-          });
+//          // 创建矢量图层并添加到地图
+//           const vectorLayer = new VectorLayer({
+//             source: vectorSource,
+//             // 设置样式
+//           });
 
-          if (map) {
-            map.value.map.addLayer(vectorLayer);
-          }
-        };
+//           if (map) {
+//             map.value.map.addLayer(vectorLayer);
+//           }
+//         };
 
-        shpReader.readAsArrayBuffer(shpBlob);
-        break; // 如果有多个SHP文件，此处决定是否只解析第一个
-      }
-    }
-  } else {
-    console.error('请选择类型为ZIP的文件进行上传。');
-  }
-};
+//         shpReader.readAsArrayBuffer(shpBlob);
+//         break; // 如果有多个SHP文件，此处决定是否只解析第一个
+//       }
+//     }
+//   } else {
+//     console.error('请选择类型为ZIP的文件进行上传。');
+//   }
+// };
 
 /*const raster = new TileLayer({
   source: new OSM(),
@@ -602,6 +604,130 @@ function storeGeoJSON(coordinates) {
     }
   });
 }
+
+
+// shp上传
+// document.getElementById('shapefile-upload').addEventListener('change', function(e) {
+//   const file = e.target.files[0];
+
+//   // 读取zip文件
+//   const reader = new FileReader();
+//   reader.onload = async function(e) {
+//     const zip = await JSZip.loadAsync(e.target.result);
+
+//     // 查找并读取shp、shx和dbf文件
+//     let shpContent, shxContent, dbfContent;
+//     for (const filename of Object.keys(zip.files)) {
+//       if (filename.endsWith('.shp')) {
+//         shpContent = await zip.files[filename].async('arraybuffer');
+//       } else if (filename.endsWith('.shx')) {
+//         shxContent = await zip.files[filename].async('arraybuffer');
+//       } else if (filename.endsWith('.dbf')) {
+//         dbfContent = await zip.files[filename].async('arraybuffer');
+//       }
+//     }
+
+//     // 将SHP转换为GeoJSON（这里假设使用mapshaper）
+//     const combinedBuffers = [shpContent, shxContent, dbfContent].join('');
+//     const result = await MapShaper.applyCommands(['-i inmemory', '-proj wgs84', '-o format=geojson out'], combinedBuffers);
+
+//     // 从结果中提取GeoJSON
+//     const geojson = JSON.parse(result.info.out_files.out.json);
+
+//     // 在OpenLayers中显示GeoJSON
+//     const vectorSource = new ol.source.Vector({
+//       features: (new ol.format.GeoJSON()).readFeatures(geojson)
+//     });
+
+//     const vectorLayer = new ol.layer.Vector({
+//       source: vectorSource,
+//       style: new ol.style.Style({
+//         fill: new ol.style.Fill({
+//           color: 'rgba(255, 255, 255, 0.2)'
+//         }),
+//         stroke: new ol.style.Stroke({
+//           color: '#ffcc33',
+//           width: 2
+//         })
+//       })
+//     });
+
+//     const map = new ol.Map({
+//       layers: [vectorLayer],
+//       target: 'map',
+//       view: new ol.View({
+//         center: ol.proj.fromLonLat([0, 0]),
+//         zoom: 2
+//       })
+//     });
+//   };
+
+//   reader.readAsArrayBuffer(file);
+// });
+
+
+
+// 处理文件上传
+// 先写一个parseShp函数 能返回GeoJSON
+
+
+
+
+
+
+
+
+
+
+
+
+// async function handleFileUpload(fileList) {
+//   const file = fileList[0];
+//   if (!file) return;
+
+//   const reader = new FileReader();
+//   reader.readAsArrayBuffer(file.raw);
+
+//   reader.onload = async () => {
+//     const zip = await JSZip.loadAsync(reader.result);
+//     for (const relativePath of Object.keys(zip.files)) {
+//       if (relativePath.toLowerCase().endsWith('.shp')) {
+//         const shpBuffer = await zip.files[relativePath].async('arraybuffer');
+//         const geojson = await parseShp(shpBuffer); // 假设有parseShp函数能返回GeoJSON
+
+//         // 创建矢量源和矢量图层
+//         const vectorSource = new VectorSource({
+//           features: new GeoJSON().readFeatures(geojson),
+//         });
+//         const vectorLayer = new VectorLayer({
+//           source: vectorSource,
+//         });
+
+//         // 加载到地图上
+//         if (map.value) {
+//           map.value.addLayer(vectorLayer);
+//         } else {
+//           console.error('Map is not initialized yet.');
+//         }
+//       }
+//     }
+//   };
+
+//   reader.onerror = err => {
+//     console.error('Error reading uploaded ZIP file:', err);
+//   };
+// }
+
+// // 用于处理进度，若不需要可移除或替换为实际的进度处理函数
+// function onProgress(ev) {
+//   // ...
+// }
+
+
+
+// --------------------------------------------------------------
+
+
 </script>
 
 
