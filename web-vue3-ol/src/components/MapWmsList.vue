@@ -174,7 +174,7 @@
     <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
     <!-- 上传文件组件 -->
-    <!-- <el-upload
+    <el-upload
       class="shapefile-upload"
       ref="upload"
       action="string"
@@ -183,37 +183,15 @@
       :on-progress="onProgress"
       multiple="multiple"
       accept=".zip"
-      type="file"
-      name="file"
-      id="inFile"
       @change="handleFileUpload"
     >
       <div class="upfile">
-        <el-button
-          size="small"
-          type="success"><el-icon><Upload /></el-icon>上传文件</el-button>
+      <el-button
+        size="small"
+        type="success"
+        class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件</el-button>
       </div>
-    </el-upload> -->
-
-
-
-    <div id="ShpUpload">
-      <!-- 用户选择文件部分 -->
-      <form enctype="multipart/form-data" method="post" id="uploadForm">
-        <div class="field">
-          <label class="file-upload">
-            <input type="file" name="file" id="inFile" accept=".zip" @change="handleFileUpload"/>
-          </label>
-        </div>
-      </form>
-      <span class="file-upload-status" style="opacity:1" id="upload-status"></span>
-      <div id="fileInfo"> </div>
-    </div>
-
-
-    <!-- <input type="file" id="fileInput" accept=".zip">
-    <button id="uploadButton">上传并解压</button> -->
-    <!-- <div id="status"></div> -->
+    </el-upload>  
 
     <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
     <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
@@ -506,7 +484,6 @@ onMounted(async () => {
 });
 
 
-
 // function importSubmit (e,filerow,fileList) {
 //  //const inputEl = fileInput.value!;
 //  //const file = (event.target as HTMLInputElement).files?.[0];
@@ -542,6 +519,40 @@ onMounted(async () => {
 //   }
 // };
 
+// const handleFileUpload = async (event: Event) => {
+// //  const inputEl = fileInput.value!;
+//   const file = (event.target as HTMLInputElement).files?.[0];
+
+//   if (file && file.type === 'application/zip') {
+//     const zip = await JSZip.loadAsync(file);
+//     for (const filename of Object.keys(zip.files)) {
+//       if (filename.endsWith('.shp')) {
+//         const shpBlob = await zip.file(filename).async('arraybuffer');
+       
+//         const shpReader = new FileReader();
+//         shpReader.onloadend = async () => {
+//           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
+//           const vectorSource = new VectorSource({ features: shpSource });
+
+//          // 创建矢量图层并添加到地图
+//           const vectorLayer = new VectorLayer({
+//             source: vectorSource,
+//             // 设置样式
+//           });
+
+//           if (map) {
+//             map.value.map.addLayer(vectorLayer);
+//           }
+//         };
+
+//         shpReader.readAsArrayBuffer(shpBlob);
+//         break; // 如果有多个SHP文件，此处决定是否只解析第一个
+//       }
+//     }
+//   } else {
+//     console.error('请选择类型为ZIP的文件进行上传。');
+//   }
+// };
 
 /*const raster = new TileLayer({
   source: new OSM(),
@@ -656,6 +667,13 @@ function storeGeoJSON(coordinates) {
 
 
 
+// 处理文件上传
+// 先写一个parseShp函数 能返回GeoJSON
+
+
+
+
+
 
 
 
@@ -704,57 +722,10 @@ function storeGeoJSON(coordinates) {
 // function onProgress(ev) {
 //   // ...
 // }
+
+
+
 // --------------------------------------------------------------
-
-
-
-// function uploadZip(payload: Event | null, zip?: File) {
-//   const file = zip ? zip : Zip.value.files[0]
-//   if (file) {
-//     // 筛选压缩包不能超过1G
-//     let size = Number(file.size) / 1024 / 1024
-//     if (file.type != 'application/x-zip-compressed') {
-//       message.info(`有不是zip的文件夹-${file.name}，已过滤`)
-//       return
-//     } else if (size > 1024) {
-//       message.info(`有超过1G的压缩包-${file.name}，已过滤`)
-//       return
-//     }
-//     const reader = new FileReader();
-//     reader.onload = function () {
-//       const buffer = new Uint8Array(reader.result as ArrayBuffer);
-//       jszip.loadAsync(buffer).then((zip) => {
-//         const promises: Promise<void>[] = [];
-//         zip.forEach((relativePath, zipEntry) => {
-//           promises.push(new Promise((resolve, reject) => {
-//             zipEntry.async('blob').then((blob) => {
-//               const file = new File([blob], zipEntry.name);
-//               filtration(file)
-//               resolve();
-//             }).catch((err) => {
-//               reject(err);
-//             });
-//           }));
-//         });
-//         Promise.all(promises).then(() => {
-//           console.log(tableData.value, '解压出来的文件');
-//         }).catch((err) => {
-//           console.error(err);
-//         });
-//       }).catch((err) => {
-//         console.error(err);
-//       });
-//     };
-//     reader.readAsArrayBuffer(file);
-//   }
-// }
-
-
-
-
-var inFile = document.getElementById('inFile');
-console.log("inFile:" + inFile);
-
 
 
 </script>

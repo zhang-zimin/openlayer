@@ -1,109 +1,160 @@
 <template>
-  <div class="bottom-table">
-    <!-- 表格上面那一排按钮 -->
-    <div class="bottom-button">
-      <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>计算</el-button>
-      <el-button type="primary" @click="UpdateWry"><el-icon><Refresh /></el-icon>更新</el-button>
-      <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">
-        <el-icon><Download /></el-icon>csv下载
-      </el-button>
-      <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
-        <el-icon><Download /></el-icon>shp下载
-      </el-button>
-      <el-input v-model="username" placeholder="填写查询信息"/>
+<!--{{ msg }}-
+  <h1 v-if="selData.hasOwnProperty('OBJECTID')">Vue is awesome! {{ selData }}</h1>
+  <h1 v-else>Oh no 😢</h1>-->
+  <!--<h3>{{ msg }}</h3>
+    <div class="text">信息列表</div>
+    <div class="flexbox">-->
+      <!--<el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />-->
+  <div>
+  <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>计算</el-button>
+  <el-button type="primary" @click="UpdateWry"><el-icon><Refresh /></el-icon>更新</el-button>
+  <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">
+    <el-icon><Download /></el-icon>csv下载
+  </el-button>
+  <!-- <el-input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" /> -->
+  <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
+    <el-icon><Download /></el-icon>shp下载
+  </el-button>
+  <el-input v-model="username" placeholder="填写查询信息"/>
+  <el-button type="primary" @click="query"> 
+    <el-icon><Search /></el-icon>查询
+  </el-button>
+
+  <!-- </div>
+  <el-card>
+    <div class="query-input">
+      <el-input v-model="username" placeholder="请输入用户名"/>
+      <el-input v-model="email" placeholder="请输入邮箱"/>
       <el-button type="primary" @click="query"> 
         <el-icon><Search /></el-icon>查询
       </el-button>
-    </div>
+      <el-button type="danger" @click="query2">
+        <el-icon><Refresh /></el-icon>重置
+      </el-button>
+    </div> 
+  </el-card>-->
 
-    <el-card style="margin-top:-15px; height: 600px">
-      <el-table 
-        :data="showrows" stripe style="width: 100%" row-key="id"
-        :has-n-o="false"
-        height="450"
-        :cell-class-name="tableCellClassName"
-        @row-dblclick="dbclick"
-        @sort-change="handleSortChange"
-        >
-        <ecnpm install v-fit-columns --save prop="OBJECTID" label="OBJECTID" width="120" sortable="custom"/>
-        <el-table-column prop="id" label="id" width="70" sortable="custom"/>
-        <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="160" sortable="custom"/>
-        <el-table-column prop="draintype" label="draintype" width="120" sortable="custom"/>
-        <el-table-column prop="drainsubtype" label="drainsubtype" width="80" sortable="custom"/>
-        <el-table-column prop="agriculturetype" label="agriculturetype" width="80" sortable="custom"/>
-        <el-table-column prop="username" label="username" width="80" sortable="custom"/>
-        <el-table-column prop="useraddress" label="useraddress" width="110" sortable="custom"/>
-        <el-table-column prop="codinflow" label="codinflow" width="80" sortable="custom"/>
-        <el-table-column prop="codstandard" label="codstandard" width="80" editable sortable="custom">
+  <!--
+  <el-card>
+    <el-table :data="tableData" stripe style="width: 100%">
+    <el-table-column prop="username" label="姓名" width="180" />
+    <el-table-column prop="sex" label="性别" width="180" />
+    <el-table-column prop="age" label="年龄" width="180" />
+    <el-table-column prop="email" label="邮箱" width="180" />
+    <el-table-column prop="phone" label="电话" width="180" />
+    <el-table-column prop="address" label="地址"  />
+    <el-table-column fixed="right" label="操作" width="180">
+      <template #default>
+        <el-button type="primary" size="small" >编辑</el-button>
+        <el-button type="danger" size="small">删除</el-button>
+      </template>
+    </el-table-column>
+
+  </el-table>
+  <div class="demo-pagination-block">
+    <el-pagination
+      v-model:current-page="currentPage4"
+      v-model:page-size="pageSize4"
+      :page-sizes="[100, 200, 300, 400]"
+      :small="small"
+      :disabled="disabled"
+      :background="background"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="400"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
+  </div>
+  </el-card>-->
+  <!-- </div> -->
+  <!--@sort-change="sortChange"-->
+  <el-card>
+    <el-table :data="showrows" stripe style="width: 100%" row-key="id"
+      :has-n-o="false"
+      :cell-class-name="tableCellClassName"
+      @row-dblclick="dbclick"
+      @sort-change="handleSortChange"
+      v-sticky="{ top: '50px', parent: '.table-box', zIndex: 996 }">
+      <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
+      <el-table-column prop="id" label="id" width="80" sortable="custom"/>
+      <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>
+      <el-table-column prop="draintype" label="draintype" width="80" sortable="custom"/>
+      <el-table-column prop="drainsubtype" label="drainsubtype" width="80" sortable="custom"/>
+      <el-table-column prop="agriculturetype" label="agriculturetype" width="80" sortable="custom"/>
+      <el-table-column prop="username" label="username" width="80" sortable="custom"/>
+      <el-table-column prop="useraddress" label="useraddress" width="80" sortable="custom"/>
+      <el-table-column prop="codinflow" label="codinflow" width="80" sortable="custom"/>
+      <el-table-column prop="codstandard" label="codstandard" width="80" editable sortable="custom">
+        <template v-slot="scope">
+          <el-input
+            v-if="scope.row.index + ',' + scope.column.index == currentCell"
+            :ref="scope.row.index + ',' + scope.column.index"
+            v-model="scope.row.codstandard"
+            @blur="hideInput(scope.row)"
+            @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+          />
+            <span v-else>{{ scope.row.codstandard }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column prop="nh3standard" label="nh3standard" width="80" editable sortable="custom">
           <template v-slot="scope">
             <el-input
               v-if="scope.row.index + ',' + scope.column.index == currentCell"
               :ref="scope.row.index + ',' + scope.column.index"
-              v-model="scope.row.codstandard"
+              v-model="scope.row.nh3standard"
               @blur="hideInput(scope.row)"
               @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
             />
-              <span v-else>{{ scope.row.codstandard }}</span>
+            <span v-else>{{ scope.row.nh3standard }}</span>
           </template>
         </el-table-column>
-          <el-table-column prop="nh3standard" label="nh3standard" width="80" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.nh3standard"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.nh3standard }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="tpstandard" label="tpstandard" width="80" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.tpstandard"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.tpstandard }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.inflowcoefficient"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.inflowcoefficient }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="coddischarge" label="coddischarge" width="80" sortable="custom"/>
-          <el-table-column prop="nh3discharge" label="nh3discharge" width="80" sortable="custom"/>
-          <el-table-column prop="tpdischarge" label="tpdischarge" width="80" sortable="custom"/>
-          <el-table-column prop="nh3inflow" label="nh3inflow" width="80" sortable="custom"/>
-          <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
-      </el-table>
-          
-      <div class="demo-pagination-block">
-        <el-pagination
-          v-model:current-page="currentPage4"
-          v-model:page-size="pageSize4"
-          :page-sizes="[10, 20, 50, 100]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="showtotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
+        <el-table-column prop="tpstandard" label="tpstandard" width="80" editable sortable="custom">
+          <template v-slot="scope">
+            <el-input
+              v-if="scope.row.index + ',' + scope.column.index == currentCell"
+              :ref="scope.row.index + ',' + scope.column.index"
+              v-model="scope.row.tpstandard"
+              @blur="hideInput(scope.row)"
+              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+            />
+            <span v-else>{{ scope.row.tpstandard }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable sortable="custom">
+          <template v-slot="scope">
+            <el-input
+              v-if="scope.row.index + ',' + scope.column.index == currentCell"
+              :ref="scope.row.index + ',' + scope.column.index"
+              v-model="scope.row.inflowcoefficient"
+              @blur="hideInput(scope.row)"
+              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+            />
+            <span v-else>{{ scope.row.inflowcoefficient }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="coddischarge" label="coddischarge" width="80" sortable="custom"/>
+        <el-table-column prop="nh3discharge" label="nh3discharge" width="80" sortable="custom"/>
+        <el-table-column prop="tpdischarge" label="tpdischarge" width="80" sortable="custom"/>
+        <el-table-column prop="nh3inflow" label="nh3inflow" width="80" sortable="custom"/>
+        <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
+       </el-table>
+        
+    <div class="demo-pagination-block">
+      <el-pagination
+        v-model:current-page="currentPage4"
+        v-model:page-size="pageSize4"
+        :page-sizes="[10, 20, 50, 100]"
+        :small="small"
+        :disabled="disabled"
+        :background="background"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="showtotal"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+  </el-card>
   </div>
 </template>
 
@@ -482,15 +533,12 @@ function typeSelectChange() {
   margin-right: 5px;
   width: 300px;
 }
-.bottom-button {
-  margin-top: 10px;
-}
 .query-input{
   display: flex;
   justify-content:center
 }
 .el-card{
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
 .demo-pagination-block{
   display: flex;

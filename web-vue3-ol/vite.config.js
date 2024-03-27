@@ -39,7 +39,7 @@ export default defineConfig({
     //这里的ip和端口是前端项目的;下面为需要跨域访问后端项目
     proxy: {
       '/api': {   // '/api'是代理标识，用于告诉node，url前面是/api的就是使用代理的
-        target: 'http://1.1.1.200:9602',//这里填入你要请求的接口的前缀
+        target: 'http://192.168.0.103:9602',//这里填入你要请求的接口的前缀
         //ws: false,//代理websocked
         changeOrigin: true,  //是否跨域
         //secure: true,  //是否https接口
