@@ -250,7 +250,7 @@ import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
 import {getCurrentInstance} from "vue";
 import 'ol/ol.css';
-import {Map, View }from 'ol';
+import {Feature, Map, View }from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { GeoJSON } from "ol/format";
@@ -470,6 +470,7 @@ function removeDrawLayer(){
   const source = vectorDraw.getSource();
   const lastFeature = source.getFeatures().pop(); // 获取最后一个特征
   if (lastFeature) {
+    console.log("lastFeature:"+lastFeature);
     source.removeFeature(lastFeature); // 将其删除
   }
 
@@ -528,15 +529,32 @@ function importSubmit (e,filerow,fileList) {
                       shpReader.readAsArrayBuffer(resBlob);
                       shpReader.onload = function(e){
                         let geometryArray = [];
+                        let featuresArray = [];
+                        const id=ref(0);
                         open(this.result).then(source => source.read()
                                 .then(function log(result) {
                                     if (result.done) {
-                                      if(geometryArray.length>0)uploadShpGeoJSON(geometryArray);
+                                      if(geometryArray.length>0){
+                                        showFeaturesMap(featuresArray);
+                                        uploadShpGeoJSON(geometryArray);
+                                      }
                                       return;
                                     }
+                                    if(result.value.id){
+                                      console.log("have id:"+result.value.id);
+                                    }else{
+                                      id.value++;
+                                      result.value.id=id.value;
+                                      console.log("no id:"+id.value);
+                                    }
+
                                     //console.log(result.value);
                                     console.log(result.value.geometry);
                                     geometryArray.push(result.value.geometry);
+                                    const geometry=new Polygon(result.value.geometry.coordinates);
+                                    const feature=new Feature(geometry); 
+                                    // const feature=new Feature(result.value.geometry); 
+                                    featuresArray.push(feature);
                                     return source.read().then(log);
                                 }))
                             .catch(error => console.error(error.stack));
@@ -687,6 +705,21 @@ function storeGeoJSON(coordinates) {
   });
 }
 
+function showFeaturesMap(features) {
+  const vectorSource = new VectorSource({ features: features});
+  // vectorSource.addFeatures(features);
+         // 创建矢量图层并添加到地图
+          const vectorLayer = new VectorLayer({
+            source: vectorSource,
+            // 设置样式
+          });
+
+          if (map) {
+            map.value.map.addLayer(vectorLayer);
+          }
+       
+}
+
 function uploadShpGeoJSON(geometryArray) {
    let shpArray=geometryArray.join('');
   //let shpArray=getGeometryJson(geometryArray);
@@ -696,8 +729,8 @@ Post('/Pollution/acceptShp',geometryArray).then((response) => {
     const { code, msg,data: res } = response.data;
     if (code === 200) {
       console.log("上传结束:"+res);
-      //mapRightData.list=res;
-      //rightChildRef.value.childSelMethod(mapRightData.list);
+      mapRightData.list=res;
+      rightChildRef.value.childSelMethod(mapRightData.list);
       ElMessage.success(msg ?? "Submitted!");
         
     } else {
