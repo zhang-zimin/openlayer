@@ -69,13 +69,15 @@
   </el-card>-->
   <!-- </div> -->
   <!--@sort-change="sortChange"-->
-  <el-card>
-    <el-table :data="showrows" stripe style="width: 100%" row-key="id"
-      :has-n-o="false"
-      :cell-class-name="tableCellClassName"
-      @row-dblclick="dbclick"
-      @sort-change="handleSortChange"
-      v-sticky="{ top: '50px', parent: '.table-box', zIndex: 996 }">
+  <el-card style="margin-top:-15px; height: 600px">
+      <el-table 
+        :data="showrows" stripe style="width: 100%" row-key="id"
+        :has-n-o="false"
+        height="450"
+        :cell-class-name="tableCellClassName"
+        @row-dblclick="dbclick"
+        @sort-change="handleSortChange"
+        >
       <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
       <el-table-column prop="id" label="id" width="80" sortable="custom"/>
       <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>

@@ -743,7 +743,7 @@ Post('/Pollution/acceptShp',geometryArray).then((response) => {
 function getGeometryJson(geometryArray) {
   let polygonStr = "";
   let polygonArray = [];
-  for(let i = 0; i < getGeometryJson.length; i++) { 
+  for(let i = 0; i < geometryArray.length; i++) { 
     console.log(geometryArray[i]);
     polygonArray.push('{"type":"Polygon","coordinates":'+getPointStr(geometryArray[i].coordinates)+'}');
   }
@@ -989,7 +989,7 @@ function getPointStr(coordinates){
 
   .map-right {
    width: 28%;
-   height: 28%;
+   height: 60%;
    position: absolute;
    background: #fff;
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
