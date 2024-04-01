@@ -512,7 +512,7 @@ function importSubmit (e,filerow,fileList) {
  //const inputEl = fileInput.value!;
  //const file = (event.target as HTMLInputElement).files?.[0];
   const file=filerow.raw;
-  if (file && file.type === 'application/zip') {
+  if (file && (file.type === 'application/zip'|| file.type === 'application/x-zip-compressed')){
           // 读取zip压缩文件里面的文件内容
           JSZip.loadAsync(file).then((zip) => {
                 for (let key in zip.files) {
