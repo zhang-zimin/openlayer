@@ -1,8 +1,8 @@
 <template>
-  <div class="MonitoringData">
-    <div id="title" style="height: 5px;" v-drag>中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院</div>
+  <!-- <div class="MonitoringData"> -->
+    <!-- <div id="title" style="height: 5px;" v-drag>中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院</div> -->
     <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.2.0/split.min.js"></script> -->
-    <div id="a" class="split split-horizontal">
+    <!-- <div id="a" class="split split-horizontal">
       <div id="d" class="split content">d</div>
     </div>
     <div id="b" class="split split-horizontal">
@@ -11,13 +11,74 @@
     </div>
     <div id="c" class="split split-horizontal">
       <div id="g" class="split content">g</div>
+    </div> -->
+
+    <!-- <split-pane split="horizontal" @resize="resize" :min-percent="40">
+    <div slot="paneL">
+        <div class="left-container">11111111</div>
     </div>
+    <template slot="paneR">
+      <split-pane split="vertical" :min-percent="30">
+        <template slot="paneL">
+            <div class="top-container"></div>
+        </template>
+        <template slot="paneR">
+            <div class="bottom-container"></div>
+        </template>
+      </split-pane>
+    </template>
 
+  </split-pane> -->
 
+  <div id="app">
+  <splitpanes class="default-theme">
+    <pane min-size="20">
+      <!-- 111111111111111111111111111111 -->
+       1
+      <br/><div class="specs">
+        
+        <div class="map-left">
+    <el-button type="primary" @click="drawPolygon">
+      <el-icon><EditPen /></el-icon>绘制多边形
+    </el-button>
+    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
+    <el-button type="primary" @click="removeDrawLayer">
+      <el-icon><Delete /></el-icon>清除绘制
+    </el-button>
+    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
+    <!-- 上传文件组件 -->
+    <el-upload
+      class="shapefile-upload"
+      ref="upload"
+      action="string"
+      :file-list="uploadFiles"
+      :auto-upload="true"
+      :on-progress="importSubmit"
+      multiple="multiple"
+      accept=".zip"
+    >
+      <div class="upfile">
+      <el-button
+        size="small"
+        type="success"
+        class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件</el-button>
+      </div>
+    </el-upload>  
 
-
-    <!-- 地图组件 -->
+    <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
+    <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
+    <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
+      </div>
+      </div></pane>
+    <pane>
+      <splitpanes class="default-theme" horizontal="horizontal">
+        <pane min-size="15">
+        <!-- 22222222222222222222222222222222222222 -->
+2
+          <br/><div class="specs">
+            
+                      <!-- 地图组件 -->
     <ol-map
     ref="map" 
     id="map"
@@ -168,53 +229,14 @@
       </template>
     </ol-overlay>
     </ol-map>
-<!--
-  <div id="popup" class="ol-popup">
-    <div id="popup-closer" class="ol-popup-closer">X</div>
-    <div id="popup-detail" class="ol-popup-detail">查看详情</div>
-    <div id="popup-content" class="popup-content">
-    </div>
-  </div>-->
-    
-
-
-  <div class="map-left">
-    <el-button type="primary" @click="drawPolygon">
-      <el-icon><EditPen /></el-icon>绘制多边形
-    </el-button>
-    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
-    <el-button type="primary" @click="removeDrawLayer">
-      <el-icon><Delete /></el-icon>清除绘制
-    </el-button>
-    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
-
-    <!-- 上传文件组件 -->
-    <el-upload
-      class="shapefile-upload"
-      ref="upload"
-      action="string"
-      :file-list="uploadFiles"
-      :auto-upload="true"
-      :on-progress="importSubmit"
-      multiple="multiple"
-      accept=".zip"
-    >
-      <div class="upfile">
-      <el-button
-        size="small"
-        type="success"
-        class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件</el-button>
-      </div>
-    </el-upload>  
-
-    <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
-    <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
-    <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
-    </div>
-
-
-    <!-- 点击按钮展开表格 -->
-    <el-button 
+          </div></pane>
+        <!-- <pane>3</pane> -->
+        <pane>
+          <!-- 44444444444444444444 -->
+4
+<div>
+                <!-- 点击按钮展开表格 -->
+                <el-button 
     type="primary" 
     v-show="!modelSatus.status" 
     @click="modelSatus.status=true"
@@ -249,10 +271,37 @@
         </li>
       </div>-->
     </div>
-
-    <div class="map-right">
+</div>
+        </pane>
+      </splitpanes>
+    </pane>
+    <pane>
+      <!-- 555555555555555555555555555 -->
+      <div class="map-right">
       <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
     </div>
+    </pane>
+  </splitpanes>
+
+
+
+
+<!--
+  <div id="popup" class="ol-popup">
+    <div id="popup-closer" class="ol-popup-closer">X</div>
+    <div id="popup-detail" class="ol-popup-detail">查看详情</div>
+    <div id="popup-content" class="popup-content">
+    </div>
+  </div>-->
+    
+
+
+
+
+
+
+
+
 
   </div>
 </template>
@@ -288,6 +337,11 @@ import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
 import { Get, Post,Put } from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
 import {open} from 'shapefile'
+import splitPane from 'vue3-splitpane'
+import { Splitpanes, Pane } from 'splitpanes';
+// const { Splitpanes, Pane } = splitpanes
+
+
 
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
@@ -923,6 +977,16 @@ function getPointStr(coordinates){
 //   cursor: 'row-resize'
 // })
 
+
+
+
+
+
+
+// export function {
+//   components: { Splitpanes, Pane }
+// }
+
 </script>
 
 
@@ -941,9 +1005,9 @@ function getPointStr(coordinates){
   text-align: center;
 }
 .map-left {
-  width: 10%;
-  height: 60%;
-  position: absolute;
+  // width: 10%;
+  // height: 60%;
+  // position: absolute;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   position: absolute;
@@ -983,13 +1047,13 @@ function getPointStr(coordinates){
   }
 }
  .map-bottom {
-   width: 98%;
-   height: 40%;
-   position: absolute;
+  //  width: 98%;
+  //  height: 40%;
+  //  position: absolute;
    background: #fff;
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-   position: absolute;
-   bottom: 0px;
+  //  position: absolute;
+  //  bottom: 0px;
    overflow: auto;
    padding: 10px;
    .text {
@@ -1020,14 +1084,14 @@ function getPointStr(coordinates){
   }
 
   .map-right {
-   width: 28%;
-   height: 60%;
-   position: absolute;
+  //  width: 28%;
+  //  height: 60%;
+  //  position: absolute;
    background: #fff;
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-   position: absolute;
-   top: 6px;
-   right: 6px;
+
+  //  top: 6px;
+  //  right: 6px;
    overflow: auto;
    padding: 10px;
    .text {
@@ -1162,4 +1226,55 @@ function getPointStr(coordinates){
     //      height: 100%;
     //      float: left;
     //  }
+//     .splitpanes__pane {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   font-family: Helvetica, Arial, sans-serif;
+//   color: rgba(255, 255, 255, 0.6);
+//   font-size: 5em;
+// }
+.splitpanes__pane {
+  box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+em.specs {
+  font-size: 0.2em;
+  line-height: 1;
+  position: absolute;
+  color: #bbb;
+  bottom: 0.5em;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+
+// GENERAL STYLES.
+html, body, #app {height: 100%;margin: 0;}
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 5em;
+}
+
+// documentation link.
+p {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  color: #666;
+  z-index: 10;
+  font-size: 12px;
+  
+  a {color: inherit;}
+}
+
+
+
+
 </style>

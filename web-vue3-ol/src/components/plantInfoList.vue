@@ -16,6 +16,8 @@
     <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
       <el-icon><Download /></el-icon>shp下载
     </el-button>
+
+    <!-- 查询功能 -->
     <el-input v-model="username" placeholder="填写查询信息"/>
     <el-button type="primary" @click="query"> 
       <el-icon><Search /></el-icon>查询
@@ -141,7 +143,8 @@
           <el-table-column prop="nh3inflow" label="nh3inflow" width="80" sortable="custom"/>
           <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
          </el-table>
-          
+
+      <!-- 分页功能组件 -->
       <div class="demo-pagination-block">
         <el-pagination
           v-model:current-page="currentPage4"
