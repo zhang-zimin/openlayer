@@ -1,17 +1,6 @@
 <template>
   <div class="MonitoringData">
-    <div id="title" style="height: 5px;" v-drag>中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院</div>
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.2.0/split.min.js"></script> -->
-    <div id="a" class="split split-horizontal">
-      <div id="d" class="split content">d</div>
-    </div>
-    <div id="b" class="split split-horizontal">
-        <div id="e" class="split content">e</div>
-        <div id="f" class="split content">f</div>
-    </div>
-    <div id="c" class="split split-horizontal">
-      <div id="g" class="split content">g</div>
-    </div>
+
 
 
 

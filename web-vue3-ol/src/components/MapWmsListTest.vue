@@ -1,212 +1,200 @@
 <template>
   <!-- <div class="MonitoringData"> -->
-    <!-- <div id="title" style="height: 5px;" v-drag>中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院中电建西北院</div> -->
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.2.0/split.min.js"></script> -->
-    <!-- <div id="a" class="split split-horizontal">
-      <div id="d" class="split content">d</div>
-    </div>
-    <div id="b" class="split split-horizontal">
-        <div id="e" class="split content">e</div>
-        <div id="f" class="split content">f</div>
-    </div>
-    <div id="c" class="split split-horizontal">
-      <div id="g" class="split content">g</div>
-    </div> -->
+  <!-- <div id="title" style="
+    height: 5px;
+    font-size: 30px; /* 设置较大的字体大小 */
+    font-family: Arial, Helvetica, sans-serif; /* 使用常见的标题字体家族 */
+    color: #333; /* 设置深灰色文本颜色 */
+    text-transform: uppercase; /* 将文本转为大写 */
+    text-align: center; /* 文本居中对齐 */
+    margin-top: 10px; /* 添加顶部外边距以提供视觉间隔 */">
+    中电建西北院污染总量控制分析平台
+  </div> -->
 
-    <!-- <split-pane split="horizontal" @resize="resize" :min-percent="40">
-    <div slot="paneL">
-        <div class="left-container">11111111</div>
-    </div>
-    <template slot="paneR">
-      <split-pane split="vertical" :min-percent="30">
-        <template slot="paneL">
-            <div class="top-container"></div>
-        </template>
-        <template slot="paneR">
-            <div class="bottom-container"></div>
-        </template>
-      </split-pane>
-    </template>
+  <!-- ========================================================================= -->
+  <div class="vue-split-container">
+    <!-- 整个页面分为15、65、20 -->
+    <SplitWrapper :sizes="[15, 65, 20]" :minSize="0" class="vue-split horizontal">
+      <!-- 15 -->
+      <SplitItem class="vue-split-item">
+        <div class="vue-split-content nested-content-1">
 
-  </split-pane> -->
+        <!-- 左侧图层展示及开关控制 -->
+        <!-- <div class="map-left"> -->
+        <el-button type="primary" @click="drawPolygon">
+          <el-icon><EditPen /></el-icon>绘制多边形
+        </el-button>
+        <br>
 
-  <div id="app">
-  <splitpanes class="default-theme">
-    <pane min-size="20">
-      <!-- 111111111111111111111111111111 -->
-       1
-      <br/><div class="specs">
-        
-        <div class="map-left">
-    <el-button type="primary" @click="drawPolygon">
-      <el-icon><EditPen /></el-icon>绘制多边形
-    </el-button>
-    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
-    <el-button type="primary" @click="removeDrawLayer">
-      <el-icon><Delete /></el-icon>清除绘制
-    </el-button>
-    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
-    <!-- 上传文件组件 -->
-    <el-upload
-      class="shapefile-upload"
-      ref="upload"
-      action="string"
-      :file-list="uploadFiles"
-      :auto-upload="true"
-      :on-progress="importSubmit"
-      multiple="multiple"
-      accept=".zip"
-    >
-      <div class="upfile">
-      <el-button
-        size="small"
-        type="success"
-        class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件</el-button>
-      </div>
-    </el-upload>  
+        <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
+        <br>
+        <el-button type="primary" @click="removeDrawLayer">
+          <el-icon><Delete /></el-icon>清除绘制
+        </el-button>
+        <br>
 
-    <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
-    <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
-    <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
-      </div>
-      </div></pane>
-    <pane>
-      <splitpanes class="default-theme" horizontal="horizontal">
-        <pane min-size="15">
-        <!-- 22222222222222222222222222222222222222 -->
-2
-          <br/><div class="specs">
-            
-                      <!-- 地图组件 -->
-    <ol-map
-    ref="map" 
-    id="map"
-    :loadTilesWhileAnimating="true"
-    :loadTilesWhileInteracting="true"
-    :style="mapstyle" 
-    @click="mapclick"
-    >
-
-    <!-- 视图 -->
-    <ol-view
-      ref="view"
-      :center="center"
-      :rotation="rotation"
-      :zoom="zoom"
-      :projection="projection"
-    />
-
-    <!--
-    :rotation="rotation" 
-    <ol-view ref="view" :center="center" :zoom="zoom" />-->
-    
-    <!-- 点击按钮来放大或缩小地图的视图 -->
-    <ol-zoom-control />
-    <!-- 用于显示地图的版权信息 -->
-    <ol-attribution-control />
-
-    <!--
-    <ol-interaction-clusterselect @select="featureSelected" :pointRadius="20">
-      <ol-style>
-        <ol-style-stroke color="green" :width="5"></ol-style-stroke>
-        <ol-style-fill color="rgba(255,255,255,0.5)"></ol-style-fill>
-        <ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>
-      </ol-style>
-    </ol-interaction-clusterselect>-->
-
-    <!--@select="featureSelected"-->
-    <ol-interaction-select
-      @select="featureSelected"
-      :condition="selectCondition"
-      :filter="selectInteactionFilter"
-    >
-      <ol-style>
-        <ol-style-stroke color="green" :width="10"></ol-style-stroke>
-        <ol-style-fill color="rgba(255,255,255,0.5)"></ol-style-fill>
-        <ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>
-      </ol-style>
-
-    </ol-interaction-select>
-
-    <!--url="http://192.168.0.107:8010/geoserver/zzmserver/wms"-->
-    <!--url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"-->
-    <ol-layer-group :opacity="0.4">
-      <!-- 佛山顺德底图 -->
-      <ol-tile-layer>
-        <ol-source-tile-wms
-          :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
-          layers="zzmserver:shunde"
-          serverType="geoserver"
-          :transition="0"
-          :params="{
-                    SERVICE: 'WMS',
-                    VERSION: '1.3.0',
-                    REQUEST: 'GetMap',
-                    FORMAT: 'image/png',
-                    TRANSPARENT: true,
-                    tiled: true,
-                    STYLES: '',
-                    exceptions: 'application/vnd.ogc.se_inimage',
-                    CRS: 'EPSG:3857',
-                    WIDTH: 256,
-                    HEIGHT: 256,
-                    BBOX: '12590050.499757469,2606944.281630356,12592493.746506888,2609387.528379775'
-                    }"
-       />
-      </ol-tile-layer>
-
-      <!-- 排水管线 -->
-      <ol-tile-layer>
-        <ol-source-tile-wms
-          :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
-          layers="zzmserver:PS_LINE-3857"
-          serverType="geoserver"
-          :transition="0"
-          :params="{
-          SERVICE: 'WMS',
-          VERSION: '1.3.0',
-          REQUEST: 'GetMap',
-          FORMAT: 'image/png',
-          TRANSPARENT: true,
-          tiled: true,
-          STYLES: '',
-          exceptions: 'application/vnd.ogc.se_inimage',
-          CRS: 'EPSG:3857',
-          WIDTH: 769,
-          HEIGHT: 470,
-          BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
-          }"
-        />
-      </ol-tile-layer>
-
-      <!--<ol-tile-layer>
-        <ol-source-tile-json
-          url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"
-          crossOrigin="anonymous"
-        />
-      </ol-tile-layer>-->
-
-      <!--url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"-->
-      
-      <ol-vector-layer title="AIRPORTS">
-        <ol-source-vector
-          ref="cities"
-          :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
-          :format="geoJson"
-          :projection="projection"
+        <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
+        <br>
+        <!-- 上传文件组件 -->
+        <el-upload
+          class="shapefile-upload"
+          ref="upload"
+          action="string"
+          :file-list="uploadFiles"
+          :auto-upload="true"
+          :on-progress="importSubmit"
+          multiple="multiple"
+          accept=".zip"
         >
-        </ol-source-vector>
+          <div class="upfile">
+            <el-button
+              type="success"
+              class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件
+            </el-button>
+          </div>
+        </el-upload>
 
-        <ol-style>
-          <ol-style-stroke color="red" :width="2"></ol-style-stroke>
-          <ol-style-fill color="rgba(255,255,255,0.1)"></ol-style-fill>
-          <ol-style-circle :radius="7">
-            <ol-style-fill color="blue"></ol-style-fill>
-          </ol-style-circle>
-        </ol-style>
-     </ol-vector-layer>
-    </ol-layer-group>
+        <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
+        <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
+        <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
+        <!-- </div> -->
+        </div>
+      </SplitItem>
+
+      <!-- 65的分成70和30 -->
+      <SplitItem class="vue-split-item">
+        <SplitWrapper :sizes="[70, 30]" :minSize="0" direction="vertical" class="vue-split vertical">
+          <!-- 70 -->
+          <SplitItem class="vue-split-item">
+            <div class="vue-split-content nested-content-2">
+              <ol-map
+                ref="map" 
+                id="map"
+                :loadTilesWhileAnimating="true"
+                :loadTilesWhileInteracting="true"
+                :style="mapstyle" 
+                @click="mapclick"
+                >
+
+                <!-- 视图 -->
+                <ol-view
+                  ref="view"
+                  :center="center"
+                  :rotation="rotation"
+                  :zoom="zoom"
+                  :projection="projection"
+                />
+
+                <!--
+                :rotation="rotation" 
+                <ol-view ref="view" :center="center" :zoom="zoom" />-->
+    
+                <!-- 点击按钮来放大或缩小地图的视图 -->
+                <ol-zoom-control />
+                <!-- 用于显示地图的版权信息 -->
+                <ol-attribution-control />
+
+                <!--
+                <ol-interaction-clusterselect @select="featureSelected" :pointRadius="20">
+                  <ol-style>
+                    <ol-style-stroke color="green" :width="5"></ol-style-stroke>
+                    <ol-style-fill color="rgba(255,255,255,0.5)"></ol-style-fill>
+                    <ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>
+                  </ol-style>
+                </ol-interaction-clusterselect>-->
+
+                <!--@select="featureSelected"-->
+                <ol-interaction-select
+                  @select="featureSelected"
+                  :condition="selectCondition"
+                  :filter="selectInteactionFilter"
+                >
+                  <ol-style>
+                    <ol-style-stroke color="green" :width="10"></ol-style-stroke>
+                    <ol-style-fill color="rgba(255,255,255,0.5)"></ol-style-fill>
+                    <ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>
+                  </ol-style>
+                </ol-interaction-select>    
+
+                <!--url="http://192.168.0.107:8010/geoserver/zzmserver/wms"-->
+                <!--url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"-->
+                <ol-layer-group :opacity="0.4">
+                  <!-- 佛山顺德底图 -->
+                  <ol-tile-layer>
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:shunde"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                                SERVICE: 'WMS',
+                                VERSION: '1.3.0',
+                                REQUEST: 'GetMap',
+                                FORMAT: 'image/png',
+                                TRANSPARENT: true,
+                                tiled: true,
+                                STYLES: '',
+                                exceptions: 'application/vnd.ogc.se_inimage',
+                                CRS: 'EPSG:3857',
+                                WIDTH: 256,
+                                HEIGHT: 256,
+                                BBOX: '12590050.499757469,2606944.281630356,12592493.746506888,2609387.528379775'
+                                }"
+                  />
+                  </ol-tile-layer>
+
+                  <!-- 排水管线 -->
+                  <ol-tile-layer>
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:PS_LINE-3857"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.3.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 769,
+                      HEIGHT: 470,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+                  <!--<ol-tile-layer>
+                    <ol-source-tile-json
+                      url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"
+                      crossOrigin="anonymous"
+                    />
+                  </ol-tile-layer>-->
+
+                  <!--url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"-->
+                  
+                  <!-- <ol-vector-layer title="AIRPORTS">
+                    <ol-source-vector
+                      ref="cities"
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
+                      :format="geoJson"
+                      :projection="projection"
+                    >
+                    </ol-source-vector>
+
+                    <ol-style>
+                      <ol-style-stroke color="red" :width="2"></ol-style-stroke>
+                      <ol-style-fill color="rgba(255,255,255,0.1)"></ol-style-fill>
+                      <ol-style-circle :radius="7">
+                        <ol-style-fill color="blue"></ol-style-fill>
+                      </ol-style-circle>
+                    </ol-style>
+                </ol-vector-layer> -->
+                </ol-layer-group>
     <!--<ol-image-layer id="xkcd">
       <ol-source-image-static
         :url="imgUrl"
@@ -228,82 +216,69 @@
         </div>
       </template>
     </ol-overlay>
-    </ol-map>
-          </div></pane>
-        <!-- <pane>3</pane> -->
-        <pane>
-          <!-- 44444444444444444444 -->
-4
-<div>
-                <!-- 点击按钮展开表格 -->
-                <el-button 
+              </ol-map>
+            </div>
+          </SplitItem>
+
+          <!-- 30 -->
+          <SplitItem class="vue-split-item">
+            <div class="vue-split-content nested-content-2">
+
+                <!-- <div id="e" class="split content" v-show="modelSatus.status"> -->
+    <!-- 点击按钮展开表格 -->
+    <!-- <el-button 
     type="primary" 
     v-show="!modelSatus.status" 
     @click="modelSatus.status=true"
     >
       <el-icon><DArrowRight /></el-icon>
-    </el-button>
+    </el-button> -->
 
-    <!-- 点击按钮收起表格 -->
-    <!-- <div class="map-bottom" v-show="modelSatus.status" style="position: relative;"> -->
-    <div class="map-bottom" v-show="modelSatus.status">
-      <el-button 
-        type="primary" 
-        @click="modelSatus.status=false" 
-        style="position: absolute; bottom: 0; left: 0;">
-        <el-icon><DArrowLeft /></el-icon>
-      </el-button>
-    
-    <!--msg="计算结果展示"-->
-      <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
-      <!--<div class="text"> 信息展示</div>
-      <div class="flexbox">
-        <el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />
-        <el-button type="primary" @click="look">查询</el-button>
-      </div>
-      <div class="list">
-        <li v-for="(item,index) in form.list " :key='index'>
-          <div class="fx-space-between-center li">
-            <div>{{item.name}}</div>
-            <div>{{item.record}}</div>
-          </div>
-          <div class="text-li">{{item.text}}</div>
-        </li>
-      </div>-->
-    </div>
-</div>
-        </pane>
-      </splitpanes>
-    </pane>
-    <pane>
-      <!-- 555555555555555555555555555 -->
-      <div class="map-right">
-      <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
-    </div>
-    </pane>
-  </splitpanes>
+      <!-- 点击按钮收起表格 -->
+      <!-- <div class="map-bottom" v-show="modelSatus.status" style="position: relative;"> -->
+      <!-- <div class="map-bottom" > -->
+        <!-- <el-button 
+          type="primary" 
+          @click="modelSatus.status=false" 
+          style="position: absolute; bottom: 0; left: 0;">
+          <el-icon><DArrowLeft /></el-icon>
+        </el-button> -->
+      
+      <!--msg="计算结果展示"-->
+        <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
+        <!--<div class="text"> 信息展示</div>
+        <div class="flexbox">
+          <el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />
+          <el-button type="primary" @click="look">查询</el-button>
+        </div>
+        <div class="list">
+          <li v-for="(item,index) in form.list " :key='index'>
+            <div class="fx-space-between-center li">
+              <div>{{item.name}}</div>
+              <div>{{item.record}}</div>
+            </div>
+            <div class="text-li">{{item.text}}</div>
+          </li>
+        </div>-->
+      <!-- </div> -->
+            </div>
+          </SplitItem>
 
+        </SplitWrapper>
+      </SplitItem>
 
-
-
-<!--
-  <div id="popup" class="ol-popup">
-    <div id="popup-closer" class="ol-popup-closer">X</div>
-    <div id="popup-detail" class="ol-popup-detail">查看详情</div>
-    <div id="popup-content" class="popup-content">
-    </div>
-  </div>-->
-    
-
-
-
-
-
-
-
-
-
+      <!-- 20 -->
+      <SplitItem class="vue-split-item">
+            <div class="vue-split-content nested-content-1">
+              <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
+            </div>
+      </SplitItem>
+    </SplitWrapper>
   </div>
+    
+
+<!-- ====================================================================== -->
+  <!-- </div> -->
 </template>
 
 
@@ -337,12 +312,9 @@ import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
 import { Get, Post,Put } from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
 import {open} from 'shapefile'
-import splitPane from 'vue3-splitpane'
-import { Splitpanes, Pane } from 'splitpanes';
-// const { Splitpanes, Pane } = splitpanes
-
-
-
+// const Split = require('split.js');
+import Split from 'split.js';
+import { SplitWrapper, SplitItem } from 'vue3-split'
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
 //console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 
@@ -353,7 +325,7 @@ console.log(proxy.$baseUrl)
 const screenWidth = ref(document.documentElement.clientWidth);//实时屏幕宽度
 const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕高度
 
-const mapstyle=ref("width: "+(screenWidth.value-16)+"px;height: "+(screenHeight.value-50)+"px")  
+const mapstyle=ref("width: "+(screenWidth.value-16)+"px;height: "+(screenHeight.value-380)+"px")  
 console.log(mapstyle.value)
 
 const selectedCityName = ref("");
@@ -628,112 +600,22 @@ function importSubmit (e,filerow,fileList) {
                                 }))
                             .catch(error => console.error(error.stack));
                     }
-/*
-                      shpReader.onloadend = async () => {
-                      const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-                      const vectorSource = new VectorSource({ features: shpSource });
 
-                    // 创建矢量图层并添加到地图
-                      const vectorLayer = new VectorLayer({
-                        source: vectorSource,
-                        // 设置样式
-                      });
-
-                      if (map) {
-                        map.value.map.addLayer(vectorLayer);
-                      }
-                    };
-
-                    
-                    //break; // 如果有多个SHP文件，此处决定是否只解析第一个
-*/
                   })
                   }
 
                 }
               })
             
-/*
-    const zip =  JSZip.loadAsync(file);
-    const zipfiles=zip.files;
-    for (const filename of Object.keys(zip.files)) {
-      if (filename.endsWith('.shp')) {
-        const shpBlob =  zip.file(filename).async('arraybuffer');
-        const shpReader = new FileReader();
-        shpReader.onloadend = async () => {
-          const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-          const vectorSource = new VectorSource({ features: shpSource });
 
-         // 创建矢量图层并添加到地图
-          const vectorLayer = new VectorLayer({
-            source: vectorSource,
-            // 设置样式
-          });
-
-          if (map) {
-            map.value.map.addLayer(vectorLayer);
-          }
-        };
-
-        shpReader.readAsArrayBuffer(shpBlob);
-        break; // 如果有多个SHP文件，此处决定是否只解析第一个
-      }
-    }*/
   } else {
     console.error('请选择类型为ZIP的文件进行上传。');
   }
 };
 
-// const handleFileUpload = async (event: Event) => {
-// //  const inputEl = fileInput.value!;
-//   const file = (event.target as HTMLInputElement).files?.[0];
 
-//   if (file && file.type === 'application/zip') {
-//     const zip = await JSZip.loadAsync(file);
-//     for (const filename of Object.keys(zip.files)) {
-//       if (filename.endsWith('.shp')) {
-//         const shpBlob = await zip.file(filename).async('arraybuffer');
-       
-//         const shpReader = new FileReader();
-//         shpReader.onloadend = async () => {
-//           const shpSource = new ShpFormat().readFeatures(shpReader.result as ArrayBuffer);
-//           const vectorSource = new VectorSource({ features: shpSource });
 
-//          // 创建矢量图层并添加到地图
-//           const vectorLayer = new VectorLayer({
-//             source: vectorSource,
-//             // 设置样式
-//           });
 
-//           if (map) {
-//             map.value.map.addLayer(vectorLayer);
-//           }
-//         };
-
-//         shpReader.readAsArrayBuffer(shpBlob);
-//         break; // 如果有多个SHP文件，此处决定是否只解析第一个
-//       }
-//     }
-//   } else {
-//     console.error('请选择类型为ZIP的文件进行上传。');
-//   }
-// };
-
-/*const raster = new TileLayer({
-  source: new OSM(),
-});
-*/
-
-/*const currentInstance = ref()
-    onMounted(() => {
-      currentInstance.value = getCurrentInstance()
-      const ctx=getCurrentInstance().ctx;
-      console.log("ctx:"+ctx);
-      const props=getCurrentInstance().ctx.$props;
-      console.log("props:"+props);
-      console.log("currentInstance.olmap:"+props);
-    });
-*/
 const rightChildRef = ref(null);
 //http://192.168.0.102:9602/Pollution/storeGeoJSON
 function storeGeoJSON(coordinates) {
@@ -753,10 +635,7 @@ function storeGeoJSON(coordinates) {
   pointArray=stringsArray.join('');
   console.log("pointArray:"+pointArray);
   let stringsArray1 = [];
-  /*stringsArray1.push(pointArray);
-  let stringsArray2 = [stringsArray1];
-  console.log("stringsArray2:"+stringsArray2);*/
-  //stringsArray1.push("[["+pointArray+"]]");
+
 
   Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":pointArray}).then((response) => {
     console.log("response.data:"+response.data);
@@ -838,443 +717,72 @@ function getPointStr(coordinates){
   return pointArray;
 }
 
-// shp上传
-// document.getElementById('shapefile-upload').addEventListener('change', function(e) {
-//   const file = e.target.files[0];
-
-//   // 读取zip文件
-//   const reader = new FileReader();
-//   reader.onload = async function(e) {
-//     const zip = await JSZip.loadAsync(e.target.result);
-
-//     // 查找并读取shp、shx和dbf文件
-//     let shpContent, shxContent, dbfContent;
-//     for (const filename of Object.keys(zip.files)) {
-//       if (filename.endsWith('.shp')) {
-//         shpContent = await zip.files[filename].async('arraybuffer');
-//       } else if (filename.endsWith('.shx')) {
-//         shxContent = await zip.files[filename].async('arraybuffer');
-//       } else if (filename.endsWith('.dbf')) {
-//         dbfContent = await zip.files[filename].async('arraybuffer');
-//       }
-//     }
-
-//     // 将SHP转换为GeoJSON（这里假设使用mapshaper）
-//     const combinedBuffers = [shpContent, shxContent, dbfContent].join('');
-//     const result = await MapShaper.applyCommands(['-i inmemory', '-proj wgs84', '-o format=geojson out'], combinedBuffers);
-
-//     // 从结果中提取GeoJSON
-//     const geojson = JSON.parse(result.info.out_files.out.json);
-
-//     // 在OpenLayers中显示GeoJSON
-//     const vectorSource = new ol.source.Vector({
-//       features: (new ol.format.GeoJSON()).readFeatures(geojson)
-//     });
-
-//     const vectorLayer = new ol.layer.Vector({
-//       source: vectorSource,
-//       style: new ol.style.Style({
-//         fill: new ol.style.Fill({
-//           color: 'rgba(255, 255, 255, 0.2)'
-//         }),
-//         stroke: new ol.style.Stroke({
-//           color: '#ffcc33',
-//           width: 2
-//         })
-//       })
-//     });
-
-//     const map = new ol.Map({
-//       layers: [vectorLayer],
-//       target: 'map',
-//       view: new ol.View({
-//         center: ol.proj.fromLonLat([0, 0]),
-//         zoom: 2
-//       })
-//     });
-//   };
-
-//   reader.readAsArrayBuffer(file);
-// });
-
-
-
-// 处理文件上传
-// 先写一个parseShp函数 能返回GeoJSON
-
-
-
-
-
-
-
-
-
-
-
-
-// async function handleFileUpload(fileList) {
-//   const file = fileList[0];
-//   if (!file) return;
-
-//   const reader = new FileReader();
-//   reader.readAsArrayBuffer(file.raw);
-
-//   reader.onload = async () => {
-//     const zip = await JSZip.loadAsync(reader.result);
-//     for (const relativePath of Object.keys(zip.files)) {
-//       if (relativePath.toLowerCase().endsWith('.shp')) {
-//         const shpBuffer = await zip.files[relativePath].async('arraybuffer');
-//         const geojson = await parseShp(shpBuffer); // 假设有parseShp函数能返回GeoJSON
-
-//         // 创建矢量源和矢量图层
-//         const vectorSource = new VectorSource({
-//           features: new GeoJSON().readFeatures(geojson),
-//         });
-//         const vectorLayer = new VectorLayer({
-//           source: vectorSource,
-//         });
-
-//         // 加载到地图上
-//         if (map.value) {
-//           map.value.addLayer(vectorLayer);
-//         } else {
-//           console.error('Map is not initialized yet.');
-//         }
-//       }
-//     }
-//   };
-
-//   reader.onerror = err => {
-//     console.error('Error reading uploaded ZIP file:', err);
-//   };
-// }
-
-// // 用于处理进度，若不需要可移除或替换为实际的进度处理函数
-// function onProgress(ev) {
-//   // ...
-// }
-
-
-
-// --------------------------------------------------------------
-// Split(['#a', '#b'], {
-//   gutterSize: 8,
-//   cursor: 'col-resize'
-// })
-
-// Split(['#c', '#d'], {
-//   direction: 'vertical',
-//   sizes: [25, 75],
-//   gutterSize: 8,
-//   cursor: 'row-resize'
-// })
-
-// Split(['#e', '#f'], {
-//   direction: 'vertical',
-//   sizes: [25, 75],
-//   gutterSize: 8,
-//   cursor: 'row-resize'
-// })
-
-
-
-
-
-
-
-// export function {
-//   components: { Splitpanes, Pane }
-// }
-
 </script>
 
 
 <style scoped lang="scss">
-// ----------------------------------------------------------------------
-.MonitoringData {
- height: 100%;
- position: relative;
-.model {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  background: #fff;
-  bottom: 0;
-  left: 0;
-  text-align: center;
-}
-.map-left {
-  // width: 10%;
-  // height: 60%;
-  // position: absolute;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  top: 6px;
-  overflow: auto;
-  padding: 10px;
-  .text {
-    font-size: 12px;
-    color: #cccccc;
-    padding-bottom: 10px;
-  }
-  .list {
-    width: 100%;
-    margin-top: 15px;
-    li {
-      border-bottom: 1px solid #e3e3e3;
-      padding: 5px 0;
-    }
-    .li {
-      width: 100%;
-      font-size: 16px;
-      color: #868585;
-      padding-bottom: 5px;
-    }
-    .text-li {
-      background: linear-gradient(red, green, blue);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-  }
-
-  button {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    margin-left: 0px;
-  }
-}
- .map-bottom {
-  //  width: 98%;
-  //  height: 40%;
-  //  position: absolute;
-   background: #fff;
-   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  //  position: absolute;
-  //  bottom: 0px;
-   overflow: auto;
-   padding: 10px;
-   .text {
-     font-size: 12px;
-     color: #cccccc;
-     padding-bottom: 10px;
-   }
-   .list {
-     width: 100%;
-     margin-top: 15px;
-     li {
-       border-bottom: 1px solid #e3e3e3;
-       padding: 5px 0;
-     }
-     .li {
-       width: 100%;
-       font-size: 16px;
-       color: #868585;
-       padding-bottom: 5px;
-     }
-      .text-li {
-        background: linear-gradient(red, green, blue);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-    }
-  }
-
-  .map-right {
-  //  width: 28%;
-  //  height: 60%;
-  //  position: absolute;
-   background: #fff;
-   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-
-  //  top: 6px;
-  //  right: 6px;
-   overflow: auto;
-   padding: 10px;
-   .text {
-     font-size: 12px;
-     color: #cccccc;
-     padding-bottom: 10px;
-   }
-   .list {
-     width: 100%;
-     margin-top: 15px;
-     li {
-       border-bottom: 1px solid #e3e3e3;
-       padding: 5px 0;
-     }
-     .li {
-       width: 100%;
-       font-size: 16px;
-       color: #868585;
-       padding-bottom: 5px;
-     }
-      .text-li {
-        background: linear-gradient(red, green, blue);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-    }
-  }
-}
-// ----------------------------------------------------------------------
 #Map {
   width: 100%;
   height: 100%;
-
-  .ol-popup {
-    position: absolute;
-    background-color: white;
-    -webkit-filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #cccccc;
-    bottom: 12px;
-    left: -50px;
-  }
-  .ol-popup:after,
-  .ol-popup:before {
-    top: 100%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-  }
-  .ol-popup:after {
-    border-top-color: white;
-    border-width: 10px;
-    left: 48px;
-    margin-left: -10px;
-  }
-  .ol-popup:before {
-    border-top-color: #cccccc;
-    border-width: 11px;
-    left: 48px;
-    margin-left: -11px;
-  }
-  .ol-popup-closer {
-    text-decoration: none;
-    position: absolute;
-    top: 2px;
-    right: 8px;
-    cursor: pointer;
-  }
-  .ol-popup-detail {
-    text-decoration: none;
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    cursor: pointer;
-  }
-  .popup-content {
-    width: 400px;
-  }
 }
 
-// html,
-//      body {
-//          height: 100%;
-//      }
-     
-//      body {
-//          padding: 8px;
-//          background-color: #F6F6F6;
-//          box-sizing: border-box;
-//      }
-     
-    //  .split {
-    //      -webkit-box-sizing: border-box;
-    //      -moz-box-sizing: border-box;
-    //      box-sizing: border-box;
-    //      overflow-y: auto;
-    //      overflow-x: hidden;
-    //  }
-     
-    //  .content {
-    //      border: 1px solid #C0C0C0;
-    //      box-shadow: inset 0 1px 2px #e4e4e4;
-    //      background-color: #fff;
-    //  }
-     
-    //  .gutter {
-    //      background-color: transparent;
-    //      background-repeat: no-repeat;
-    //      background-position: 50%;
-    //  }
-     
-    //  .gutter.gutter-horizontal {
-    //      cursor: col-resize;
-    //      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-        
-    //  }
-     
-    //  .gutter.gutter-vertical {
-    //      cursor: row-resize;
-    //      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-        
-    //  }
-     
-    //  .split.split-horizontal,
-    //  .gutter.gutter-horizontal {
-    //      height: 100%;
-    //      float: left;
-    //  }
-//     .splitpanes__pane {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   font-family: Helvetica, Arial, sans-serif;
-//   color: rgba(255, 255, 255, 0.6);
-//   font-size: 5em;
-// }
-.splitpanes__pane {
-  box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
-  justify-content: center;
-  align-items: center;
+.vue-split-container {
+  height: 100%;
+  // border: 4px dashed rgba(229, 231, 235, 0.4);
+  // border-radius: 0.5rem;
+}
+
+.vue-split {
+  height: 100%;
+}
+
+.vue-split.horizontal {
   display: flex;
-  position: relative;
+  flex-direction: row;
 }
 
-em.specs {
-  font-size: 0.2em;
-  line-height: 1;
-  position: absolute;
-  color: #bbb;
-  bottom: 0.5em;
-  left: 0;
-  right: 0;
-  text-align: center;
-}
-
-
-// GENERAL STYLES.
-html, body, #app {height: 100%;margin: 0;}
-body {
-  font-family: Helvetica, Arial, sans-serif;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 5em;
-}
-
-// documentation link.
-p {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  color: #666;
-  z-index: 10;
-  font-size: 12px;
+.vue-split.horizontal .vue-split-content {
+  height: 100%;
   
-  a {color: inherit;}
 }
 
+.gutter {
+  background-color: #441010;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
 
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
+}
 
+.gutter.gutter-vertical {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  cursor: row-resize;
+}
 
+.vue-split-item {
+  height: 100%;
+  overflow: hidden;
+}
+
+.vue-split-content {
+  padding: 16px;
+  height: 100%;
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.nested-content-1 {
+  // height:100%;
+  background: rgba(0, 256, 0, .1);
+}
+
+.nested-content-2 {
+  background: rgba(0, 0, 256, .1);
+}
 </style>
