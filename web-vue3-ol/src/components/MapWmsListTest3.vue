@@ -55,6 +55,15 @@
           </div>
         </el-upload>
 
+
+        <!-- 图层开关 -->
+        <div id="layerControl">
+        <div class="title"><label>图层列表</label></div>
+        <ul id="layerTree" class="layerTree"></ul>
+    </div>
+
+
+
         <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
         <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
         <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
@@ -314,13 +323,15 @@ import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
 import {OSM, Vector as VectorSource2} from 'ol/source.js';
 import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
-import { Get, Post,Put } from "../axios/api"; 
+import { Get, Post,PostFile,Put } from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
 import {open} from 'shapefile'
 // const Split = require('split.js');
 import Split from 'split.js';
 import { SplitWrapper, SplitItem } from 'vue3-split'
 import Dbf from 'dbf-js';
+// import { readDBF } from 'dbf';
+import {DBFFile} from 'dbffile';
 import iconv from 'iconv-lite';
 const config = reactive({
   max: 3,
@@ -561,29 +572,49 @@ function doDownload (data, name) {
         link.click()
       }
 
+
+
 function importSubmit (e,filerow,fileList) {
  //const inputEl = fileInput.value!;
  //const file = (event.target as HTMLInputElement).files?.[0];
   const file=filerow.raw;
+  // console.log(file);
+    uploadZip(file)
+    return;
+
+
+
+
+
+  
+
+
+
+
+
+
   if (file && (file.type === 'application/zip'|| file.type === 'application/x-zip-compressed')){
           // 读取zip压缩文件里面的文件内容
           JSZip.loadAsync(file).then((zip) => {
                 for (let key in zip.files) {
                   // console.log(key, zip.files[key].name); // 打印文件名
                   const filename = zip.files[key].name; 
-                 if (filename.endsWith('.shp')) {
+                  console.log("filename:" +filename);                
+                
+                  if (filename.endsWith('.shp')) {
 
                   const dbfFileName=filename.split('.')[0]+".dbf";
-                    // console.log("dbfFileName:"+dbfFileName);
+                    console.log("dbfFileName:"+dbfFileName);
                   const dbfBlob =  zip.file(dbfFileName).async('arraybuffer');
                   // const dbf = new Dbf(dbfBlob);
                   dbfBlob.then(res => {
                       console.log("dbfBlob:" + res);
 
-                      // const dbf = new Dbf(res);
-                      // const dbf = new Dbf(this.dbfBlob);
-                      // const dbf = new Dbf(dbfBlob);
+
+                      
                     })
+
+                    // const dbf = new Dbf(dbfBlob);
 
 
 
@@ -642,6 +673,29 @@ function importSubmit (e,filerow,fileList) {
   }
 };
 
+function uploadZip (ZIPfile) {
+  const formData = new FormData();
+  formData.append('file', ZIPfile)
+  const zipfiledata = formData;
+  
+  // console.log("zipfiledata::"+zipfiledata);
+  
+  PostFile('/Pollution2/upload-shapefile',zipfiledata).then((response) => {
+
+    // console.log("ZIPfile.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("计算结束:"+res);
+      mapRightData.list=res;
+      rightChildRef.value.childSelMethod(mapRightData.list);
+      ElMessage.success(msg ?? "Submitted!");
+        
+    } else {
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
+    }
+  });
+}
 
 
 
@@ -681,6 +735,15 @@ function storeGeoJSON(coordinates) {
     }
   });
 }
+
+
+
+
+
+
+
+
+
 
 function showFeaturesMap(features) {
   const vectorSource = new VectorSource({ features: features});
@@ -819,17 +882,17 @@ function getPointStr(coordinates){
 
 .nested-content-1 {
   // height:100%;
-  background: rgba(0, 256, 0, .1);
+  background: rgba(0, 256, 0, .03);
 }
 
 .nested-content-2 {
-  background: rgba(0, 0, 256, .1);
+  background: rgba(0, 0, 256, .03);
 }
 
-.map-border {
-  // width: 100%;
-  // height: 100%;
-  border: 1px solid #333; /* 根据需要调整边框宽度、颜色和样式 */
-  border-radius: 4px; /* 可选：添加圆角以实现边框圆角化 */
-}
+// .map-border {
+//   // width: 100%;
+//   // height: 100%;
+//   border: 1px solid #333; /* 根据需要调整边框宽度、颜色和样式 */
+//   border-radius: 4px; /* 可选：添加圆角以实现边框圆角化 */
+// }
 </style>

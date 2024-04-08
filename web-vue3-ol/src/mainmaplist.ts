@@ -9,8 +9,8 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 
 // import App from './components/MapWmsList.vue'
-import App from './components/MapWmsListTest.vue'
-// import App from './components/MapWmsListTest2.vue'
+// import App from './components/MapWmsListTest.vue'
+import App from './components/MapWmsListTest3.vue'
 
 //import App from './components/MapWms.vue'
 //import App from './components/HeNanMap.vue'

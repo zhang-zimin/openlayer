@@ -1,5 +1,11 @@
 <template>
-  <el-card>
+
+    
+    
+    
+    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+    <el-tab-pane label="污染源负荷结构分析" name="first">
+        <el-card>
         <el-table 
           :data="showrows" stripe style="width: 100%" row-key="id"
           :has-n-o="false"
@@ -29,7 +35,20 @@
         />
       </div>-->
     </el-card>
-   <div class="select-el-form">
+    <div class="m-4">
+    <p>Child options expand when clicked (default)</p>
+    <el-cascader v-model="value" :options="options" @change="handleChange" />
+  </div>
+  <div class="m-4">
+    <p>Child options expand when hovered</p>
+    <el-cascader
+      v-model="value"
+      :options="options"
+      :props="props"
+      @change="handleChange"
+    />
+  </div>
+      <div class="select-el-form">
     <div class="raw">
     <el-form-item label="污染源" prop="segment1" class="item">
       <el-select
@@ -156,6 +175,43 @@
   <div ref="pieChart" class="pieChart"></div>
   
   </div>
+
+    </el-tab-pane>
+
+    <el-tab-pane label="自由绘制" name="second">
+      <el-button type="primary" @click="drawPolygon">
+            <el-icon><EditPen /></el-icon>绘制多边形
+          </el-button>
+          <br>
+
+
+        <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
+        <br>
+        <el-button type="primary" @click="removeDrawLayer">
+          <el-icon><Delete /></el-icon>清除绘制
+        </el-button>
+        <br>
+
+        <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
+        <br>
+
+
+
+    </el-tab-pane>
+
+
+    <el-tab-pane label="Role" name="third">Role</el-tab-pane>
+    <el-tab-pane label="Task" name="fourth">Task</el-tab-pane>
+  </el-tabs>
+
+
+
+
+
+
+
+
+
   </template>
   
   <!-- ------------------------------------------------------------------------------- -->
@@ -198,7 +254,303 @@
   const showrows=ref([])
   const showtotal = ref(0);
   
-   
+
+
+const value = ref([])
+
+const props = {
+  expandTrigger: 'hover' as const,
+}
+
+const handleChange = (value) => {
+  console.log(value)
+}
+
+const options = [
+  {
+    value: 'guide',
+    label: 'Guide',
+    children: [
+      {
+        value: 'disciplines',
+        label: 'Disciplines',
+        children: [
+          {
+            value: 'consistency',
+            label: 'Consistency',
+          },
+          {
+            value: 'feedback',
+            label: 'Feedback',
+          },
+          {
+            value: 'efficiency',
+            label: 'Efficiency',
+          },
+          {
+            value: 'controllability',
+            label: 'Controllability',
+          },
+        ],
+      },
+      {
+        value: 'navigation',
+        label: 'Navigation',
+        children: [
+          {
+            value: 'side nav',
+            label: 'Side Navigation',
+          },
+          {
+            value: 'top nav',
+            label: 'Top Navigation',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: 'component',
+    label: 'Component',
+    children: [
+      {
+        value: 'basic',
+        label: 'Basic',
+        children: [
+          {
+            value: 'layout',
+            label: 'Layout',
+          },
+          {
+            value: 'color',
+            label: 'Color',
+          },
+          {
+            value: 'typography',
+            label: 'Typography',
+          },
+          {
+            value: 'icon',
+            label: 'Icon',
+          },
+          {
+            value: 'button',
+            label: 'Button',
+          },
+        ],
+      },
+      {
+        value: 'form',
+        label: 'Form',
+        children: [
+          {
+            value: 'radio',
+            label: 'Radio',
+          },
+          {
+            value: 'checkbox',
+            label: 'Checkbox',
+          },
+          {
+            value: 'input',
+            label: 'Input',
+          },
+          {
+            value: 'input-number',
+            label: 'InputNumber',
+          },
+          {
+            value: 'select',
+            label: 'Select',
+          },
+          {
+            value: 'cascader',
+            label: 'Cascader',
+          },
+          {
+            value: 'switch',
+            label: 'Switch',
+          },
+          {
+            value: 'slider',
+            label: 'Slider',
+          },
+          {
+            value: 'time-picker',
+            label: 'TimePicker',
+          },
+          {
+            value: 'date-picker',
+            label: 'DatePicker',
+          },
+          {
+            value: 'datetime-picker',
+            label: 'DateTimePicker',
+          },
+          {
+            value: 'upload',
+            label: 'Upload',
+          },
+          {
+            value: 'rate',
+            label: 'Rate',
+          },
+          {
+            value: 'form',
+            label: 'Form',
+          },
+        ],
+      },
+      {
+        value: 'data',
+        label: 'Data',
+        children: [
+          {
+            value: 'table',
+            label: 'Table',
+          },
+          {
+            value: 'tag',
+            label: 'Tag',
+          },
+          {
+            value: 'progress',
+            label: 'Progress',
+          },
+          {
+            value: 'tree',
+            label: 'Tree',
+          },
+          {
+            value: 'pagination',
+            label: 'Pagination',
+          },
+          {
+            value: 'badge',
+            label: 'Badge',
+          },
+        ],
+      },
+      {
+        value: 'notice',
+        label: 'Notice',
+        children: [
+          {
+            value: 'alert',
+            label: 'Alert',
+          },
+          {
+            value: 'loading',
+            label: 'Loading',
+          },
+          {
+            value: 'message',
+            label: 'Message',
+          },
+          {
+            value: 'message-box',
+            label: 'MessageBox',
+          },
+          {
+            value: 'notification',
+            label: 'Notification',
+          },
+        ],
+      },
+      {
+        value: 'navigation',
+        label: 'Navigation',
+        children: [
+          {
+            value: 'menu',
+            label: 'Menu',
+          },
+          {
+            value: 'tabs',
+            label: 'Tabs',
+          },
+          {
+            value: 'breadcrumb',
+            label: 'Breadcrumb',
+          },
+          {
+            value: 'dropdown',
+            label: 'Dropdown',
+          },
+          {
+            value: 'steps',
+            label: 'Steps',
+          },
+        ],
+      },
+      {
+        value: 'others',
+        label: 'Others',
+        children: [
+          {
+            value: 'dialog',
+            label: 'Dialog',
+          },
+          {
+            value: 'tooltip',
+            label: 'Tooltip',
+          },
+          {
+            value: 'popover',
+            label: 'Popover',
+          },
+          {
+            value: 'card',
+            label: 'Card',
+          },
+          {
+            value: 'carousel',
+            label: 'Carousel',
+          },
+          {
+            value: 'collapse',
+            label: 'Collapse',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    value: 'resource',
+    label: 'Resource',
+    children: [
+      {
+        value: 'axure',
+        label: 'Axure Components',
+      },
+      {
+        value: 'sketch',
+        label: 'Sketch Templates',
+      },
+      {
+        value: 'docs',
+        label: 'Design Documentation',
+      },
+    ],
+  },
+]
+
+
+
+
+
+
+
+
+
+
+import type { TabsPaneContext } from 'element-plus'
+
+const activeName = ref('first')
+
+const handleClick = (tab: TabsPaneContext, event: Event) => {
+  console.log(tab, event)
+}
   
   const props2 = defineProps<{ msg: string ,selData:{} }>()
   /*var selList = [];//定义一个空数组
@@ -578,4 +930,12 @@
     width: 400px;
     height: 400px;
   }
+
+  .demo-tabs > .el-tabs__content {
+  padding: 32px;
+  color: #6b778c;
+  font-size: 32px;
+  font-weight: 600;
+}
+
   </style>

@@ -71,15 +71,25 @@
     </el-card>-->
     <!-- </div> -->
     <!--@sort-change="sortChange"-->
+    <!-- <el-card style="margin-top:-15px; height: 600px"> -->
     <el-card style="margin-top:-15px; height: 600px">
         <el-table 
-          :data="showrows" stripe style="width: 100%" row-key="id"
+          :data="showrows"
+          stripe
+          style="width: 100%"
+          row-key="id"
           :has-n-o="false"
-          height="450"
+          height="400"
           :cell-class-name="tableCellClassName"
           @row-dblclick="dbclick"
           @sort-change="handleSortChange"
+          ref="multipleTableRef"
+          @selection-change="handleSelectionChange"
+          fit="true"
+          
           >
+          <!-- v-loading="loading" -->
+        <el-table-column type="selection" width="55" />
         <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
         <el-table-column prop="id" label="id" width="80" sortable="custom"/>
         <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>
@@ -144,8 +154,17 @@
           <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
          </el-table>
 
+         <!-- <div style="margin-top: 20px">
+         <el-button @click="toggleSelection()">Clear selection</el-button>
+        </div> -->
       <!-- 分页功能组件 -->
       <div class="demo-pagination-block">
+
+        <!-- 清除当前选择 -->
+        <div style="margin-top: 0px; margin-right: 25px">
+         <el-button @click="toggleSelection()">Clear selection</el-button>
+        </div>
+
         <el-pagination
           v-model:current-page="currentPage4"
           v-model:page-size="pageSize4"
@@ -169,7 +188,7 @@
   import { Search } from '@element-plus/icons-vue';
   import { Refresh } from '@element-plus/icons-vue';
   import axios from 'axios';
-  
+  import { ElTable } from 'element-plus'
   // 通过getCurrentInstance 获取
   import { getCurrentInstance, onMounted } from 'vue'
   const { baseURL } = getCurrentInstance().appContext.config.globalProperties
@@ -198,10 +217,30 @@
     input: "",
     list: {},
   });
-  
+  interface User {
+  date: string
+  name: string
+  address: string
+}
   const showrows=ref([])
   const showtotal = ref(0);
-  
+  const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<User[]>([])
+const toggleSelection = (rows?: User[]) => {
+  if (rows) {
+    rows.forEach((row) => {
+      // TODO: improvement typing when refactor table
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      multipleTableRef.value!.toggleRowSelection(row, undefined)
+    })
+  } else {
+    multipleTableRef.value!.clearSelection()
+  }
+}
+const handleSelectionChange = (val: User[]) => {
+  multipleSelection.value = val
+}
   //defineProps<{ msg: string ,selData:{} }>()
   /*const props2 = defineProps({
     config: Object,
@@ -216,7 +255,7 @@
     console.log("0")
   }
   */
-  
+  const loading = ref(true)
   const props2 = defineProps<{ msg: string ,selData:{} }>()
   /*var selList = [];//定义一个空数组
   if(props2.selData.hasOwnProperty("OBJECTID")){
@@ -550,4 +589,8 @@
     justify-content: center;
     margin-top: 20px;
   }
+
+  .example-showcase .el-loading-mask {
+  z-index: 9;
+}
   </style>
