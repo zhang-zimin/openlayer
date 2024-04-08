@@ -72,7 +72,7 @@
     <!-- </div> -->
     <!--@sort-change="sortChange"-->
     <!-- <el-card style="margin-top:-15px; height: 600px"> -->
-    <el-card style="margin-top:-15px; height: 600px">
+    <el-card style="margin-top:-15px; height: 550px">
         <el-table 
           :data="showrows"
           stripe
@@ -86,18 +86,19 @@
           ref="multipleTableRef"
           @selection-change="handleSelectionChange"
           fit="true"
-          
+          :row-style="{height: '0'}"
+          :cell-style="{padding: '0'}"
           >
           <!-- v-loading="loading" -->
-        <el-table-column type="selection" width="55" />
+        <el-table-column type="selection" width="40" />
         <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
         <el-table-column prop="id" label="id" width="80" sortable="custom"/>
         <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>
         <el-table-column prop="draintype" label="draintype" width="80" sortable="custom"/>
         <el-table-column prop="drainsubtype" label="drainsubtype" width="80" sortable="custom"/>
         <el-table-column prop="agriculturetype" label="agriculturetype" width="80" sortable="custom"/>
-        <el-table-column prop="username" label="username" width="80" sortable="custom"/>
-        <el-table-column prop="useraddress" label="useraddress" width="80" sortable="custom"/>
+        <el-table-column prop="username" label="名称" width="180" sortable="custom"/>
+        <el-table-column prop="useraddress" label="useraddress" width="180" sortable="custom"/>
         <el-table-column prop="codinflow" label="codinflow" width="80" sortable="custom"/>
         <el-table-column prop="codstandard" label="codstandard" width="80" editable sortable="custom">
           <template v-slot="scope">
@@ -123,7 +124,7 @@
               <span v-else>{{ scope.row.nh3standard }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="tpstandard" label="tpstandard" width="80" editable sortable="custom">
+          <el-table-column prop="tpstandard" label="tpstandard" width="180" editable sortable="custom">
             <template v-slot="scope">
               <el-input
                 v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -147,11 +148,11 @@
               <span v-else>{{ scope.row.inflowcoefficient }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="coddischarge" label="coddischarge" width="80" sortable="custom"/>
-          <el-table-column prop="nh3discharge" label="nh3discharge" width="80" sortable="custom"/>
-          <el-table-column prop="tpdischarge" label="tpdischarge" width="80" sortable="custom"/>
-          <el-table-column prop="nh3inflow" label="nh3inflow" width="80" sortable="custom"/>
-          <el-table-column prop="tpinflow" label="tpinflow" width="80" sortable="custom"/>
+          <el-table-column prop="coddischarge" label="coddischarge" width="180" sortable="custom"/>
+          <el-table-column prop="nh3discharge" label="nh3discharge" width="180" sortable="custom"/>
+          <el-table-column prop="tpdischarge" label="tpdischarge" width="180" sortable="custom"/>
+          <el-table-column prop="nh3inflow" label="nh3inflow" width="180" sortable="custom"/>
+          <el-table-column prop="tpinflow" label="tpinflow" width="180" sortable="custom"/>
          </el-table>
 
          <!-- <div style="margin-top: 20px">

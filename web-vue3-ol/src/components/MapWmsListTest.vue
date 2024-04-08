@@ -55,6 +55,15 @@
           </div>
         </el-upload>
 
+
+                <!-- 图层开关 -->
+                <div id="layerControl">
+        <div class="title"><label>图层列表</label></div>
+        <ul id="layerTree" class="layerTree"></ul>
+    </div>
+
+
+    
         <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
         <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
         <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
@@ -310,18 +319,19 @@ import { Icon } from "ol/style";
 import { fromLonLat } from "ol/proj";
 import JSZip from 'jszip';
 import * as shp from 'shpjs';
-import DBF from 'dbffile';
+//import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
 import {OSM, Vector as VectorSource2} from 'ol/source.js';
 import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
-import { Get, Post,Put } from "../axios/api"; 
+import { Get, Post,Put ,PostFile} from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
 import {open} from 'shapefile'
 // const Split = require('split.js');
 import Split from 'split.js';
-import { SplitWrapper, SplitItem } from 'vue3-split'
-import Dbf from 'dbf-js';
-import iconv from 'iconv-lite';
+import { SplitWrapper, SplitItem } from 'vue3-split';
+import DbfABC from 'dbf-js';
+import iconv from 'iconv-lite'
+//import {DBFFile} from 'dbffile';
 const config = reactive({
   max: 3,
 })
@@ -561,35 +571,150 @@ function doDownload (data, name) {
         link.click()
       }
 
+      
+//import { readFileSync } from 'fs'
+//import fs from "fs"
+
 function importSubmit (e,filerow,fileList) {
  //const inputEl = fileInput.value!;
  //const file = (event.target as HTMLInputElement).files?.[0];
   const file=filerow.raw;
+   uploadZip(file);
+   return;
   if (file && (file.type === 'application/zip'|| file.type === 'application/x-zip-compressed')){
           // 读取zip压缩文件里面的文件内容
           JSZip.loadAsync(file).then((zip) => {
-                for (let key in zip.files) {
-                  // console.log(key, zip.files[key].name); // 打印文件名
-                  const filename = zip.files[key].name; 
-                 if (filename.endsWith('.shp')) {
-
-                  const dbfFileName=filename.split('.')[0]+".dbf";
-                    // console.log("dbfFileName:"+dbfFileName);
-                  const dbfBlob =  zip.file(dbfFileName).async('arraybuffer');
-                  // const dbf = new Dbf(dbfBlob);
-                  dbfBlob.then(res => {
-                      console.log("dbfBlob:" + res);
-
-                      // const dbf = new Dbf(res);
-                      // const dbf = new Dbf(this.dbfBlob);
-                      // const dbf = new Dbf(dbfBlob);
-                    })
-
-
-
-
-
+                // for (let key in zip.files) {
+                  // 压缩包里的内容file.files
+          const fileList = Object.keys(zip.files)
+          const pattern = new RegExp(/\S\.shp$/)
+          let shpFile = fileList.find(i => pattern.test(i))
+       
+         console.log("that.shpFile:"+ shpFile)
                   
+                  // const filename = zip.files[key].name; 
+                  const filename = shpFile;
+                 if (filename.endsWith('.shp')) {
+                  let prj=filename.split('.')[0]+".prj";
+                  let prjBlob =  zip.file(prj).async('string');
+                  prjBlob.then(function(data) {
+                      console.log(data);
+                      if(data.includes("WGS_1984_Web_Mercator")){
+                        ElMessage.success("此文件是3857编码格式文件");
+                      }else{
+                        ElMessage.error("此文件不是3857编码格式文件");
+                        return;
+                      }
+                  });
+
+                  let dbfFileName=filename.split('.')[0]+".dbf";
+                  // let dbfBlob =  zip.file(dbfFileName).async('arraybuffer');
+                  
+                  if (dbfFileName) {
+                              zip.files[dbfFileName].async("blob").then((blob) => {
+                                  // 读取文件内容
+                                  const reader = new FileReader();
+                                  reader.readAsArrayBuffer(blob);
+                                  reader.onload = (e) => {
+                                      // 获取文件内容
+                                      const data = new Uint8Array(e.target.result);
+                                      console.log("Uint8Array:"+data);
+                                      // const dbf=new DbfABC(data);
+                                      // const records=dbf.records;
+                                      //let buffer = readFileSync(dbfFileName);
+                                      /*DbfABC.parse(dbfFileName, (err, dbf) => {
+                                        if (err) {
+                                          console.log(err);
+                                        } else {
+                                          console.log(dbf);
+                                          // console.log(dbf.records);
+                                        }
+                                      });*/
+                                      // const Accessor = require('../dist');
+
+                                      // let {header, data2} = Accessor.read('./table-foxpro.dbf');
+
+                                      // console.log(header);
+                                      // console.log(data2);
+
+                                      // console.log('----');
+
+                                      // header = Accessor.header('./table-dbase4.dbf');
+
+                                      // console.log(header);
+                                     
+                                      // readDbf(e.target.result);
+                                      //readDbf(data);
+                                    // 创建一个shapefile对象
+                                }
+                            })
+                        } 
+
+                  // dbfBlob.then(res => {
+                  //     console.log("res:"+res);
+                  //     // const resBlob=new Blob([res]);
+                  //     const resBlob = { hello: "world" };
+                  //     const blob = new Blob([JSON.stringify(obj, null, 2)], {
+                  //       type: "application/json",
+                  //     });
+                  //     // readDbf(resBlob);
+                  //     const dbfReader = new FileReader();
+                       
+                  //     dbfReader.readAsArrayBuffer(resBlob);
+                  //     dbfReader.onload = function(event) {
+                  //       // event.target相当于reader
+                  //       console.log(event.target.result);
+                  //       readDbf(event.target.result);
+                  //     }
+                  // });
+                
+                  //  let dbf = DBFFile.open(dbfFileName);
+                  // console.log("bdf:"+dbf);
+                 /*const dbf=new Dbf(dbfFileName);
+                  const records=dbf.records;
+                  const fields=dbf.fields;
+                  const data=[];
+                  for(let i=0;i<records.length;i++){
+                      let record=records[i];
+                      let obj={};
+                      for(let j=0;j<fields.length;j++){
+                          let field=fields[j];
+                          obj[field.name]=record[j];
+                      }
+                      data.push(obj);
+                  }
+                  console.log(fields);
+                  console.log(data);
+*/
+
+/*
+获取 .dbf 文件内容： 你提供的代码片段展示了如何从一个 ZIP 文件中提取名为 dbfFileName 的 .dbf 文件内容。这里使用了某种 ZIP 解压缩库（未指定具体库名称），通过 zip.file() 方法获取文件对象，然后调用其 async('arraybuffer') 方法异步获取文件内容为 ArrayBuffer 类型。这一步骤确保了 .dbf 文件以二进制形式存储在内存中，为后续解析做好准备。
+
+解析 .dbf 文件： 要从 ArrayBuffer 中读取并解析 .dbf 文件数据，你需要使用专门支持 DBF 文件格式解析的库。常见的库有：
+
+dbf（npm 包名：@felixge/node-dbf）
+dbf-file（npm 包名：dbf-file）
+simple-dbf-reader（npm 包名：simple-dbf-reader）
+
+npm install dbf-file
+import { read } from 'dbf-file';
+
+   // ... 在获取到 dbfBlob 后
+   dbfBlob.then((arrayBuffer) => {
+     read(arrayBuffer)
+       .then((data) => {
+         // data 是解析后的 DBF 数据，可以在此处进行进一步处理或传递给 Vue 组件状态
+         console.log(data);
+       })
+       .catch((error) => {
+         console.error('Error parsing DBF file:', error);
+       });
+   });
+    <!-- 显示数据行，假设 data.records 存储了记录数组 -->
+           <tr v-for="record in data.records" :key="record.id">
+             <td v-for="value in record.values" :key="value.fieldName">{{ value }}</td>
+           </tr>
+*/
                     let shpBlob =  zip.file(filename).async('arraybuffer');
                     shpBlob.then(res => {
                       //console.log(res);
@@ -633,7 +758,7 @@ function importSubmit (e,filerow,fileList) {
                   })
                   }
 
-                }
+                // }end for zip files
               })
             
 
@@ -746,6 +871,41 @@ function getPointStr(coordinates){
   return pointArray;
 }
 
+function readDbf(dbffile){
+  console.log("readDbf dbffile:"+dbffile);
+  Post('/Pollution/readDbf',{"file":dbffile}).then((response) => {
+    console.log("readDbf response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("success:"+msg+"readDbf 结束:"+res);
+      
+      ElMessage.success(msg ?? "Submitted!");
+        
+    } else {
+      console.log("fail:"+msg);
+      //ElMessage.error(msg);
+      ElMessage.error("readDbf 失败");
+    }
+  });
+}
+
+function uploadZip(zipFile){
+  console.log("zipFile dbffile:"+zipFile);
+  const formData=new FormData();
+  formData.append("file",zipFile);
+  PostFile('/Pollution2/upload-shapefile',formData).then((response) => {
+    console.log("zipFile response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("success:"+msg+"zipFile 结束:"+res);
+      ElMessage.success(msg ?? "Submitted!"); 
+    } else {
+      console.log("fail:"+msg);
+      //ElMessage.error(msg);
+      ElMessage.error("zipFile 失败");
+    }
+  });
+}
 </script>
 
 
@@ -826,10 +986,10 @@ function getPointStr(coordinates){
   background: rgba(0, 0, 256, .1);
 }
 
-.map-border {
-  // width: 100%;
-  // height: 100%;
-  border: 1px solid #333; /* 根据需要调整边框宽度、颜色和样式 */
-  border-radius: 4px; /* 可选：添加圆角以实现边框圆角化 */
-}
+// .map-border {
+//   // width: 100%;
+//   // height: 100%;
+//   border: 1px solid #333; /* 根据需要调整边框宽度、颜色和样式 */
+//   border-radius: 4px; /* 可选：添加圆角以实现边框圆角化 */
+// }
 </style>
