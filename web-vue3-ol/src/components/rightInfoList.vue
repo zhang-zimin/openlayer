@@ -62,7 +62,7 @@
       style="width: 240px"
     >
       <el-option
-        v-for="item in optionfenqu"
+        v-for="item in fenquTypeArray"
         :key="item.value"
         :label="item.label"
         :value="item.value"
@@ -99,7 +99,7 @@
         </el-option>
       </el-select>
     </el-form-item> -->
-    <el-form-item label="污染源" prop="segment2"  class="item">
+    <!--<el-form-item label="污染源" prop="segment2"  class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -157,7 +157,7 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
+    </el-form-item>-->
     <!-- <el-form-item label="污染小类" prop="segment4"  class="item">
       <el-select
         clear-icon="close"
@@ -191,7 +191,7 @@
 
    <div class="m-4">
     污染源
-    <el-cascader :options="optionswry" :props="propswry" clearable />
+    <el-cascader :options="fenquTypeArray" :props="propswry" clearable />
   </div>
   <!-- <div class="m-4">
     <p>Collapse tags</p>
@@ -219,8 +219,22 @@
     />
   </div> -->
 
-
-
+  <div class="m-4">
+    <p>污染指标</p>
+    <el-select
+      v-model="valueindex"
+      multiple
+      placeholder="Select"
+      style="width: 240px"
+    >
+      <el-option
+        v-for="item in optionindex"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
+  </div>
 
    <div class="raw">
     <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>统计</el-button>
@@ -523,13 +537,49 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     //segment4Options=drainsubtypeArray;
     console.log("drainsubtypeArray:"+drainsubtypeArray);
   };
+
+  let fenquTypeArray = ref([]);
+  const fenquSelMethod = (fenquSelDataList: []) => {
+    console.log('fenquSelDataList method called:'+fenquSelDataList);
+    for(let i = 0; i < fenquSelDataList.length; i++) { 
+      const selItem = ref({key:"",label:""});
+      selItem.value.key = fenquSelDataList[i].properties.FID_1;
+      selItem.value.label = fenquSelDataList[i].properties.fenqu;
+      fenquTypeArray.value.push(selItem.value);
+    }
+    console.log("fenquTypeArray:"+fenquTypeArray);
+  }
+
+  const fenquMapMethod = (fenquMapData: []) => {
+    //console.log('fenquMapData method called:'+fenquMapData);
+    console.log('fenquMapData length:'+fenquMapData.length);
+    // console.log('fenquMapData.fenquList:'+fenquMapData.fenquList);
+    for(let i = 0; i < fenquMapData.length; i++) { 
+      const selItem = ref({value:"",label:"",children:[]});
+      selItem.value.value = fenquMapData[i].fenqu;
+      selItem.value.label = fenquMapData[i].fenqu;
+      const childListData = fenquMapData[i].list;
+      const childList = ref([]);
+      for(let j = 0; j < childListData.length; j++) { 
+        const selItemChild = ref({value:"",label:""});
+        selItemChild.value.value = childListData[j];
+        selItemChild.value.label = childListData[j];
+        childList.value.push(selItemChild.value);
+      }
+      selItem.value.children=childList.value;
+      fenquTypeArray.value.push(selItem.value);
+    }
+    console.log("fenquTypeArray:"+fenquTypeArray);
+    optionswry.value=fenquTypeArray.value;
+  }
+
   let draintypeArray = ref([]);
   let drainsubtypeArray = ref([]);
   const childMethod = (str: string) => {
     console.log('Child method called：'+str);
   };
   defineExpose({
-    childMethod,childSelMethod
+    childMethod,childSelMethod,fenquSelMethod,fenquMapMethod
   });
   watch(props2.selData, (newData) => {
     console.log(`new newData is: ${newData}`)
