@@ -35,7 +35,7 @@
         />
       </div>-->
     </el-card>
-    <div class="m-4">
+    <!-- <div class="m-4">
     <p>Child options expand when clicked (default)</p>
     <el-cascader v-model="value" :options="options" @change="handleChange" />
   </div>
@@ -47,10 +47,31 @@
       :props="props"
       @change="handleChange"
     />
-  </div>
+  </div> -->
+
+
+
       <div class="select-el-form">
+
+  <div class="m-4">
+    <p>分区</p>
+    <el-select
+      v-model="valuefenqu"
+      multiple
+      placeholder="Select"
+      style="width: 240px"
+    >
+      <el-option
+        v-for="item in optionfenqu"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
+  </div>
+
     <div class="raw">
-    <el-form-item label="污染源" prop="segment1" class="item">
+    <!-- <el-form-item label="污染源" prop="segment1" class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -77,8 +98,8 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
-    <el-form-item label="点面源" prop="segment2"  class="item">
+    </el-form-item> -->
+    <el-form-item label="污染源" prop="segment2"  class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -137,7 +158,7 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="污染小类" prop="segment4"  class="item">
+    <!-- <el-form-item label="污染小类" prop="segment4"  class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -164,9 +185,43 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
+    </el-form-item> -->
    </div>
-  
+
+
+   <div class="m-4">
+    污染源
+    <el-cascader :options="optionswry" :props="propswry" clearable />
+  </div>
+  <!-- <div class="m-4">
+    <p>Collapse tags</p>
+    <el-cascader :options="optionswry" :props="propswry" collapse-tags clearable />
+  </div>
+  <div class="m-4">
+    <p>Collapse tags tooltip</p>
+    <el-cascader
+      :options="optionswry"
+      :props="propswry"
+      collapse-tags
+      collapse-tags-tooltip
+      clearable
+    />
+  </div>
+  <div class="m-4">
+    <p>Max Collapse Tags</p>
+    <el-cascader
+      :options="optionswry"
+      :props="propswry"
+      collapse-tags
+      collapse-tags-tooltip
+      max-collapse-tags="3"
+      clearable
+    />
+  </div> -->
+
+
+
+
    <div class="raw">
     <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>统计</el-button>
    </div>
@@ -175,6 +230,8 @@
   <div ref="pieChart" class="pieChart"></div>
   
   </div>
+
+
 
     </el-tab-pane>
 
@@ -255,8 +312,50 @@
   const showtotal = ref(0);
   
 
+  const valuefenqu = ref([])
+const valueindex = ref([])
+const value3 = ref([])
+const value4 = ref([])
+const optionfenqu = [
+  {
+    value: 'Option1',
+    label: 'Option1',
+  },
+  {
+    value: 'Option2',
+    label: 'Option2',
+  },
+  {
+    value: 'Option3',
+    label: 'Option3',
+  },
+  {
+    value: 'Option4',
+    label: 'Option4',
+  },
+  {
+    value: 'Option5',
+    label: 'Option5',
+  },
+]
 
-const value = ref([])
+const optionindex = [
+  {
+    value: 'codsum',
+    label: 'codsum',
+  },
+  {
+    value: 'nh3sum',
+    label: 'nh3sum',
+  },
+  {
+    value: 'tpsum',
+    label: 'tpsum',
+  }
+]
+
+
+// const value = ref([])
 
 const props = {
   expandTrigger: 'hover' as const,
@@ -266,277 +365,94 @@ const handleChange = (value) => {
   console.log(value)
 }
 
-const options = [
+
+
+
+const propswry = { multiple: true }
+
+const optionswry = [
   {
-    value: 'guide',
-    label: 'Guide',
+    value: 1,
+    label: 'Asia',
     children: [
       {
-        value: 'disciplines',
-        label: 'Disciplines',
+        value: 2,
+        label: 'China',
         children: [
-          {
-            value: 'consistency',
-            label: 'Consistency',
-          },
-          {
-            value: 'feedback',
-            label: 'Feedback',
-          },
-          {
-            value: 'efficiency',
-            label: 'Efficiency',
-          },
-          {
-            value: 'controllability',
-            label: 'Controllability',
-          },
+          { value: 3, label: 'Beijing' },
+          { value: 4, label: 'Shanghai' },
+          { value: 5, label: 'Hangzhou' },
         ],
       },
       {
-        value: 'navigation',
-        label: 'Navigation',
+        value: 6,
+        label: 'Japan',
         children: [
-          {
-            value: 'side nav',
-            label: 'Side Navigation',
-          },
-          {
-            value: 'top nav',
-            label: 'Top Navigation',
-          },
+          { value: 7, label: 'Tokyo' },
+          { value: 8, label: 'Osaka' },
+          { value: 9, label: 'Kyoto' },
+        ],
+      },
+      {
+        value: 10,
+        label: 'Korea',
+        children: [
+          { value: 11, label: 'Seoul' },
+          { value: 12, label: 'Busan' },
+          { value: 13, label: 'Taegu' },
         ],
       },
     ],
   },
   {
-    value: 'component',
-    label: 'Component',
+    value: 14,
+    label: 'Europe',
     children: [
       {
-        value: 'basic',
-        label: 'Basic',
+        value: 15,
+        label: 'France',
         children: [
-          {
-            value: 'layout',
-            label: 'Layout',
-          },
-          {
-            value: 'color',
-            label: 'Color',
-          },
-          {
-            value: 'typography',
-            label: 'Typography',
-          },
-          {
-            value: 'icon',
-            label: 'Icon',
-          },
-          {
-            value: 'button',
-            label: 'Button',
-          },
+          { value: 16, label: 'Paris' },
+          { value: 17, label: 'Marseille' },
+          { value: 18, label: 'Lyon' },
         ],
       },
       {
-        value: 'form',
-        label: 'Form',
+        value: 19,
+        label: 'UK',
         children: [
-          {
-            value: 'radio',
-            label: 'Radio',
-          },
-          {
-            value: 'checkbox',
-            label: 'Checkbox',
-          },
-          {
-            value: 'input',
-            label: 'Input',
-          },
-          {
-            value: 'input-number',
-            label: 'InputNumber',
-          },
-          {
-            value: 'select',
-            label: 'Select',
-          },
-          {
-            value: 'cascader',
-            label: 'Cascader',
-          },
-          {
-            value: 'switch',
-            label: 'Switch',
-          },
-          {
-            value: 'slider',
-            label: 'Slider',
-          },
-          {
-            value: 'time-picker',
-            label: 'TimePicker',
-          },
-          {
-            value: 'date-picker',
-            label: 'DatePicker',
-          },
-          {
-            value: 'datetime-picker',
-            label: 'DateTimePicker',
-          },
-          {
-            value: 'upload',
-            label: 'Upload',
-          },
-          {
-            value: 'rate',
-            label: 'Rate',
-          },
-          {
-            value: 'form',
-            label: 'Form',
-          },
-        ],
-      },
-      {
-        value: 'data',
-        label: 'Data',
-        children: [
-          {
-            value: 'table',
-            label: 'Table',
-          },
-          {
-            value: 'tag',
-            label: 'Tag',
-          },
-          {
-            value: 'progress',
-            label: 'Progress',
-          },
-          {
-            value: 'tree',
-            label: 'Tree',
-          },
-          {
-            value: 'pagination',
-            label: 'Pagination',
-          },
-          {
-            value: 'badge',
-            label: 'Badge',
-          },
-        ],
-      },
-      {
-        value: 'notice',
-        label: 'Notice',
-        children: [
-          {
-            value: 'alert',
-            label: 'Alert',
-          },
-          {
-            value: 'loading',
-            label: 'Loading',
-          },
-          {
-            value: 'message',
-            label: 'Message',
-          },
-          {
-            value: 'message-box',
-            label: 'MessageBox',
-          },
-          {
-            value: 'notification',
-            label: 'Notification',
-          },
-        ],
-      },
-      {
-        value: 'navigation',
-        label: 'Navigation',
-        children: [
-          {
-            value: 'menu',
-            label: 'Menu',
-          },
-          {
-            value: 'tabs',
-            label: 'Tabs',
-          },
-          {
-            value: 'breadcrumb',
-            label: 'Breadcrumb',
-          },
-          {
-            value: 'dropdown',
-            label: 'Dropdown',
-          },
-          {
-            value: 'steps',
-            label: 'Steps',
-          },
-        ],
-      },
-      {
-        value: 'others',
-        label: 'Others',
-        children: [
-          {
-            value: 'dialog',
-            label: 'Dialog',
-          },
-          {
-            value: 'tooltip',
-            label: 'Tooltip',
-          },
-          {
-            value: 'popover',
-            label: 'Popover',
-          },
-          {
-            value: 'card',
-            label: 'Card',
-          },
-          {
-            value: 'carousel',
-            label: 'Carousel',
-          },
-          {
-            value: 'collapse',
-            label: 'Collapse',
-          },
+          { value: 20, label: 'London' },
+          { value: 21, label: 'Birmingham' },
+          { value: 22, label: 'Manchester' },
         ],
       },
     ],
   },
   {
-    value: 'resource',
-    label: 'Resource',
+    value: 23,
+    label: 'North America',
     children: [
       {
-        value: 'axure',
-        label: 'Axure Components',
+        value: 24,
+        label: 'US',
+        children: [
+          { value: 25, label: 'New York' },
+          { value: 26, label: 'Los Angeles' },
+          { value: 27, label: 'Washington' },
+        ],
       },
       {
-        value: 'sketch',
-        label: 'Sketch Templates',
-      },
-      {
-        value: 'docs',
-        label: 'Design Documentation',
+        value: 28,
+        label: 'Canada',
+        children: [
+          { value: 29, label: 'Toronto' },
+          { value: 30, label: 'Montreal' },
+          { value: 31, label: 'Ottawa' },
+        ],
       },
     ],
   },
 ]
-
-
-
 
 
 
