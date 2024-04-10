@@ -570,8 +570,7 @@ function doDownload (data, name) {
         document.body.appendChild(link)
         link.click()
       }
-
-      
+ 
 //import { readFileSync } from 'fs'
 //import fs from "fs"
 
@@ -580,7 +579,7 @@ function importSubmit (e,filerow,fileList) {
  //const file = (event.target as HTMLInputElement).files?.[0];
   const file=filerow.raw;
    uploadZip(file);
-   return;
+   //return;
   if (file && (file.type === 'application/zip'|| file.type === 'application/x-zip-compressed')){
           // 读取zip压缩文件里面的文件内容
           JSZip.loadAsync(file).then((zip) => {
