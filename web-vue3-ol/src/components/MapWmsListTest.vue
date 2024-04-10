@@ -56,11 +56,11 @@
         </el-upload>
 
 
-                <!-- 图层开关 -->
-                <div id="layerControl">
-        <div class="title"><label>图层列表</label></div>
-        <ul id="layerTree" class="layerTree"></ul>
-    </div>
+        <!-- 图层开关 -->
+        <div id="layerControl">
+          <div class="title"><label>图层列表</label></div>
+          <ul id="layerTree" class="layerTree"></ul>
+        </div>
 
 
     
@@ -580,7 +580,7 @@ function importSubmit (e,filerow,fileList) {
  //const file = (event.target as HTMLInputElement).files?.[0];
   const file=filerow.raw;
    uploadZip(file);
-   return;
+  //  return;
   if (file && (file.type === 'application/zip'|| file.type === 'application/x-zip-compressed')){
           // 读取zip压缩文件里面的文件内容
           JSZip.loadAsync(file).then((zip) => {
@@ -898,6 +898,7 @@ function uploadZip(zipFile){
     const { code, msg,data: res } = response.data;
     if (code === 200) {
       console.log("success:"+msg+"zipFile 结束:"+res);
+      
       ElMessage.success(msg ?? "Submitted!"); 
     } else {
       console.log("fail:"+msg);
