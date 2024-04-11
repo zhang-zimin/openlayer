@@ -93,14 +93,14 @@
         <el-table-column type="selection" width="40" />
         <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
         <el-table-column prop="id" label="id" width="80" sortable="custom"/>
-        <el-table-column prop="nextsurveyno3" label="nextsurveyno3" width="80" sortable="custom"/>
-        <el-table-column prop="draintype" label="draintype" width="80" sortable="custom"/>
-        <el-table-column prop="drainsubtype" label="drainsubtype" width="80" sortable="custom"/>
-        <el-table-column prop="agriculturetype" label="agriculturetype" width="80" sortable="custom"/>
-        <el-table-column prop="username" label="名称" width="180" sortable="custom"/>
-        <el-table-column prop="useraddress" label="useraddress" width="180" sortable="custom"/>
-        <el-table-column prop="codinflow" label="codinflow" width="80" sortable="custom"/>
-        <el-table-column prop="codstandard" label="codstandard" width="80" editable sortable="custom">
+        <el-table-column prop="nextsurveyno3" label="下游编号" width="80" sortable="custom"/>
+        <el-table-column prop="draintype" label="面源类型" width="80" sortable="custom"/>
+        <el-table-column prop="drainsubtype" label="面源子类" width="80" sortable="custom"/>
+        <el-table-column prop="agriculturetype" label="农业类型" width="80" sortable="custom"/>
+        <el-table-column prop="username" label="对象名称" width="180" sortable="custom"/>
+        <el-table-column prop="useraddress" label="排水户地图地址" width="180" sortable="custom"/>
+        <el-table-column prop="codinflow" label="cod入流量" width="80" sortable="custom"/>
+        <el-table-column prop="codstandard" label="cod标准" width="80" editable sortable="custom">
           <template v-slot="scope">
             <el-input
               v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -112,48 +112,48 @@
               <span v-else>{{ scope.row.codstandard }}</span>
           </template>
         </el-table-column>
-          <el-table-column prop="nh3standard" label="nh3standard" width="80" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.nh3standard"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.nh3standard }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="tpstandard" label="tpstandard" width="180" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.tpstandard"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.tpstandard }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="inflowcoefficient" label="inflowcoefficient" width="80" editable sortable="custom">
-            <template v-slot="scope">
-              <el-input
-                v-if="scope.row.index + ',' + scope.column.index == currentCell"
-                :ref="scope.row.index + ',' + scope.column.index"
-                v-model="scope.row.inflowcoefficient"
-                @blur="hideInput(scope.row)"
-                @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-              />
-              <span v-else>{{ scope.row.inflowcoefficient }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="coddischarge" label="coddischarge" width="180" sortable="custom"/>
-          <el-table-column prop="nh3discharge" label="nh3discharge" width="180" sortable="custom"/>
-          <el-table-column prop="tpdischarge" label="tpdischarge" width="180" sortable="custom"/>
-          <el-table-column prop="nh3inflow" label="nh3inflow" width="180" sortable="custom"/>
-          <el-table-column prop="tpinflow" label="tpinflow" width="180" sortable="custom"/>
-         </el-table>
+        <el-table-column prop="nh3standard" label="nh3标准" width="80" editable sortable="custom">
+          <template v-slot="scope">
+            <el-input
+              v-if="scope.row.index + ',' + scope.column.index == currentCell"
+              :ref="scope.row.index + ',' + scope.column.index"
+              v-model="scope.row.nh3standard"
+              @blur="hideInput(scope.row)"
+              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+            />
+            <span v-else>{{ scope.row.nh3standard }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="tpstandard" label="tp标准" width="180" editable sortable="custom">
+          <template v-slot="scope">
+            <el-input
+              v-if="scope.row.index + ',' + scope.column.index == currentCell"
+              :ref="scope.row.index + ',' + scope.column.index"
+              v-model="scope.row.tpstandard"
+              @blur="hideInput(scope.row)"
+              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+            />
+            <span v-else>{{ scope.row.tpstandard }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="inflowcoefficient" label="入流系数" width="80" editable sortable="custom">
+          <template v-slot="scope">
+            <el-input
+              v-if="scope.row.index + ',' + scope.column.index == currentCell"
+              :ref="scope.row.index + ',' + scope.column.index"
+              v-model="scope.row.inflowcoefficient"
+              @blur="hideInput(scope.row)"
+              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+            />
+            <span v-else>{{ scope.row.inflowcoefficient }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="coddischarge" label="cod排放量" width="180" sortable="custom"/>
+        <el-table-column prop="nh3discharge" label="nh3排放量" width="180" sortable="custom"/>
+        <el-table-column prop="tpdischarge" label="tp排放量" width="180" sortable="custom"/>
+        <el-table-column prop="nh3inflow" label="nh3入流量" width="180" sortable="custom"/>
+        <el-table-column prop="tpinflow" label="tp入流量" width="180" sortable="custom"/>
+        </el-table>
 
          <!-- <div style="margin-top: 20px">
          <el-button @click="toggleSelection()">Clear selection</el-button>
@@ -163,7 +163,7 @@
 
         <!-- 清除当前选择 -->
         <div style="margin-top: 0px; margin-right: 25px">
-         <el-button @click="toggleSelection()">Clear selection</el-button>
+         <el-button @click="toggleSelection()">清除选择</el-button>
         </div>
 
         <el-pagination
@@ -339,51 +339,11 @@ const handleSelectionChange = (val: User[]) => {
   const query = () => {
     GetAll();   
   }
-  const query2 = () => {
-    //console.log('2222:')
-    console.log(username.value)
-  }
+  // const query2 = () => {
+  //   //console.log('2222:')
+  //   console.log(username.value)
+  // }
   
-  const tableData = [{
-    username:"李莲花",
-    sex:"男",
-    age:38,
-    email:"123456@qq.com",
-    phone:12345678901,
-    address:"莲花楼",
-  },
-  {
-    username:"方多病",
-    sex:"男",
-    age:23,
-    email:"fdb@qq.com",
-    phone:1589999999,
-    address:"天机堂",
-  },
-  {
-    username:"笛飞声",
-    sex:"男",
-    age:39,
-    email:"dfs@153.com",
-    phone:13266666666,
-    address:"金鸳盟",
-  },
-  {
-    username:"乔婉娩",
-    sex:"女",
-    age:32,
-    email:"qwm@163.com",
-    phone:12345678901,
-    address:"四顾门",
-  },
-  {
-    username:"角丽谯",
-    sex:"女",
-    age:32,
-    email:"jlq@163.com",
-    phone:1258888888,
-    address:"金鸳盟",
-  },]
   
   function calculation(){
     console.log("calculation");
