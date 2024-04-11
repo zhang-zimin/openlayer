@@ -819,11 +819,13 @@ function uploadZip(zipFile){
   console.log("zipFile dbffile:"+zipFile);
   const formData=new FormData();
   formData.append("file",zipFile);
-  PostFile('/Pollution2/upload-shapefile',formData).then((response) => {
+  PostFile('/Pollution/upload-shapefile',formData).then((response) => {
     console.log("zipFile response.data:"+response.data);
     const { code, msg,data: res } = response.data;
     if (code === 200) {
       console.log("success:"+msg+"zipFile 结束:"+res);
+      // rightChildRef.value.fenquSelMethod(res.geojson.list);
+      rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
       ElMessage.success(msg ?? "Submitted!"); 
     } else {
       console.log("fail:"+msg);
