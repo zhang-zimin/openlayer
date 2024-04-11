@@ -7,7 +7,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import optimizer from "vite-plugin-optimizer";
+import optimizer from "vite-plugin-optimizer";  
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,12 +21,12 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    // optimizer({
-    //   fs: () => ({
-    //       find: /^(node:)?fs$/,
-    //       code: `const fs = require('fs'); export { fs as default }`
-    //   }),
-    // }),
+    optimizer({
+      // fs: () => ({
+      //     find: /^(node:)?fs$/,
+      //     code: `const fs = require('fs'); export { fs as default }`
+      // }),
+    }),
   ],
   resolve: {
     alias: {
