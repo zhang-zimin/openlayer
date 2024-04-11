@@ -49,21 +49,16 @@
 
       <div class="select-el-form">
 
-  <div class="m-4">
+        <div class="m-4">
     分区
-    <el-select
-      v-model="valuefenqu"
-      multiple
-      placeholder="Select"
-      style="width: 240px"
-    >
-      <el-option
-        v-for="item in fenquTypeArray"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
-    </el-select>
+    <el-cascader :options="fenquTypeArray" :props="propswry" clearable />
+  </div>
+
+
+  <div class="m-4">
+    污染源
+    <!-- <el-cascader :options="fenquTypeArray" :props="propswry" clearable /> -->
+    <el-cascader :options="WryOptions" :props="WryProps" clearable />
   </div>
 
     <!-- <div class="raw"> -->
@@ -186,10 +181,7 @@
    <!-- </div> -->
 
 
-   <div class="m-4">
-    污染源
-    <el-cascader :options="fenquTypeArray" :props="propswry" clearable />
-  </div>
+
   <!-- <div class="m-4">
     <p>Collapse tags</p>
     <el-cascader :options="optionswry" :props="propswry" collapse-tags clearable />
@@ -360,7 +352,48 @@ const handleChange = (value) => {
 }
 
 
+const WryProps = { multiple: true }
 
+const WryOptions = [
+  {
+    value: 1,
+    label: '点源',
+    children: [
+      {
+        value: 2,
+        label: '工业',
+      },
+      {
+        value: 6,
+        label: '城镇生活源',
+      },
+    ],
+  },
+  {
+    value: 14,
+    label: '面源',
+    children: [
+      {
+        value: 15,
+        label: '农业面源',
+      },
+      {
+        value: 19,
+        label: '地表径流',
+      },
+    ],
+  },
+  {
+    value: 23,
+    label: '内源',
+    children: [
+      {
+        value: 24,
+        label: '内源',
+      },
+    ],
+  },
+]
 
 const propswry = { multiple: true }
 
