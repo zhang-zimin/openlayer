@@ -339,51 +339,11 @@ const handleSelectionChange = (val: User[]) => {
   const query = () => {
     GetAll();   
   }
-  const query2 = () => {
-    //console.log('2222:')
-    console.log(username.value)
-  }
+  // const query2 = () => {
+  //   //console.log('2222:')
+  //   console.log(username.value)
+  // }
   
-  const tableData = [{
-    username:"李莲花",
-    sex:"男",
-    age:38,
-    email:"123456@qq.com",
-    phone:12345678901,
-    address:"莲花楼",
-  },
-  {
-    username:"方多病",
-    sex:"男",
-    age:23,
-    email:"fdb@qq.com",
-    phone:1589999999,
-    address:"天机堂",
-  },
-  {
-    username:"笛飞声",
-    sex:"男",
-    age:39,
-    email:"dfs@153.com",
-    phone:13266666666,
-    address:"金鸳盟",
-  },
-  {
-    username:"乔婉娩",
-    sex:"女",
-    age:32,
-    email:"qwm@163.com",
-    phone:12345678901,
-    address:"四顾门",
-  },
-  {
-    username:"角丽谯",
-    sex:"女",
-    age:32,
-    email:"jlq@163.com",
-    phone:1258888888,
-    address:"金鸳盟",
-  },]
   
   function calculation(){
     console.log("calculation");

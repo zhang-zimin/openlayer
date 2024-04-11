@@ -1,8 +1,4 @@
 <template>
-
-    
-    
-    
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
     <el-tab-pane label="污染源负荷结构分析" name="first">
         <el-card>
@@ -54,7 +50,7 @@
       <div class="select-el-form">
 
   <div class="m-4">
-    <p>分区</p>
+    分区
     <el-select
       v-model="valuefenqu"
       multiple
@@ -70,7 +66,7 @@
     </el-select>
   </div>
 
-    <div class="raw">
+    <!-- <div class="raw"> -->
     <!-- <el-form-item label="污染源" prop="segment1" class="item">
       <el-select
         clear-icon="close"
@@ -99,7 +95,7 @@
         </el-option>
       </el-select>
     </el-form-item> -->
-    <el-form-item label="污染源" prop="segment2"  class="item">
+    <!-- <el-form-item label="污染源" prop="segment2"  class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -126,11 +122,11 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
-   </div>
+    </el-form-item> -->
+   <!-- </div> -->
   
-   <div class="raw">
-    <el-form-item label="污染大类" prop="segment3" class="item">
+   <!-- <div class="raw"> -->
+    <!-- <el-form-item label="污染大类" prop="segment3" class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -157,7 +153,7 @@
           >
         </el-option>
       </el-select>
-    </el-form-item>
+    </el-form-item> -->
     <!-- <el-form-item label="污染小类" prop="segment4"  class="item">
       <el-select
         clear-icon="close"
@@ -186,7 +182,7 @@
         </el-option>
       </el-select>
     </el-form-item> -->
-   </div>
+   <!-- </div> -->
 
 
    <div class="m-4">
@@ -219,7 +215,22 @@
     />
   </div> -->
 
-
+  <div class="m-4">
+    污染指标
+    <el-select
+      v-model="valueindex"
+      multiple
+      placeholder="Select"
+      style="width: 240px"
+    >
+      <el-option
+        v-for="item in optionindex"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
+  </div>
 
 
    <div class="raw">
@@ -235,30 +246,12 @@
 
     </el-tab-pane>
 
-    <el-tab-pane label="自由绘制" name="second">
-      <el-button type="primary" @click="drawPolygon">
-            <el-icon><EditPen /></el-icon>绘制多边形
-          </el-button>
-          <br>
-
-
-        <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
-        <br>
-        <el-button type="primary" @click="removeDrawLayer">
-          <el-icon><Delete /></el-icon>清除绘制
-        </el-button>
-        <br>
-
-        <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
-        <br>
-
-
-
+    <el-tab-pane label="污染源负荷空间分析" name="second">
+    
     </el-tab-pane>
 
 
-    <el-tab-pane label="Role" name="third">Role</el-tab-pane>
-    <el-tab-pane label="Task" name="fourth">Task</el-tab-pane>
+
   </el-tabs>
 
 
@@ -851,7 +844,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   padding: 32px;
   color: #6b778c;
   font-size: 32px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
   </style>

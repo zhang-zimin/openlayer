@@ -1,80 +1,55 @@
 <template>
-  <!-- <div class="MonitoringData"> -->
-  <!-- <div id="title" style="
-    height: 5px;
-    font-size: 30px; /* 设置较大的字体大小 */
-    font-family: Arial, Helvetica, sans-serif; /* 使用常见的标题字体家族 */
-    color: #333; /* 设置深灰色文本颜色 */
-    text-transform: uppercase; /* 将文本转为大写 */
-    text-align: center; /* 文本居中对齐 */
-    margin-top: 10px; /* 添加顶部外边距以提供视觉间隔 */">
-    中电建西北院污染总量控制分析平台
-  </div> -->
+  <!-- 顶部工具栏 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
+  <div class="toptools" style="height: 120px;">
+    <el-button type="primary" @click="drawPolygon">
+      <el-icon><EditPen /></el-icon>绘制多边形
+    </el-button>
 
-  <!-- ========================================================================= -->
-  <div class="vue-split-container">
-    <!-- 整个页面分为15、65、20 -->
-    <SplitWrapper :sizes="[15, 65, 20]" :minSize="0" class="vue-split horizontal">
-      <!-- 15 -->
-      <SplitItem class="vue-split-item">
-        <div class="vue-split-content nested-content-1">
+    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
 
-        <!-- 左侧图层展示及开关控制 -->
-        <!-- <div class="map-left"> -->
-          <el-button type="primary" @click="drawPolygon">
-            <el-icon><EditPen /></el-icon>绘制多边形
-          </el-button>
-          <br>
+    <el-button type="primary" @click="removeDrawLayer">
+      <el-icon><Delete /></el-icon>清除绘制
+    </el-button>
 
+    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
-        <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
-        <br>
-        <el-button type="primary" @click="removeDrawLayer">
-          <el-icon><Delete /></el-icon>清除绘制
+    <el-upload
+      class="shapefile-upload"
+      ref="upload"
+      action="string"
+      :file-list="uploadFiles"
+      :auto-upload="true"
+      :on-progress="importSubmit"
+      multiple="multiple"
+      accept=".zip"
+    >
+      <div class="upfile">
+        <el-button
+          type="success"
+          class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件
         </el-button>
-        <br>
+      </div>
+    </el-upload>
+  </div>
+  <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
-        <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
-        <br>
-        <!-- 上传文件组件 -->
-        <el-upload
-          class="shapefile-upload"
-          ref="upload"
-          action="string"
-          :file-list="uploadFiles"
-          :auto-upload="true"
-          :on-progress="importSubmit"
-          multiple="multiple"
-          accept=".zip"
-        >
-          <div class="upfile">
-            <el-button
-              type="success"
-              class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件
-            </el-button>
-          </div>
-        </el-upload>
+  <!-- 页面内容 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
+  <div class="vue-split-container" style="margin-top: 8px;">
 
-
-                <!-- 图层开关 -->
-                <div id="layerControl">
-        <div class="title"><label>图层列表</label></div>
-        <ul id="layerTree" class="layerTree"></ul>
-    </div>
-
-
-    
-        <!--<el-button type="primary" @click="leftmodelSatus.status=false">left</el-button>-->
-        <!--<input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" >上传SHP文件</input>  -->
-        <!--<input type="file" @change="handleFileUpload" accept=".zip">-->
-        <!-- </div> -->
+    <!-- 分为15%左侧图层列表、65%地图展示+表格、20%分析结果 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
+    <SplitWrapper :sizes="[15, 65, 20]" :minSize="0" class="vue-split horizontal">
+      <!-- 15%左侧图层列表 -->
+      <SplitItem class="vue-split-item">
+        <div class="vue-split-content nested-content-1" id="layerControl">
+          <div class="title"><label>图层列表</label></div>
+          <ul id="layerTree" class="layerTree"></ul>
         </div>
       </SplitItem>
 
-      <!-- 65的分成70和30 -->
+      <!-- 65%:地图展示70%+表格30% ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
       <SplitItem class="vue-split-item map-container" >
-        <SplitWrapper :sizes="[70, 30]" :minSize="0" direction="vertical" class="vue-split vertical map-container">
-          <!-- 70 -->
+        <SplitWrapper :sizes="[60, 40]" :minSize="0" direction="vertical" class="vue-split vertical map-container">
+          <!-- 地图展示70% -->
           <SplitItem class="vue-split-item map-container" >
             <div class="vue-split-content nested-content-2 map-container">
               <!-- this.$refs.map -->
@@ -88,9 +63,6 @@
                 class="map-border"
                 >
 
-                <!-- :style="mapstyle" -->
-                
-                <!-- 视图 -->
                 <ol-view
                   ref="view"
                   :center="center"
@@ -108,15 +80,6 @@
                 <!-- 用于显示地图的版权信息 -->
                 <ol-attribution-control />
 
-                <!--
-                <ol-interaction-clusterselect @select="featureSelected" :pointRadius="20">
-                  <ol-style>
-                    <ol-style-stroke color="green" :width="5"></ol-style-stroke>
-                    <ol-style-fill color="rgba(255,255,255,0.5)"></ol-style-fill>
-                    <ol-style-icon :src="markerIcon" :scale="0.05"></ol-style-icon>
-                  </ol-style>
-                </ol-interaction-clusterselect>-->
-
                 <!--@select="featureSelected"-->
                 <ol-interaction-select
                   @select="featureSelected"
@@ -132,6 +95,8 @@
 
                 <!--url="http://192.168.0.107:8010/geoserver/zzmserver/wms"-->
                 <!--url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"-->
+
+                <!-- 图层 -->
                 <ol-layer-group :opacity="0.4">
                   <!-- 佛山顺德底图 -->
                   <ol-tile-layer>
@@ -181,15 +146,7 @@
                     />
                   </ol-tile-layer>
 
-                  <!--<ol-tile-layer>
-                    <ol-source-tile-json
-                      url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"
-                      crossOrigin="anonymous"
-                    />
-                  </ol-tile-layer>-->
-
-                  <!--url="http://192.168.0.107:8010/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3APS_LINE-3857&maxFeatures=50&outputFormat=application%2Fjson"-->
-                  
+                  <!-- 污染源地块 -->
                   <ol-vector-layer title="AIRPORTS">
                     <ol-source-vector
                       ref="cities"
@@ -201,109 +158,73 @@
 
                     <ol-style>
                       <ol-style-stroke color="red" :width="2"></ol-style-stroke>
-                      <ol-style-fill color="rgba(255,255,255,0.1)"></ol-style-fill>
+                      <ol-style-fill color="rgba(255,255,0,0.8)"></ol-style-fill>
                       <ol-style-circle :radius="7">
                         <ol-style-fill color="blue"></ol-style-fill>
                       </ol-style-circle>
                     </ol-style>
-                </ol-vector-layer>
+                  </ol-vector-layer>
                 </ol-layer-group>
-    <!--<ol-image-layer id="xkcd">
-      <ol-source-image-static
-        :url="imgUrl"
-        :imageSize="size"
-        :imageExtent="extent"
-        :projection="projection"
-        :attributions="imgCopyright"
-      >
-      </ol-source-image-static>
-    </ol-image-layer>-->
 
-            <ol-overlay
-              :position="selectedCityPosition"
-              v-if="selectedCityName != ''"
-            >
-              <template v-slot="slotProps">
-                <div class="overlay-content">
-                  {{ selectedCityName }} {{ slotProps }}
-                </div>
-              </template>
-            </ol-overlay>
-                      </ol-map>
+                <ol-overlay
+                  :position="selectedCityPosition"
+                  v-if="selectedCityName != ''"
+                >
+                  <template v-slot="slotProps">
+                    <div class="overlay-content">
+                      {{ selectedCityName }} {{ slotProps }}
+                    </div>
+                  </template>
+                </ol-overlay>
+              </ol-map>
             </div>
           </SplitItem>
 
-          <!-- 30 -->
+          <!-- 表格30% -->
           <SplitItem class="vue-split-item">
             <div class="vue-split-content nested-content-2 table-container">
+              <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
 
-                <!-- <div id="e" class="split content" v-show="modelSatus.status"> -->
-    <!-- 点击按钮展开表格 -->
-    <!-- <el-button 
-    type="primary" 
-    v-show="!modelSatus.status" 
-    @click="modelSatus.status=true"
-    >
-      <el-icon><DArrowRight /></el-icon>
-    </el-button> -->
+              <!-- 表格的开关 -->
+              <!-- <div id="e" class="split content" v-show="modelSatus.status">
+              <el-button type="primary" v-show="!modelSatus.status" @click="modelSatus.status=true">
+                <el-icon><DArrowRight /></el-icon>
+              </el-button>
 
-      <!-- 点击按钮收起表格 -->
-      <!-- <div class="map-bottom" v-show="modelSatus.status" style="position: relative;"> -->
-      <!-- <div class="map-bottom" > -->
-        <!-- <el-button 
-          type="primary" 
-          @click="modelSatus.status=false" 
-          style="position: absolute; bottom: 0; left: 0;">
-          <el-icon><DArrowLeft /></el-icon>
-        </el-button> -->
-      
-      <!--msg="计算结果展示"-->
-        <PlantInfoList ref="childRef" :selData="mapClickData.list" :msg="zone_name"/>
-        <!--<div class="text"> 信息展示</div>
-        <div class="flexbox">
-          <el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />
-          <el-button type="primary" @click="look">查询</el-button>
-        </div>
-        <div class="list">
-          <li v-for="(item,index) in form.list " :key='index'>
-            <div class="fx-space-between-center li">
-              <div>{{item.name}}</div>
-              <div>{{item.record}}</div>
-            </div>
-            <div class="text-li">{{item.text}}</div>
-          </li>
-        </div>-->
-      <!-- </div> -->
+                <div class="map-bottom" v-show="modelSatus.status" style="position: relative;">
+                  <el-button type="primary" @click="modelSatus.status=false" style="position: absolute; bottom: 0; left: 0;">
+                    <el-icon><DArrowLeft /></el-icon>
+                  </el-button>
+                </div>
+              </div> -->
+
             </div>
           </SplitItem>
-
         </SplitWrapper>
       </SplitItem>
+      <!-- 65%:地图展示70%+表格30% ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
-      <!-- 20 -->
+      <!-- 20%分析结果 -->
       <SplitItem class="vue-split-item">
-            <div class="vue-split-content nested-content-1">
-              <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
-            </div>
+        <div class="vue-split-content nested-content-1 analysis">
+          <RightInfoList ref="rightChildRef" :selData="mapRightData.list"/>
+        </div>
       </SplitItem>
     </SplitWrapper>
   </div>
-    
-
-<!-- ====================================================================== -->
-  <!-- </div> -->
+  <!-- 页面内容 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 </template>
 
 
 <script setup lang="ts"> 
+import 'ol/ol.css';
 import { ref, reactive, inject, onMounted  } from "vue";
+import { getCurrentInstance } from "vue";
 import { ElMessage } from 'element-plus';
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
-import {getCurrentInstance} from "vue";
-import 'ol/ol.css';
-import {Feature, Map, View }from 'ol';
+import { Feature, Map, View }from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { GeoJSON } from "ol/format";
@@ -321,17 +242,20 @@ import JSZip from 'jszip';
 import * as shp from 'shpjs';
 //import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
-import {OSM, Vector as VectorSource2} from 'ol/source.js';
-import {Tile as TileLayer2, Vector as VectorLayer2} from 'ol/layer.js';
+import {  OSM, Vector as VectorSource2} from 'ol/source.js';
+import { Tile as TileLayer2, Vector as VectorLayer2 } from 'ol/layer.js';
 import { Get, Post,Put ,PostFile} from "../axios/api"; 
 import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
-import {open} from 'shapefile'
+import { open } from 'shapefile'
 // const Split = require('split.js');
 import Split from 'split.js';
 import { SplitWrapper, SplitItem } from 'vue3-split';
 import DbfABC from 'dbf-js';
 import iconv from 'iconv-lite'
 //import {DBFFile} from 'dbffile';
+
+
+
 const config = reactive({
   max: 3,
 })
@@ -345,9 +269,10 @@ console.log(proxy.$baseUrl)
 const screenWidth = ref(document.documentElement.clientWidth);//实时屏幕宽度
 const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕高度
 
+
 const mapstyle=ref("width: "+(screenWidth.value-204)+"px;height: "+(screenHeight.value-350)+"px")
-// const mapstyle=ref("width: "+(screenWidth.value*0.65)+"px;height: "+(screenHeight.value*0.7)+"px")
-console.log(mapstyle.value)
+
+// console.log(mapstyle.value)
 
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);
@@ -415,13 +340,16 @@ const featureSelected = (event) => {
     selectedCityName.value = "";
   }
 };
+
+const zone_name=ref("");
+const childRef = ref(null);
+
 function featureClicked(event) {
   console.log("featureClicked");
   console.log(event);
   console.log(event.target.value)
 }
-const zone_name=ref("");
-const childRef = ref(null);
+
 function mapclick(event){
     console.log("mapclick");
     console.log(event);
@@ -467,36 +395,36 @@ function addInteraction() {
   
   //const value = typeSelect.value;
   //if (value !== 'None') {
-    draw = new Draw({
-      source: source,
-      type: 'Polygon',
-      /*style: new Style({
-					fill: new Fill({               //填充样式
-						color: 'rgba(255, 255, 255, 0.2)'
-					}),
-					stroke: new Stroke({           //线样式
-						color: '#ffcc33',
-						width: 2
-					}),
-					image: new Circle({            //点样式
-						radius: 7, 
-						fill: new Fill({
-							color: '#2d98da'
-						})
-					}),
-					text: new Text({
-						font: '16px Calibri,sans-serif',
-						text: "未保存地块",
-						fill: new Fill({
-						  color: "#c0392b"
-						}),
-						backgroundFill: new Fill({      // 填充背景
-							color: 'rgba(0,0,0,1)',
-						}),
-					})
-        })*/
-    });
-    
+  draw = new Draw({
+    source: source,
+    type: 'Polygon',
+    /*style: new Style({
+        fill: new Fill({               //填充样式
+          color: 'rgba(255, 255, 255, 0.2)'
+        }),
+        stroke: new Stroke({           //线样式
+          color: '#ffcc33',
+          width: 2
+        }),
+        image: new Circle({            //点样式
+          radius: 7, 
+          fill: new Fill({
+            color: '#2d98da'
+          })
+        }),
+        text: new Text({
+          font: '16px Calibri,sans-serif',
+          text: "未保存地块",
+          fill: new Fill({
+            color: "#c0392b"
+          }),
+          backgroundFill: new Fill({      // 填充背景
+            color: 'rgba(0,0,0,1)',
+          }),
+        })
+      })*/
+  });
+
   map.value.map.addInteraction(draw);
   const maptemp=map.value.map;
   const mapValues=map.value.map.values_;
@@ -516,9 +444,7 @@ function addInteraction() {
 
     const coordinates = draw.coordinates;
     console.log("coordinates:"+coordinates);
-
   });
-
 }
 
 function drawPolygon(){
@@ -590,24 +516,24 @@ function importSubmit (e,filerow,fileList) {
           const pattern = new RegExp(/\S\.shp$/)
           let shpFile = fileList.find(i => pattern.test(i))
        
-         console.log("that.shpFile:"+ shpFile)
+          console.log("that.shpFile:"+ shpFile)
                   
                   // const filename = zip.files[key].name; 
                   const filename = shpFile;
-                 if (filename.endsWith('.shp')) {
+                  if (filename.endsWith('.shp')) {
                   let prj=filename.split('.')[0]+".prj";
                   let prjBlob =  zip.file(prj).async('string');
                   prjBlob.then(function(data) {
                       console.log(data);
                       if(data.includes("WGS_1984_Web_Mercator")){
                         ElMessage.success("此文件是3857编码格式文件");
-                      }else{
+                      } else {
                         ElMessage.error("此文件不是3857编码格式文件");
                         return;
                       }
                   });
 
-                  let dbfFileName=filename.split('.')[0]+".dbf";
+                  let dbfFileName = filename.split('.')[0]+".dbf";
                   // let dbfBlob =  zip.file(dbfFileName).async('arraybuffer');
                   
                   if (dbfFileName) {
@@ -953,12 +879,12 @@ function uploadZip(zipFile){
 }
 
 .gutter.gutter-horizontal {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  // background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
   cursor: col-resize;
 }
 
 .gutter.gutter-vertical {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  // background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
   cursor: row-resize;
 }
 
@@ -977,15 +903,23 @@ function uploadZip(zipFile){
   overflow-wrap: break-word;
 }
 
-.nested-content-1 {
+.nested-content-1,
+.nested-content-2,
+.toptools {
   // height:100%;
-  background: rgba(0, 256, 0, .1);
+  background: rgba(247,248,248, .9);
+  border: 1px solid rgb(4,124,195);
 }
 
-.nested-content-2 {
-  background: rgba(0, 0, 256, .1);
-}
+// .nested-content-2 {
+//   background: rgba(247,248,248, .9);
+//   border-color: rgb(156,220,252);
+// }
 
+// .toptools {
+//   background: rgba(247,248,248, .9);
+//   border-color: rgb(156,220,252);
+// }
 // .map-border {
 //   // width: 100%;
 //   // height: 100%;
