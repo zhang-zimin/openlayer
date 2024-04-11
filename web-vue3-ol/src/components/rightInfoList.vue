@@ -96,7 +96,7 @@
       </el-select>
     </el-form-item> -->
     <!-- <el-form-item label="污染源" prop="segment2"  class="item">
-    <!--<el-form-item label="污染源" prop="segment2"  class="item">
+    <el-form-item label="污染源" prop="segment2"  class="item">
       <el-select
         clear-icon="close"
         clearable
@@ -873,8 +873,8 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     margin-bottom: 5px;
   }
   .pieChart{
-    width: 400px;
-    height: 400px;
+    width: 250px;
+    height: 250px;
   }
 
   .demo-tabs > .el-tabs__content {
