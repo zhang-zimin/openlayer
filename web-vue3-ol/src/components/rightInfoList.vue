@@ -51,14 +51,14 @@
 
         <div class="m-4">
     分区
-    <el-cascader :options="fenquTypeArray" :props="propswry" clearable />
+    <el-cascader :options="fenquTypeArray" :props="propswry" v-model="fenquTypeList" clearable />
   </div>
 
 
   <div class="m-4">
     污染源
     <!-- <el-cascader :options="fenquTypeArray" :props="propswry" clearable /> -->
-    <el-cascader :options="WryOptions" :props="WryProps" clearable />
+    <el-cascader :options="WryOptions" :props="WryProps" v-model="wryPropsList" clearable />
   </div>
 
     <!-- <div class="raw"> -->
@@ -211,7 +211,7 @@
   <div class="m-4">
     污染指标
     <el-select
-      v-model="valueindex"
+      v-model="WryPropsIndexList"
       multiple
       placeholder="Select"
       style="width: 240px"
@@ -356,42 +356,36 @@ const WryProps = { multiple: true }
 
 const WryOptions = [
   {
-    value: 1,
+    value: '点源',
     label: '点源',
     children: [
       {
-        value: 2,
+        value: '工业',
         label: '工业',
       },
       {
-        value: 6,
+        value: '城镇生活源',
         label: '城镇生活源',
       },
     ],
   },
   {
-    value: 14,
+    value: '面源',
     label: '面源',
     children: [
       {
-        value: 15,
+        value: '农业面源',
         label: '农业面源',
       },
       {
-        value: 19,
+        value: '地表径流',
         label: '地表径流',
       },
     ],
   },
   {
-    value: 23,
+    value: '内源',
     label: '内源',
-    children: [
-      {
-        value: 24,
-        label: '内源',
-      },
-    ],
   },
 ]
 
@@ -820,24 +814,22 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
       }
     });
   }
+  const fenquTypeList=ref([]);
+  const wryPropsList=ref([]);
+  const WryPropsIndexList=ref([]);
   
   function calculation(){
-    console.log("calculation");
-    Post('/Pollution/calculation',{}).then((response) => {
-      const { code, msg, data,rows,total: res } = response.data;
+    console.log("calculation fenquTypeList:"+fenquTypeList.value);
+    console.log("calculation wryPropsList:"+wryPropsList.value);
+    console.log("calculation WryPropsIndexList:"+WryPropsIndexList.value);
+    const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
+    Post('/Pollution/PollutionSourceStatistics',geojson).then((response) => {
+      const { code, msg, data: res } = response.data;
       if (code === 200) {
-        console.log("计算后重新获取数据");
+        console.log("统计结果:"+res);
         ElMessage.success(msg ?? "Submitted!");
+        //画图
         //GetAll();   
-  
-        /*localStorage.setItem("token", res.token);
-        ElMessage.success(msg ?? "Submitted!");
-        router.push({
-          path: "/", // HelloWorld.vue在路由配置文件中定义的路径
-          params: {
-            isLogged: true,
-          },
-        });*/
       } else {
         ElMessage.error(msg);
       }
