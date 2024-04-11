@@ -910,7 +910,7 @@ function uploadZip(zipFile){
 .toptools {
   // height:100%;
   background: rgba(247,248,248, .9);
-  border: 1px solid rgb(4,124,195);
+  // border: 1px solid rgb(4,124,195);
 }
 
 // .nested-content-2 {
