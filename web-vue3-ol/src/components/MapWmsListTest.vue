@@ -254,11 +254,6 @@ import DbfABC from 'dbf-js';
 import iconv from 'iconv-lite'
 //import {DBFFile} from 'dbffile';
 
-
-
-const config = reactive({
-  max: 3,
-})
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
 //console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 

@@ -15,35 +15,9 @@
         <el-table-column prop="nh3sum" label="nh3sum" width="100" />
         <el-table-column prop="tpsum" label="tpsum" width="100"/>
       </el-table>
-          <!--
-      <div class="demo-pagination-block">
-        <el-pagination
-          v-model:current-page="currentPage4"
-          v-model:page-size="pageSize4"
-          :page-sizes="[10, 20, 50, 100]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="showtotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>-->
+
     </el-card>
-    <!-- <div class="m-4">
-    <p>Child options expand when clicked (default)</p>
-    <el-cascader v-model="value" :options="options" @change="handleChange" />
-  </div>
-  <div class="m-4">
-    <p>Child options expand when hovered</p>
-    <el-cascader
-      v-model="value"
-      :options="options"
-      :props="props"
-      @change="handleChange"
-    />
-  </div> -->
+
 
 
 
@@ -61,152 +35,6 @@
     <el-cascader :options="WryOptions" :props="WryProps" clearable />
   </div>
 
-    <!-- <div class="raw"> -->
-    <!-- <el-form-item label="污染源" prop="segment1" class="item">
-      <el-select
-        clear-icon="close"
-        clearable
-        v-model="segment1"
-        filterable
-        multiple
-        collapse-tags
-        collapse-tags-tooltip
-        placeholder="请选择类别"
-        :style="{ width: '100%' }"
-        @change="handleSegment1Change"
-      >
-        <el-option
-          v-for="(item, index) in segment1Options"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        >
-          <span
-            ><el-checkbox v-model="checkSegment1[index]" /><span
-              class="select-text"
-              >{{ item.label }}</span
-            ></span
-          >
-        </el-option>
-      </el-select>
-    </el-form-item> -->
-    <!-- <el-form-item label="污染源" prop="segment2"  class="item">
-    <el-form-item label="污染源" prop="segment2"  class="item">
-      <el-select
-        clear-icon="close"
-        clearable
-        v-model="segment2"
-        filterable
-        multiple
-        collapse-tags
-        collapse-tags-tooltip
-        placeholder="请选择类别"
-        :style="{ width: '100%' }"
-        @change="handleSegment2Change"
-      >
-        <el-option
-          v-for="(item, index) in segment2Options"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        >
-          <span
-            ><el-checkbox v-model="checkSegment2[index]" /><span
-              class="select-text"
-              >{{ item.label }}</span
-            ></span
-          >
-        </el-option>
-      </el-select>
-    </el-form-item> -->
-   <!-- </div> -->
-  
-   <!-- <div class="raw"> -->
-    <!-- <el-form-item label="污染大类" prop="segment3" class="item">
-      <el-select
-        clear-icon="close"
-        clearable
-        v-model="segment3"
-        filterable
-        multiple
-        collapse-tags
-        collapse-tags-tooltip
-        placeholder="请选择类别"
-        :style="{ width: '100%' }"
-        @change="draintypeArrayChange"
-      >
-        <el-option
-          v-for="(item, index) in draintypeArray"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        >
-          <span
-            ><el-checkbox v-model="checkSegment3[index]" /><span
-              class="select-text"
-              >{{ item.label }}</span
-            ></span
-          >
-        </el-option>
-      </el-select>
-    </el-form-item> -->
-    <!-- <el-form-item label="污染小类" prop="segment4"  class="item">
-      <el-select
-        clear-icon="close"
-        clearable
-        v-model="segment4"
-        filterable
-        multiple
-        collapse-tags
-        collapse-tags-tooltip
-        placeholder="请选择类别"
-        :style="{ width: '100%' }"
-        @change="drainsubtypeArrayChange"
-      >
-        <el-option
-          v-for="(item, index) in drainsubtypeArray"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        >
-          <span
-            ><el-checkbox v-model="checkSegment4[index]" /><span
-              class="select-text"
-              >{{ item.label }}</span
-            ></span
-          >
-        </el-option>
-      </el-select>
-    </el-form-item> -->
-   <!-- </div> -->
-
-
-
-  <!-- <div class="m-4">
-    <p>Collapse tags</p>
-    <el-cascader :options="optionswry" :props="propswry" collapse-tags clearable />
-  </div>
-  <div class="m-4">
-    <p>Collapse tags tooltip</p>
-    <el-cascader
-      :options="optionswry"
-      :props="propswry"
-      collapse-tags
-      collapse-tags-tooltip
-      clearable
-    />
-  </div>
-  <div class="m-4">
-    <p>Max Collapse Tags</p>
-    <el-cascader
-      :options="optionswry"
-      :props="propswry"
-      collapse-tags
-      collapse-tags-tooltip
-      max-collapse-tags="3"
-      clearable
-    />
-  </div> -->
 
   <div class="m-4">
     污染指标
@@ -243,17 +71,7 @@
     
     </el-tab-pane>
 
-
-
   </el-tabs>
-
-
-
-
-
-
-
-
 
   </template>
   
@@ -297,33 +115,9 @@
   const showrows=ref([])
   const showtotal = ref(0);
   
-
-  const valuefenqu = ref([])
 const valueindex = ref([])
-const value3 = ref([])
-const value4 = ref([])
-const optionfenqu = [
-  {
-    value: 'Option1',
-    label: 'Option1',
-  },
-  {
-    value: 'Option2',
-    label: 'Option2',
-  },
-  {
-    value: 'Option3',
-    label: 'Option3',
-  },
-  {
-    value: 'Option4',
-    label: 'Option4',
-  },
-  {
-    value: 'Option5',
-    label: 'Option5',
-  },
-]
+
+
 
 const optionindex = [
   {
@@ -585,7 +379,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
       fenquTypeArray.value.push(selItem.value);
     }
     console.log("fenquTypeArray:"+fenquTypeArray);
-    optionswry.value=fenquTypeArray.value;
+    // optionswry.value=fenquTypeArray.value;
   }
 
   let draintypeArray = ref([]);
