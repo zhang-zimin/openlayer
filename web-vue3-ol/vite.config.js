@@ -7,7 +7,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import optimizer from "vite-plugin-optimizer";
+import optimizer from "vite-plugin-optimizer";  
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,12 +21,12 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    // optimizer({
-    //   fs: () => ({
-    //       find: /^(node:)?fs$/,
-    //       code: `const fs = require('fs'); export { fs as default }`
-    //   }),
-    // }),
+    optimizer({
+      // fs: () => ({
+      //     find: /^(node:)?fs$/,
+      //     code: `const fs = require('fs'); export { fs as default }`
+      // }),
+    }),
   ],
   resolve: {
     alias: {
@@ -46,8 +46,8 @@ export default defineConfig({
     //这里的ip和端口是前端项目的;下面为需要跨域访问后端项目
     proxy: {
       '/api': {   // '/api'是代理标识，用于告诉node，url前面是/api的就是使用代理的
-        // target: 'http://192.168.0.102:9602',//这里填入你要请求的接口的前缀 局域网
-        target: 'http://1.1.1.200:9602',//这里填入你要请求的接口的前缀 交换机
+        target: 'http://192.168.0.102:9602',//这里填入你要请求的接口的前缀 局域网
+        // target: 'http://1.1.1.200:9602',//这里填入你要请求的接口的前缀 交换机
 
         
         //ws: false,//代理websocked

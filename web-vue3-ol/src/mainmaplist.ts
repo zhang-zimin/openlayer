@@ -8,8 +8,9 @@ import { createPinia } from 'pinia'
 
 import ElementPlus from 'element-plus'
 
+// import App from './components/MapWmsList.vue'
 import App from './components/MapWmsListTest.vue'
-
+// import App from './components/MapWmsListTest3.vue'
 
 //import App from './components/MapWms.vue'
 //import App from './components/HeNanMap.vue'
@@ -36,8 +37,8 @@ app.use(createPinia())
   app.use(OpenLayersMap, options);
 
 //app.config.globalProperties.baseURL = 'http://192.168.0.103:8010'// 自定义添加
-// const baseUrl = 'http://192.168.0.107:8010'// 自定义添加
-const baseUrl = 'http://1.1.1.250:8010'// 自定义添加
+const baseUrl = 'http://192.168.0.107:8010'// 自定义添加
+// const baseUrl = 'http://1.1.1.250:8010'// 自定义添加
 app.config.globalProperties.$baseUrl = baseUrl
 app.config.globalProperties.$getFullUrl = (params) => {
   return baseUrl + params
@@ -45,3 +46,5 @@ app.config.globalProperties.$getFullUrl = (params) => {
 
 app.use(ElementPlus);
 app.mount('#app')
+
+

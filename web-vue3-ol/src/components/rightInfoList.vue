@@ -506,8 +506,10 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   
     console.log('childSelData method called:'+childSelDataList);
   
-      showrows.value=childSelDataList.results;
-      showtotal.value = childSelDataList.results.length;
+      // showrows.value=childSelDataList.results;
+      // showtotal.value = childSelDataList.results.length;
+      showrows.value=childSelDataList;
+      showtotal.value = childSelDataList.length;
       console.log("right list length:"+showtotal.value);
   /*
     var selList = [];//定义一个空数组
