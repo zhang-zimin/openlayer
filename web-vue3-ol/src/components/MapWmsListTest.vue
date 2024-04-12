@@ -220,7 +220,7 @@
 import 'ol/ol.css';
 import { ref, reactive, inject, onMounted  } from "vue";
 import { getCurrentInstance } from "vue";
-import { ElMessage } from 'element-plus';
+//import { ElMessage } from 'element-plus';
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
