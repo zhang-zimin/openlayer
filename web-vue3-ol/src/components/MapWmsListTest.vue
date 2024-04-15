@@ -633,34 +633,7 @@ function importSubmit (e,filerow,fileList) {
                   console.log(data);
 */
 
-/*
-获取 .dbf 文件内容： 你提供的代码片段展示了如何从一个 ZIP 文件中提取名为 dbfFileName 的 .dbf 文件内容。这里使用了某种 ZIP 解压缩库（未指定具体库名称），通过 zip.file() 方法获取文件对象，然后调用其 async('arraybuffer') 方法异步获取文件内容为 ArrayBuffer 类型。这一步骤确保了 .dbf 文件以二进制形式存储在内存中，为后续解析做好准备。
 
-解析 .dbf 文件： 要从 ArrayBuffer 中读取并解析 .dbf 文件数据，你需要使用专门支持 DBF 文件格式解析的库。常见的库有：
-
-dbf（npm 包名：@felixge/node-dbf）
-dbf-file（npm 包名：dbf-file）
-simple-dbf-reader（npm 包名：simple-dbf-reader）
-
-npm install dbf-file
-import { read } from 'dbf-file';
-
-   // ... 在获取到 dbfBlob 后
-   dbfBlob.then((arrayBuffer) => {
-     read(arrayBuffer)
-       .then((data) => {
-         // data 是解析后的 DBF 数据，可以在此处进行进一步处理或传递给 Vue 组件状态
-         console.log(data);
-       })
-       .catch((error) => {
-         console.error('Error parsing DBF file:', error);
-       });
-   });
-    <!-- 显示数据行，假设 data.records 存储了记录数组 -->
-           <tr v-for="record in data.records" :key="record.id">
-             <td v-for="value in record.values" :key="value.fieldName">{{ value }}</td>
-           </tr>
-*/
                     let shpBlob =  zip.file(filename).async('arraybuffer');
                     shpBlob.then(res => {
                       //console.log(res);
