@@ -55,6 +55,7 @@
           <!-- 地图展示70% -->
           <SplitItem class="vue-split-item map-container" >
             <div class="vue-split-content nested-content-2 map-container">
+              <!-- map ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
               <!-- this.$refs.map -->
               <ol-map
                 ref="map" 
@@ -65,7 +66,7 @@
                 @click="mapclick"
                 class="map-border"
                 >
-
+                
                 <ol-view
                   ref="view"
                   :center="center"
@@ -102,7 +103,7 @@
                 <!-- 图层 -->
                 <ol-layer-group :opacity="0.4">
                   <!-- 佛山顺德底图 -->
-                  <ol-tile-layer>
+                  <ol-tile-layer title="底图">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:shunde"
@@ -126,7 +127,7 @@
                   </ol-tile-layer>
 
                   <!-- 排水管线 -->
-                  <ol-tile-layer>
+                  <ol-tile-layer title="排水管线">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:PS_LINE-3857"
@@ -150,7 +151,7 @@
                   </ol-tile-layer>
 
                   <!-- 污染源地块 -->
-                  <ol-vector-layer title="AIRPORTS">
+                  <ol-vector-layer title="污染源地块">
                     <ol-source-vector
                       ref="cities"
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
@@ -180,6 +181,9 @@
                   </template>
                 </ol-overlay>
               </ol-map>
+              <!-- map ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
+
+
             </div>
           </SplitItem>
 
@@ -223,7 +227,8 @@
 import 'ol/ol.css';
 import { ref, reactive, inject, onMounted  } from "vue";
 import { getCurrentInstance } from "vue";
-//import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import type { Action } from 'element-plus';
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
@@ -256,6 +261,11 @@ import { SplitWrapper, SplitItem } from 'vue3-split';
 import DbfABC from 'dbf-js';
 import iconv from 'iconv-lite'
 //import {DBFFile} from 'dbffile';
+import 'ol-layerswitcher/dist/ol-layerswitcher.css';
+import LayerSwitcher from 'ol-layerswitcher';
+const layerSwitcher = new LayerSwitcher();
+
+
 
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
@@ -380,6 +390,7 @@ onMounted(() => {
   console.log("onMounted map:"+map.map); 
   console.log("onMounted map:"+map.id); 
   console.log("layers:"+mapvalue.layers);*/
+  showTreeLayers();
 });
 
 const source = new VectorSource2({wrapX: false});
@@ -481,6 +492,63 @@ onMounted(async () => {
  // ]);
 });
 
+function showTreeLayers(){
+  // 图层控制
+  var layersContent = document.getElementById('layerTree');    
+  var layers = map.value.map.getLayers();    //获取地图中所有图层
+  var layer = [];                   //map中的图层数组
+  var layerName = [];               //图层名称数组
+  var layerVisibility = [];         //图层可见属性数组
+  for (var i = 0; i < layers.getLength()-2 ; i++) {
+      layer[i] = layers.item(i);
+      layerName[i] = layer[i].get('title');
+      layerVisibility[i] = layer[i].getVisible();
+
+      let eleLi = document.createElement('li');           //新增li元素，用来承载图层项
+      var eleInput = document.createElement('input');     //创建复选框元素，用来控制图层开启关闭
+      eleInput.type = "checkbox";
+      eleInput.name = "layers"; 
+      eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
+
+      // layersContent.appendChild(eleLi);                   //将li元素作为子节点放入到图层目录中
+      layersContent.insertBefore(eleLi,layersContent.childNodes[0]); //将li元素作为子节点放入到图层目录中（按图层加载倒序）
+      var eleLable = document.createElement('label');     //创建label元素
+      // eleLable.className = "layer";
+      // eleLable.htmlFor = "layer";
+      setInnerText(eleLable, layerName[i]);                //在label中设置图层名称
+      eleLi.appendChild(eleLable);                         //将label加入到li中
+
+      if (layerVisibility[i]) {                            //设置图层默认显示状态
+          eleInput.checked = true;
+      }
+      addChangeEvent(eleInput, layer[i]);              //为checkbox添加变更事件
+  };
+}
+
+function setInnerText(element, text) {
+    if (typeof element.textContent == "string") {
+        element.textContent = text;
+    } else {
+        element.innerText = text;
+    }
+}
+    
+    /*
+  * 为checkbox元素绑定变更事件
+  */
+function addChangeEvent(element, layer) {
+    element.onclick = function () {
+        if (element.checked) {
+            //显示图层
+            layer.setVisible(true);
+        }
+        else {
+            //不显示图层
+            layer.setVisible(false);
+        }
+    };
+}
+
 function doDownload (data, name) {
         if (!data) {
           return
@@ -524,9 +592,33 @@ function importSubmit (e,filerow,fileList) {
                   prjBlob.then(function(data) {
                       console.log(data);
                       if(data.includes("WGS_1984_Web_Mercator")){
-                        ElMessage.success("此文件是3857编码格式文件");
+                        ElMessage({
+                          showClose: true,
+                          message: '坐标系正确!',
+                          type: 'success',
+                          duration:1000,
+                        });
+
                       } else {
-                        ElMessage.error("此文件不是3857编码格式文件");
+                        // ElMessage.error("此文件不是3857编码格式文件");
+                        // ElMessage({
+                        //   showClose: true,
+                        //   message: '该文件投影坐标系错误!请重新上传3857坐标文件',
+                        //   type: 'error',
+                        //   duration:0,
+                        // });
+
+                        ElMessageBox.alert('该文件投影坐标系错误!请重新上传3857坐标文件', '错误', {
+                        // if you want to disable its autofocus
+                        // autofocus: false,
+                        confirmButtonText: 'OK',
+                        callback: (action: Action) => {
+                          ElMessage({
+                            type: 'info',
+                            message: `action: ${action}`,
+                          })
+                        },
+                      })
                         return;
                       }
                   });
@@ -611,34 +703,7 @@ function importSubmit (e,filerow,fileList) {
                   console.log(data);
 */
 
-/*
-获取 .dbf 文件内容： 你提供的代码片段展示了如何从一个 ZIP 文件中提取名为 dbfFileName 的 .dbf 文件内容。这里使用了某种 ZIP 解压缩库（未指定具体库名称），通过 zip.file() 方法获取文件对象，然后调用其 async('arraybuffer') 方法异步获取文件内容为 ArrayBuffer 类型。这一步骤确保了 .dbf 文件以二进制形式存储在内存中，为后续解析做好准备。
 
-解析 .dbf 文件： 要从 ArrayBuffer 中读取并解析 .dbf 文件数据，你需要使用专门支持 DBF 文件格式解析的库。常见的库有：
-
-dbf（npm 包名：@felixge/node-dbf）
-dbf-file（npm 包名：dbf-file）
-simple-dbf-reader（npm 包名：simple-dbf-reader）
-
-npm install dbf-file
-import { read } from 'dbf-file';
-
-   // ... 在获取到 dbfBlob 后
-   dbfBlob.then((arrayBuffer) => {
-     read(arrayBuffer)
-       .then((data) => {
-         // data 是解析后的 DBF 数据，可以在此处进行进一步处理或传递给 Vue 组件状态
-         console.log(data);
-       })
-       .catch((error) => {
-         console.error('Error parsing DBF file:', error);
-       });
-   });
-    <!-- 显示数据行，假设 data.records 存储了记录数组 -->
-           <tr v-for="record in data.records" :key="record.id">
-             <td v-for="value in record.values" :key="value.fieldName">{{ value }}</td>
-           </tr>
-*/
                     let shpBlob =  zip.file(filename).async('arraybuffer');
                     shpBlob.then(res => {
                       //console.log(res);
@@ -943,6 +1008,53 @@ function exportMapAsImage() {
 
 
 <style scoped lang="scss">
+*{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+#map{
+    // position: absolute;
+    width: 100%;
+    height: 100%;
+}
+#layerControl {
+    // position: absolute;
+    // z-index: 999;
+    // width: 200px;
+    // height: 300px;
+    // background-color: rgba(78, 70, 109, 0.596);
+    // left: 50px;
+    // top: 200px;
+    // padding: 5px;
+    // border-radius: 10px;
+    // -webkit-border-radius: 10px;
+    // -moz-border-radius: 10px;
+    // -ms-border-radius: 10px;
+    // -o-border-radius: 10px;
+}
+
+#layerControl .title {
+    color: rgb(0, 0, 0);
+    text-align: center;
+    font-size: 20px;
+    margin: 10px 0px;
+}
+
+#layerControl li {
+    color: ivory;
+}
+
+#layerControl input {
+    margin-right: 10px;
+}
+
+#layerlistbtn {
+    position: fixed;
+    right: 15px;
+    top: 50px;
+}
+
 #map {
   width: 100%;
   height: 100%;
