@@ -59,8 +59,13 @@
    </div>
   
   <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
-  <div ref="pieChart" class="pieChart"></div>
-  
+
+  <div ref="pieChart" class="pieChart" id="pieChart"></div>
+ 
+  <div ref="pieChart2" class="pieChart" id="pieChart2"></div>
+ 
+  <div ref="pieChart3" class="pieChart" id="pieChart3"></div>
+ 
   </div>
 
 
@@ -276,6 +281,7 @@ const optionswry = [
 
 
 import type { TabsPaneContext } from 'element-plus'
+import { text } from 'stream/consumers';
 
 const activeName = ref('first')
 
@@ -346,7 +352,8 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     console.log('fenquSelDataList method called:'+fenquSelDataList);
     for(let i = 0; i < fenquSelDataList.length; i++) { 
       const selItem = ref({key:"",label:""});
-      selItem.value.key = fenquSelDataList[i].properties.FID_1;
+      // selItem.value.key = fenquSelDataList[i].properties.FID_1;
+      selItem.value.key = fenquSelDataList[i].properties.fenqu;
       selItem.value.label = fenquSelDataList[i].properties.fenqu;
       fenquTypeArray.value.push(selItem.value);
     }
@@ -354,6 +361,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   }
 
   const fenquMapMethod = (fenquMapData: []) => {
+    fenquTypeArray.value=[];
     //console.log('fenquMapData method called:'+fenquMapData);
     console.log('fenquMapData length:'+fenquMapData.length);
     // console.log('fenquMapData.fenquList:'+fenquMapData.fenquList);
@@ -621,6 +629,37 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
       const { code, msg, data: res } = response.data;
       if (code === 200) {
         console.log("统计结果:"+res);
+        const codArray=[];
+        const nh3Array=[];
+        const tpArray=[];
+        for(var i=0;i<res.length;i++){
+          const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }
+        showChart(codArray,pieChart,"codsum");
+        showChart(nh3Array,pieChart2,"nh3sum");
+        showChart(tpArray,pieChart3,"tpsum");
+
+        showrows.value=res;
+        showtotal.value = res.length;
+
+        document.getElementById("pieChart").style.display = "none";
+        document.getElementById("pieChart2").style.display = "none";
+        document.getElementById("pieChart3").style.display = "none";
+       if(WryPropsIndexList.value.includes("codsum")){
+        document.getElementById("pieChart").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("nh3sum")){
+        document.getElementById("pieChart2").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("tpsum")){
+        document.getElementById("pieChart3").style.display = "block";
+       }
+
         ElMessage.success(msg ?? "Submitted!");
         //画图
         //GetAll();   
@@ -631,6 +670,11 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   }
   
   let pieChart = ref()
+  let pieChart2 = ref()
+  let pieChart3 = ref()
+  const pieChartShow=ref();
+  const pieChartShow2=ref();
+  const pieChartShow3=ref();
   onMounted(() => {
       nextTick(() => { //将图表操作放入nextTick中
         initChart()
@@ -657,6 +701,22 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
                   name: '搜索引擎'
                 }
               ]
+            }
+          ]
+        };
+      myChart.setOption(option);
+    }
+
+    const showChart = (showdata,showPieChart,titleText) => { 
+      var myChart = (echarts as any).init(showPieChart.value);
+      var option = {
+         title:{
+                text: titleText
+              },
+          series: [
+            {
+              type: 'pie',
+              data: showdata
             }
           ]
         };

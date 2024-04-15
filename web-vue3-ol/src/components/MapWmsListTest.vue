@@ -13,6 +13,7 @@
 
     <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
 
+    <el-button type="primary" @click="exportMapAsImage">地图导出</el-button>
     <el-upload
       class="shapefile-upload"
       ref="upload"
@@ -30,6 +31,8 @@
         </el-button>
       </div>
     </el-upload>
+
+    
   </div>
   <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
@@ -829,6 +832,113 @@ function uploadZip(zipFile){
     }
   });
 }
+
+// 导出地图为PNG图片
+function exportMapAsImage2() {
+  const mapCanvas = document.createElement('canvas');
+  // var canvas =   map.value.map.getCanvas();
+  var canvas =   mapCanvas;
+  var dataURL = canvas.toDataURL('image/png');
+ 
+  // 创建一个a元素用于下载
+  var a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'map.png';
+  a.click();
+}
+
+/**
+ *  todo 保存地图
+ * @param {string} format - 格式，目前只支持图片
+ */
+ function exportMapAsImage3() {
+
+    const thisMap = map.value.map;
+    thisMap.once('postcompose', function (event) {
+            var canvas = event.context.canvas;
+            canvas.toBlob(function (blob) {
+                saveAs(blob, 'map.png');
+            });
+    });
+    thisMap.renderSync();
+}
+
+const dims = {
+  a0: [1189, 841],
+  a1: [841, 594],
+  a2: [594, 420],
+  a3: [420, 297],
+  a4: [297, 210],
+  a5: [210, 148],
+};
+
+function exportMapAsImage() {
+  const thismap=map.value.map;
+ 
+    document.body.style.cursor = 'progress';
+
+    const resolution=ref(72);
+    const dim = dims.a5;
+    const width = Math.round((dim[0] * resolution.value) / 25.4);
+    const height = Math.round((dim[1] * resolution.value) / 25.4);
+    const size = thismap.getSize();
+    const viewResolution = thismap.getView().getResolution();
+
+    thismap.once('rendercomplete', function () {
+      const mapCanvas = document.createElement('canvas');
+      mapCanvas.width = width;
+      mapCanvas.height = height;
+      const mapContext = mapCanvas.getContext('2d');
+      Array.prototype.forEach.call(
+        document.querySelectorAll('.ol-layer canvas'),
+        function (canvas) {
+          if (canvas.width > 0) {
+            const opacity = canvas.parentNode.style.opacity;
+            mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+            const transform = canvas.style.transform;
+            // Get the transform parameters from the style's transform matrix
+            const matrix = transform
+              .match(/^matrix\(([^\(]*)\)$/)[1]
+              .split(',')
+              .map(Number);
+            // Apply the transform to the export map context
+            CanvasRenderingContext2D.prototype.setTransform.apply(
+              mapContext,
+              matrix
+            );
+            mapContext.drawImage(canvas, 0, 0);
+          }
+        }
+      );
+      mapContext.globalAlpha = 1;
+      mapContext.setTransform(1, 0, 0, 1, 0, 0);
+      const pdf = new jspdf.jsPDF('landscape', undefined, format);
+ 
+      var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
+      pdf.addImage(
+        //mapCanvas.toDataURL('image/jpeg'),
+        dataURL,
+        'JPEG',
+        0,
+        0,
+        dim[0],
+        dim[1]
+      );
+      pdf.save('map.pdf');
+      // Reset original map size
+      thismap.setSize(size);
+      thismap.getView().setResolution(viewResolution);
+       
+      document.body.style.cursor = 'auto';
+    });
+
+    // Set print size
+    const printSize = [width, height];
+    thismap.setSize(printSize);
+    const scaling = Math.min(width / size[0], height / size[1]);
+    thismap.getView().setResolution(viewResolution / scaling);
+  } 
+
 </script>
 
 
