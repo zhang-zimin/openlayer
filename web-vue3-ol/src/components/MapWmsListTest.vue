@@ -100,7 +100,7 @@
                 <!-- 图层 -->
                 <ol-layer-group :opacity="0.4">
                   <!-- 佛山顺德底图 -->
-                  <ol-tile-layer name="basemap">
+                  <ol-tile-layer title="底图">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:shunde"
@@ -124,7 +124,7 @@
                   </ol-tile-layer>
 
                   <!-- 排水管线 -->
-                  <ol-tile-layer name="net">
+                  <ol-tile-layer title="排水管线">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:PS_LINE-3857"
@@ -148,7 +148,7 @@
                   </ol-tile-layer>
 
                   <!-- 污染源地块 -->
-                  <ol-vector-layer title="AIRPORTS" name="wrynone">
+                  <ol-vector-layer title="污染源地块">
                     <ol-source-vector
                       ref="cities"
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
@@ -387,6 +387,7 @@ onMounted(() => {
   console.log("onMounted map:"+map.map); 
   console.log("onMounted map:"+map.id); 
   console.log("layers:"+mapvalue.layers);*/
+  showTreeLayers();
 });
 
 const source = new VectorSource2({wrapX: false});
@@ -488,59 +489,62 @@ onMounted(async () => {
  // ]);
 });
 
-// 图层控制
-// var layersContent = document.getElementById('layerTree');    
-// var layers = map.getLayers();    //获取地图中所有图层
-// var layer = [];                   //map中的图层数组
-// var layerName = [];               //图层名称数组
-// var layerVisibility = [];         //图层可见属性数组
-// for (var i = 0; i < layers.getLength() ; i++) {
-//     layer[i] = layers.item(i);
-//     layerName[i] = layer[i].get('title');
-//     layerVisibility[i] = layer[i].getVisible();
+function showTreeLayers(){
+  // 图层控制
+  var layersContent = document.getElementById('layerTree');    
+  var layers = map.value.map.getLayers();    //获取地图中所有图层
+  var layer = [];                   //map中的图层数组
+  var layerName = [];               //图层名称数组
+  var layerVisibility = [];         //图层可见属性数组
+  for (var i = 0; i < layers.getLength()-2 ; i++) {
+      layer[i] = layers.item(i);
+      layerName[i] = layer[i].get('title');
+      layerVisibility[i] = layer[i].getVisible();
 
-//     let eleLi = document.createElement('li');           //新增li元素，用来承载图层项
-//     var eleInput = document.createElement('input');     //创建复选框元素，用来控制图层开启关闭
-//     eleInput.type = "checkbox";
-//     eleInput.name = "layers"; 
-//      eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
+      let eleLi = document.createElement('li');           //新增li元素，用来承载图层项
+      var eleInput = document.createElement('input');     //创建复选框元素，用来控制图层开启关闭
+      eleInput.type = "checkbox";
+      eleInput.name = "layers"; 
+      eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
 
-//     // layersContent.appendChild(eleLi);                   //将li元素作为子节点放入到图层目录中
-//     layersContent.insertBefore(eleLi,layersContent.childNodes[0]); //将li元素作为子节点放入到图层目录中（按图层加载倒序）
-//     var eleLable = document.createElement('label');     //创建label元素
-//     // eleLable.className = "layer";
-//     // eleLable.htmlFor = "layer";
-//     setInnerText(eleLable, layerName[i]);                //在label中设置图层名称
-//     eleLi.appendChild(eleLable);                         //将label加入到li中
+      // layersContent.appendChild(eleLi);                   //将li元素作为子节点放入到图层目录中
+      layersContent.insertBefore(eleLi,layersContent.childNodes[0]); //将li元素作为子节点放入到图层目录中（按图层加载倒序）
+      var eleLable = document.createElement('label');     //创建label元素
+      // eleLable.className = "layer";
+      // eleLable.htmlFor = "layer";
+      setInnerText(eleLable, layerName[i]);                //在label中设置图层名称
+      eleLi.appendChild(eleLable);                         //将label加入到li中
 
-//      if (layerVisibility[i]) {                            //设置图层默认显示状态
-//         eleInput.checked = true;
-//     }
-//     addChangeEvent(eleInput, layer[i]);              //为checkbox添加变更事件
-// };
-// function setInnerText(element, text) {
-//     if (typeof element.textContent == "string") {
-//         element.textContent = text;
-//     } else {
-//         element.innerText = text;
-//     }
-// }
+      if (layerVisibility[i]) {                            //设置图层默认显示状态
+          eleInput.checked = true;
+      }
+      addChangeEvent(eleInput, layer[i]);              //为checkbox添加变更事件
+  };
+}
+
+function setInnerText(element, text) {
+    if (typeof element.textContent == "string") {
+        element.textContent = text;
+    } else {
+        element.innerText = text;
+    }
+}
     
-//     /*
-//   * 为checkbox元素绑定变更事件
-//   */
-// function addChangeEvent(element, layer) {
-//     element.onclick = function () {
-//         if (element.checked) {
-//             //显示图层
-//             layer.setVisible(true);
-//         }
-//         else {
-//             //不显示图层
-//             layer.setVisible(false);
-//         }
-//     };
-// }
+    /*
+  * 为checkbox元素绑定变更事件
+  */
+function addChangeEvent(element, layer) {
+    element.onclick = function () {
+        if (element.checked) {
+            //显示图层
+            layer.setVisible(true);
+        }
+        else {
+            //不显示图层
+            layer.setVisible(false);
+        }
+    };
+}
 
 function doDownload (data, name) {
         if (!data) {
@@ -905,23 +909,23 @@ function uploadZip(zipFile){
     height: 100%;
 }
 #layerControl {
-    position: absolute;
-    z-index: 999;
-    width: 200px;
-    height: 300px;
-    background-color: rgba(78, 70, 109, 0.596);
-    left: 50px;
-    top: 200px;
-    padding: 5px;
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
+    // position: absolute;
+    // z-index: 999;
+    // width: 200px;
+    // height: 300px;
+    // background-color: rgba(78, 70, 109, 0.596);
+    // left: 50px;
+    // top: 200px;
+    // padding: 5px;
+    // border-radius: 10px;
+    // -webkit-border-radius: 10px;
+    // -moz-border-radius: 10px;
+    // -ms-border-radius: 10px;
+    // -o-border-radius: 10px;
 }
 
 #layerControl .title {
-    color: ivory;
+    color: rgb(0, 0, 0);
     text-align: center;
     font-size: 20px;
     margin: 10px 0px;
