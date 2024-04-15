@@ -220,7 +220,8 @@
 import 'ol/ol.css';
 import { ref, reactive, inject, onMounted  } from "vue";
 import { getCurrentInstance } from "vue";
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import type { Action } from 'element-plus';
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
@@ -521,9 +522,33 @@ function importSubmit (e,filerow,fileList) {
                   prjBlob.then(function(data) {
                       console.log(data);
                       if(data.includes("WGS_1984_Web_Mercator")){
-                        ElMessage.success("此文件是3857编码格式文件");
+                        ElMessage({
+                          showClose: true,
+                          message: '坐标系正确!',
+                          type: 'success',
+                          duration:1000,
+                        });
+
                       } else {
-                        ElMessage.error("此文件不是3857编码格式文件");
+                        // ElMessage.error("此文件不是3857编码格式文件");
+                        // ElMessage({
+                        //   showClose: true,
+                        //   message: '该文件投影坐标系错误!请重新上传3857坐标文件',
+                        //   type: 'error',
+                        //   duration:0,
+                        // });
+
+                        ElMessageBox.alert('该文件投影坐标系错误!请重新上传3857坐标文件', '错误', {
+                        // if you want to disable its autofocus
+                        // autofocus: false,
+                        confirmButtonText: 'OK',
+                        callback: (action: Action) => {
+                          ElMessage({
+                            type: 'info',
+                            message: `action: ${action}`,
+                          })
+                        },
+                      })
                         return;
                       }
                   });
