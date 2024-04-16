@@ -1,19 +1,21 @@
 <template>
   <!-- 顶部工具栏 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
-  <div class="toptools" style="height: 120px;">
-    <el-button type="primary" @click="drawPolygon">
-      <el-icon><EditPen /></el-icon>绘制多边形
+  <div class="toptools">
+    <el-button type="primary" plain @click="drawPolygon" class="AllButton">
+      <el-icon><Edit /></el-icon>绘制多边形
     </el-button>
-
-    <el-button type="primary" @click="cancelDraw">结束绘制</el-button>
-
-    <el-button type="primary" @click="removeDrawLayer">
+    <el-button type="primary" plain @click="cancelDraw" class="AllButton">
+      <el-icon><SwitchButton /></el-icon>结束绘制
+    </el-button>
+    <el-button type="primary" plain @click="removeDrawLayer" class="AllButton">
       <el-icon><Delete /></el-icon>清除绘制
     </el-button>
-
-    <el-button type="primary" @click="getPolygon">获取多边形数据</el-button>
-
-    <el-button type="primary" @click="exportMapAsImage">地图导出</el-button>
+    <el-button type="primary" plain @click="getPolygon" class="AllButton">
+      <el-icon><Connection /></el-icon>获取多边形数据
+    </el-button>
+    <el-button type="primary" plain @click="exportMapAsImage" class="AllButton">
+      <el-icon><TopRight /></el-icon>地图导出
+    </el-button>
     <el-upload
       class="shapefile-upload"
       ref="upload"
@@ -24,15 +26,16 @@
       multiple="multiple"
       accept=".zip"
     >
-      <div class="upfile">
+      <div>
         <el-button
-          type="success"
-          class="chaxuns fontSizes"><el-icon><Upload /></el-icon>上传文件
+          type="primary" plain
+          slot='trigger'
+          class="chaxuns fontSizes AllButton">
+          <el-icon><Upload /></el-icon>
+          上传文件
         </el-button>
       </div>
     </el-upload>
-
-    
   </div>
   <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
@@ -44,7 +47,9 @@
       <!-- 15%左侧图层列表 -->
       <SplitItem class="vue-split-item">
         <div class="vue-split-content nested-content-1" id="layerControl">
-          <div class="title"><label>图层列表</label></div>
+          <div class="title layersItem">
+            <el-text class="layersItemText" size="large">图层列表</el-text>
+          </div>
           <ul id="layerTree" class="layerTree"></ul>
         </div>
       </SplitItem>
@@ -103,7 +108,7 @@
                 <!-- 图层 -->
                 <ol-layer-group :opacity="0.4">
                   <!-- 佛山顺德底图 -->
-                  <ol-tile-layer title="底图">
+                  <ol-tile-layer title="BaseMap">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:shunde"
@@ -250,10 +255,23 @@ import JSZip from 'jszip';
 import * as shp from 'shpjs';
 //import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
-import {  OSM, Vector as VectorSource2} from 'ol/source.js';
+import { OSM, Vector as VectorSource2} from 'ol/source.js';
 import { Tile as TileLayer2, Vector as VectorLayer2 } from 'ol/layer.js';
 import { Get, Post,Put ,PostFile} from "../axios/api"; 
-import { DArrowRight, DArrowLeft, Download, Upload, Delete, EditPen, Refresh, DataAnalysis } from '@element-plus/icons-vue';
+import { 
+  DArrowRight,
+  Connection,
+  DArrowLeft, 
+  Download, 
+  Upload, 
+  Delete, 
+  EditPen, 
+  Refresh, 
+  DataAnalysis,
+  Search,
+  SwitchButton,
+  Edit,TopRight,
+  } from '@element-plus/icons-vue';
 import { open } from 'shapefile'
 // const Split = require('split.js');
 import Split from 'split.js';
@@ -511,7 +529,7 @@ function showTreeLayers(){
       eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
 
       // layersContent.appendChild(eleLi);                   //将li元素作为子节点放入到图层目录中
-      layersContent.insertBefore(eleLi,layersContent.childNodes[0]); //将li元素作为子节点放入到图层目录中（按图层加载倒序）
+      layersContent.insertBefore(eleLi,layersContent.childNodes[1]); //将li元素作为子节点放入到图层目录中（按图层加载倒序0,顺序1）
       var eleLable = document.createElement('label');     //创建label元素
       // eleLable.className = "layer";
       // eleLable.htmlFor = "layer";
@@ -548,6 +566,11 @@ function addChangeEvent(element, layer) {
         }
     };
 }
+
+
+
+
+
 
 function doDownload (data, name) {
         if (!data) {
@@ -831,17 +854,17 @@ Post('/Pollution/acceptShp',geometryArray).then((response) => {
   });
 }
 
-function getGeometryJson(geometryArray) {
-  let polygonStr = "";
-  let polygonArray = [];
-  for(let i = 0; i < geometryArray.length; i++) { 
-    console.log(geometryArray[i]);
-    polygonArray.push('{"type":"Polygon","coordinates":'+getPointStr(geometryArray[i].coordinates)+'}');
-  }
-  polygonStr=polygonArray.join('');
-  //console.log("polygonStr:"+polygonStr);
-  return polygonStr;
-}
+// function getGeometryJson(geometryArray) {
+//   let polygonStr = "";
+//   let polygonArray = [];
+//   for(let i = 0; i < geometryArray.length; i++) { 
+//     console.log(geometryArray[i]);
+//     polygonArray.push('{"type":"Polygon","coordinates":'+getPointStr(geometryArray[i].coordinates)+'}');
+//   }
+//   polygonStr=polygonArray.join('');
+//   //console.log("polygonStr:"+polygonStr);
+//   return polygonStr;
+// }
 //解析一个coordinates为字符串 {type: 'Polygon', coordinates: Array(1)}
 function getPointStr(coordinates){
   let pointArray = "";
@@ -860,23 +883,23 @@ function getPointStr(coordinates){
   return pointArray;
 }
 
-function readDbf(dbffile){
-  console.log("readDbf dbffile:"+dbffile);
-  Post('/Pollution/readDbf',{"file":dbffile}).then((response) => {
-    console.log("readDbf response.data:"+response.data);
-    const { code, msg,data: res } = response.data;
-    if (code === 200) {
-      console.log("success:"+msg+"readDbf 结束:"+res);
+// function readDbf(dbffile){
+//   console.log("readDbf dbffile:"+dbffile);
+//   Post('/Pollution/readDbf',{"file":dbffile}).then((response) => {
+//     console.log("readDbf response.data:"+response.data);
+//     const { code, msg,data: res } = response.data;
+//     if (code === 200) {
+//       console.log("success:"+msg+"readDbf 结束:"+res);
       
-      ElMessage.success(msg ?? "Submitted!");
+//       ElMessage.success(msg ?? "Submitted!");
         
-    } else {
-      console.log("fail:"+msg);
-      //ElMessage.error(msg);
-      ElMessage.error("readDbf 失败");
-    }
-  });
-}
+//     } else {
+//       console.log("fail:"+msg);
+//       //ElMessage.error(msg);
+//       ElMessage.error("readDbf 失败");
+//     }
+//   });
+// }
 
 function uploadZip(zipFile){
   console.log("zipFile dbffile:"+zipFile);
@@ -899,110 +922,117 @@ function uploadZip(zipFile){
 }
 
 // 导出地图为PNG图片
-function exportMapAsImage2() {
-  const mapCanvas = document.createElement('canvas');
-  // var canvas =   map.value.map.getCanvas();
-  var canvas =   mapCanvas;
-  var dataURL = canvas.toDataURL('image/png');
+// function exportMapAsImage2() {
+//   const mapCanvas = document.createElement('canvas');
+//   // var canvas =   map.value.map.getCanvas();
+//   var canvas =   mapCanvas;
+//   var dataURL = canvas.toDataURL('image/png');
  
-  // 创建一个a元素用于下载
-  var a = document.createElement('a');
-  a.href = dataURL;
-  a.download = 'map.png';
-  a.click();
-}
+//   // 创建一个a元素用于下载
+//   var a = document.createElement('a');
+//   a.href = dataURL;
+//   a.download = 'map.png';
+//   a.click();
+// }
 
-/**
- *  todo 保存地图
- * @param {string} format - 格式，目前只支持图片
- */
- function exportMapAsImage3() {
+// /**
+//  *  todo 保存地图
+//  * @param {string} format - 格式，目前只支持图片
+//  */
+//  function exportMapAsImage3() {
 
-    const thisMap = map.value.map;
-    thisMap.once('postcompose', function (event) {
-            var canvas = event.context.canvas;
-            canvas.toBlob(function (blob) {
-                saveAs(blob, 'map.png');
-            });
-    });
-    thisMap.renderSync();
-}
+//     const thisMap = map.value.map;
+//     thisMap.once('postcompose', function (event) {
+//             var canvas = event.context.canvas;
+//             canvas.toBlob(function (blob) {
+//                 saveAs(blob, 'map.png');
+//             });
+//     });
+//     thisMap.renderSync();
+// }
 
-const dims = {
-  a0: [1189, 841],
-  a1: [841, 594],
-  a2: [594, 420],
-  a3: [420, 297],
-  a4: [297, 210],
-  a5: [210, 148],
-};
+// const dims = {
+//   a0: [1189, 841],
+//   a1: [841, 594],
+//   a2: [594, 420],
+//   a3: [420, 297],
+//   a4: [297, 210],
+//   a5: [210, 148],
+// };
 
-function exportMapAsImage() {
-  const thismap=map.value.map;
+// function exportMapAsImage() {
+//   const thismap=map.value.map;
  
-    document.body.style.cursor = 'progress';
+//     document.body.style.cursor = 'progress';
 
-    const resolution=ref(72);
-    const dim = dims.a5;
-    const width = Math.round((dim[0] * resolution.value) / 25.4);
-    const height = Math.round((dim[1] * resolution.value) / 25.4);
-    const size = thismap.getSize();
-    const viewResolution = thismap.getView().getResolution();
+//     const resolution=ref(72);
+//     const dim = dims.a5;
+//     const width = Math.round((dim[0] * resolution.value) / 25.4);
+//     const height = Math.round((dim[1] * resolution.value) / 25.4);
+//     const size = thismap.getSize();
+//     const viewResolution = thismap.getView().getResolution();
 
-    thismap.once('rendercomplete', function () {
-      const mapCanvas = document.createElement('canvas');
-      mapCanvas.width = width;
-      mapCanvas.height = height;
-      const mapContext = mapCanvas.getContext('2d');
-      Array.prototype.forEach.call(
-        document.querySelectorAll('.ol-layer canvas'),
-        function (canvas) {
-          if (canvas.width > 0) {
-            const opacity = canvas.parentNode.style.opacity;
-            mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-            const transform = canvas.style.transform;
-            // Get the transform parameters from the style's transform matrix
-            const matrix = transform
-              .match(/^matrix\(([^\(]*)\)$/)[1]
-              .split(',')
-              .map(Number);
-            // Apply the transform to the export map context
-            CanvasRenderingContext2D.prototype.setTransform.apply(
-              mapContext,
-              matrix
-            );
-            mapContext.drawImage(canvas, 0, 0);
-          }
-        }
-      );
-      mapContext.globalAlpha = 1;
-      mapContext.setTransform(1, 0, 0, 1, 0, 0);
-      const pdf = new jspdf.jsPDF('landscape', undefined, format);
+//     thismap.once('rendercomplete', function () {
+//       const mapCanvas = document.createElement('canvas');
+//       mapCanvas.width = width;
+//       mapCanvas.height = height;
+//       const mapContext = mapCanvas.getContext('2d');
+//       Array.prototype.forEach.call(
+//         document.querySelectorAll('.ol-layer canvas'),
+//         function (canvas) {
+//           if (canvas.width > 0) {
+//             const opacity = canvas.parentNode.style.opacity;
+//             mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+//             const transform = canvas.style.transform;
+//             // Get the transform parameters from the style's transform matrix
+//             const matrix = transform
+//               .match(/^matrix\(([^\(]*)\)$/)[1]
+//               .split(',')
+//               .map(Number);
+//             // Apply the transform to the export map context
+//             CanvasRenderingContext2D.prototype.setTransform.apply(
+//               mapContext,
+//               matrix
+//             );
+//             mapContext.drawImage(canvas, 0, 0);
+//           }
+//         }
+//       );
+//       mapContext.globalAlpha = 1;
+//       mapContext.setTransform(1, 0, 0, 1, 0, 0);
+//       const pdf = new jspdf.jsPDF('landscape', undefined, format);
  
-      var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
-      pdf.addImage(
-        //mapCanvas.toDataURL('image/jpeg'),
-        dataURL,
-        'JPEG',
-        0,
-        0,
-        dim[0],
-        dim[1]
-      );
-      pdf.save('map.pdf');
-      // Reset original map size
-      thismap.setSize(size);
-      thismap.getView().setResolution(viewResolution);
+//       var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
+//       pdf.addImage(
+//         //mapCanvas.toDataURL('image/jpeg'),
+//         dataURL,
+//         'JPEG',
+//         0,
+//         0,
+//         dim[0],
+//         dim[1]
+//       );
+//       pdf.save('map.pdf');
+//       // Reset original map size
+//       thismap.setSize(size);
+//       thismap.getView().setResolution(viewResolution);
        
-      document.body.style.cursor = 'auto';
-    });
+//       document.body.style.cursor = 'auto';
+//     });
 
-    // Set print size
-    const printSize = [width, height];
-    thismap.setSize(printSize);
-    const scaling = Math.min(width / size[0], height / size[1]);
-    thismap.getView().setResolution(viewResolution / scaling);
-  } 
+//     // Set print size
+//     const printSize = [width, height];
+//     thismap.setSize(printSize);
+//     const scaling = Math.min(width / size[0], height / size[1]);
+//     thismap.getView().setResolution(viewResolution / scaling);
+//   } 
+
+
+
+
+
+
+
 
 </script>
 
@@ -1125,7 +1155,6 @@ function exportMapAsImage() {
 .nested-content-1,
 .nested-content-2,
 .toptools {
-  // height:100%;
   background: rgba(247,248,248, .9);
   // border: 1px solid rgb(4,124,195);
 }
@@ -1145,4 +1174,27 @@ function exportMapAsImage() {
 //   border: 1px solid #333; /* 根据需要调整边框宽度、颜色和样式 */
 //   border-radius: 4px; /* 可选：添加圆角以实现边框圆角化 */
 // }
+.shapefile-upload{
+  display: inline-block;
+  margin-left: 12px;
+  // display: inline;
+  text-align: center;
+  cursor: pointer;
+  outline: 0;
+  // margin-top: 10px;
+}
+.AllButton{
+  font-size: 15px;
+  padding: 10px;
+}
+
+.layersItem{
+  
+}
+.layerTree{
+  // text-indent: -10px;
+
+}
+
+
 </style>

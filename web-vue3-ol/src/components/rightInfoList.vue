@@ -1,90 +1,74 @@
 <template>
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+  <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
     <el-tab-pane label="污染源负荷结构分析" name="first">
-        <el-card>
-        <el-table 
-          :data="showrows" stripe style="width: 100%" row-key="id"
-          :has-n-o="false"
-          height="100"
-          :cell-class-name="tableCellClassName"
-          @sort-change="handleSortChange"
-          >
-  
-        <!--<el-table-column prop="id" label="id" width="40"/>-->
-        <el-table-column prop="codsum" label="codsum" width="100" />
-        <el-table-column prop="nh3sum" label="nh3sum" width="100" />
-        <el-table-column prop="tpsum" label="tpsum" width="100"/>
-      </el-table>
+    <el-card>
+      <el-table 
+      :data="showrows"
+      stripe
+      style="width: 100%"
+      row-key="id"
+      :has-n-o="false"
+      height="180px"
+      :cell-class-name="tableCellClassName"
+      @sort-change="handleSortChange"
+      >
 
+        <!--<el-table-column prop="id" label="id" width="40"/>-->
+        <el-table-column prop="codsum" label="COD总量"/>
+        <el-table-column prop="nh3sum" label="NH₃总量"/>
+        <el-table-column prop="tpsum" label="TP总量"/>
+      </el-table>
     </el-card>
 
+    <!-- 统计 -->
+    <div class="select-el-form">
+      <div class="m-4">分区选择
+        <el-cascader :options="fenquTypeArray" :props="propswry" v-model="fenquTypeList" clearable />
+      </div>
 
+      <div class="m-4">污染地块
+        <el-cascader :options="WryOptions" :props="WryProps" v-model="wryPropsList" clearable />
+      </div>
 
+      <div class="m-4">污染指标
+        <el-select
+          v-model="WryPropsIndexList"
+          multiple
+          placeholder="Select"
+          style="width: 214px"
+        >
+          <el-option
+            v-for="item in optionindex"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
 
-      <div class="select-el-form">
+      <div class="raw">
+        <el-button type="primary" plain class="AllButton" @click="calculation">
+          <el-icon><Histogram /></el-icon>统计
+        </el-button>
+      </div>
 
-        <div class="m-4">
-    分区
-    <el-cascader :options="fenquTypeArray" :props="propswry" v-model="fenquTypeList" clearable />
-  </div>
-
-
-  <div class="m-4">
-    污染源
-    <!-- <el-cascader :options="fenquTypeArray" :props="propswry" clearable /> -->
-    <el-cascader :options="WryOptions" :props="WryProps" v-model="wryPropsList" clearable />
-  </div>
-
-
-  <div class="m-4">
-    污染指标
-    <el-select
-      v-model="WryPropsIndexList"
-      multiple
-      placeholder="Select"
-      style="width: 240px"
-    >
-      <el-option
-        v-for="item in optionindex"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
-    </el-select>
-  </div>
-
-
-   <div class="raw">
-    <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>统计</el-button>
-   </div>
-  
-  <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
-
-  <div ref="pieChart" class="pieChart" id="pieChart"></div>
- 
-  <div ref="pieChart2" class="pieChart" id="pieChart2"></div>
- 
-  <div ref="pieChart3" class="pieChart" id="pieChart3"></div>
- 
-  </div>
-
-
-
+      <!-- 饼图 -->
+      <div ref="pieChart" class="pieChart" id="pieChart"></div>
+      <div ref="pieChart2" class="pieChart" id="pieChart2"></div>
+      <div ref="pieChart3" class="pieChart" id="pieChart3"></div>
+    </div>
     </el-tab-pane>
 
+    <!-- 污染源负荷空间分析 -->
     <el-tab-pane label="污染源负荷空间分析" name="second">
-    
     </el-tab-pane>
-
   </el-tabs>
-
-  </template>
+</template>
   
-  <!-- ------------------------------------------------------------------------------- -->
-  <script setup lang="ts">
+<!-- ------------------------------------------------------------------------------- -->
+<script setup lang="ts">
   import { ref,reactive,watch } from 'vue'
-  import { Search } from '@element-plus/icons-vue';
-  import { Refresh } from '@element-plus/icons-vue';
+  import { Search, Refresh, DataAnalysis, Histogram } from '@element-plus/icons-vue';
   import axios from 'axios';
   import * as echarts from 'echarts';
   
@@ -119,175 +103,104 @@
   
   const showrows=ref([])
   const showtotal = ref(0);
-  
-const valueindex = ref([])
+  const valueindex = ref([])
+
+  // 污染地块选项列表
+  const WryOptions = [
+    {
+      value: '点源',
+      label: '点源',
+      children: [
+        {
+          value: '工业',
+          label: '工业',
+        },
+        {
+          value: '城镇生活源',
+          label: '城镇生活源',
+        },
+      ],
+    },
+    {
+      value: '面源',
+      label: '面源',
+      children: [
+        {
+          value: '农业面源',
+          label: '农业面源',
+        },
+        {
+          value: '地表径流',
+          label: '地表径流',
+        },
+      ],
+    },
+    {
+      value: '内源',
+      label: '内源',
+    },
+  ]
+
+  // 污染指标选项列表
+  const optionindex = [
+    {
+      value: 'codsum',
+      label: 'COD',
+    },
+    {
+      value: 'nh3sum',
+      label: 'NH₃',
+    },
+    {
+      value: 'tpsum',
+      label: 'TP',
+    }
+  ]
 
 
-
-const optionindex = [
-  {
-    value: 'codsum',
-    label: 'codsum',
-  },
-  {
-    value: 'nh3sum',
-    label: 'nh3sum',
-  },
-  {
-    value: 'tpsum',
-    label: 'tpsum',
+  const props = {
+    expandTrigger: 'hover' as const,
   }
-]
+
+  const handleChange = (value) => {
+    console.log(value)
+  }
+
+  const propswry = { multiple: true }
+  const WryProps = { multiple: true }
+  const wryIndex = { multiple: true }
+  const checkAll = ref(false)
+  const indeterminate = ref(false)
+  const value = ref<CheckboxValueType[]>([])
 
 
-// const value = ref([])
+  import type { TabsPaneContext, CheckboxValueType } from 'element-plus'
+  import { text } from 'stream/consumers';
+  watch(value, (val) => {
+    if (val.length === 0) {
+      checkAll.value = false
+      indeterminate.value = false
+    } else if (val.length === optionindex.value.length) {
+      checkAll.value = true
+      indeterminate.value = false
+    } else {
+      indeterminate.value = true
+    }
+  })
 
-const props = {
-  expandTrigger: 'hover' as const,
-}
+  const handleCheckAll = (val: CheckboxValueType) => {
+    indeterminate.value = false
+    if (val) {
+      value.value = optionindex.value.map((_) => _.value)
+    } else {
+      value.value = []
+    }
+  }
+  const activeName = ref('first')
 
-const handleChange = (value) => {
-  console.log(value)
-}
-
-
-const WryProps = { multiple: true }
-
-const WryOptions = [
-  {
-    value: '点源',
-    label: '点源',
-    children: [
-      {
-        value: '工业',
-        label: '工业',
-      },
-      {
-        value: '城镇生活源',
-        label: '城镇生活源',
-      },
-    ],
-  },
-  {
-    value: '面源',
-    label: '面源',
-    children: [
-      {
-        value: '农业面源',
-        label: '农业面源',
-      },
-      {
-        value: '地表径流',
-        label: '地表径流',
-      },
-    ],
-  },
-  {
-    value: '内源',
-    label: '内源',
-  },
-]
-
-const propswry = { multiple: true }
-
-const optionswry = [
-  {
-    value: 1,
-    label: 'Asia',
-    children: [
-      {
-        value: 2,
-        label: 'China',
-        children: [
-          { value: 3, label: 'Beijing' },
-          { value: 4, label: 'Shanghai' },
-          { value: 5, label: 'Hangzhou' },
-        ],
-      },
-      {
-        value: 6,
-        label: 'Japan',
-        children: [
-          { value: 7, label: 'Tokyo' },
-          { value: 8, label: 'Osaka' },
-          { value: 9, label: 'Kyoto' },
-        ],
-      },
-      {
-        value: 10,
-        label: 'Korea',
-        children: [
-          { value: 11, label: 'Seoul' },
-          { value: 12, label: 'Busan' },
-          { value: 13, label: 'Taegu' },
-        ],
-      },
-    ],
-  },
-  {
-    value: 14,
-    label: 'Europe',
-    children: [
-      {
-        value: 15,
-        label: 'France',
-        children: [
-          { value: 16, label: 'Paris' },
-          { value: 17, label: 'Marseille' },
-          { value: 18, label: 'Lyon' },
-        ],
-      },
-      {
-        value: 19,
-        label: 'UK',
-        children: [
-          { value: 20, label: 'London' },
-          { value: 21, label: 'Birmingham' },
-          { value: 22, label: 'Manchester' },
-        ],
-      },
-    ],
-  },
-  {
-    value: 23,
-    label: 'North America',
-    children: [
-      {
-        value: 24,
-        label: 'US',
-        children: [
-          { value: 25, label: 'New York' },
-          { value: 26, label: 'Los Angeles' },
-          { value: 27, label: 'Washington' },
-        ],
-      },
-      {
-        value: 28,
-        label: 'Canada',
-        children: [
-          { value: 29, label: 'Toronto' },
-          { value: 30, label: 'Montreal' },
-          { value: 31, label: 'Ottawa' },
-        ],
-      },
-    ],
-  },
-]
-
-
-
-
-
-
-
-import type { TabsPaneContext } from 'element-plus'
-import { text } from 'stream/consumers';
-
-const activeName = ref('first')
-
-const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
-}
+  const handleClick = (tab: TabsPaneContext, event: Event) => {
+    console.log(tab, event)
+  }
   
   const props2 = defineProps<{ msg: string ,selData:{} }>()
   /*var selList = [];//定义一个空数组
@@ -297,14 +210,12 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     console.log("push:"+showrows.value);
   }*/
   const childSelMethod = (childSelDataList: []) => {
-  
     console.log('childSelData method called:'+childSelDataList);
-  
       // showrows.value=childSelDataList.results;
       // showtotal.value = childSelDataList.results.length;
-      showrows.value=childSelDataList;
-      showtotal.value = childSelDataList.length;
-      console.log("right list length:"+showtotal.value);
+    showrows.value=childSelDataList;
+    showtotal.value = childSelDataList.length;
+    console.log("right list length:"+showtotal.value);
   /*
     var selList = [];//定义一个空数组
     if(childSelDataList.hasOwnProperty("codsum")){
@@ -413,7 +324,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     console.log(`current page: ${val}`)
     GetAll();
   }
-      
+
   const currentCell = ref(null)
   // 给单元格绑定横向和竖向的index，这样就能确定是哪一个单元格
   function tableCellClassName({ row, column, rowIndex, columnIndex }) {
@@ -473,149 +384,149 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     console.log(typeSelect.value+":onchange:");
   }
   
-  //下拉框的多选框
-  const checkSegment1 = ref({});
-  //应用领域查询条件
-  const segment1 = ref([]);
-  const segment1Options = ref([
-    {
-      key: "codsum",
-      label: "codsum",
-    },
-    {
-      key: "nh3sum",
-      label: "nh3sum",
-    },
-    {
-      key: "tpsum",
-      label: "tpsum",
-    },
-  ]);
-  //处理下拉框的勾选操作
-  function handleSegment1Change(val) {
-    segment1Options.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment1.value[index] = true;
-      } else {
-        checkSegment1.value[index] = false;
-      }
-    });
-  }
+  // 下拉框的多选框
+  // const checkSegment1 = ref({});
+  // 应用领域查询条件
+  // const segment1 = ref([]);
+  // const segment1Options = ref([
+  //   {
+  //     key: "codsum",
+  //     label: "codsum",
+  //   },
+  //   {
+  //     key: "nh3sum",
+  //     label: "nh3sum",
+  //   },
+  //   {
+  //     key: "tpsum",
+  //     label: "tpsum",
+  //   },
+  // ]);
+  // 处理下拉框的勾选操作
+  // function handleSegment1Change(val) {
+  //   segment1Options.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment1.value[index] = true;
+  //     } else {
+  //       checkSegment1.value[index] = false;
+  //     }
+  //   });
+  // }
   
   //下拉框的多选框
-  const checkSegment2 = ref({});
-  //应用领域查询条件
-  const segment2 = ref([]);
-  const segment2Options = ref([
-    {
-      key: "点源",
-      label: "点源",
-    },
-    {
-      key: "面源",
-      label: "面源",
-    },
-    {
-      key: "内源",
-      label: "内源",
-    },
-  ]);
-  //处理下拉框的勾选操作
-  function handleSegment2Change(val) {
-    segment2Options.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment2.value[index] = true;
-      } else {
-        checkSegment2.value[index] = false;
-      }
-    });
-  }
+  // const checkSegment2 = ref({});
+  // 应用领域查询条件
+  // const segment2 = ref([]);
+  // const segment2Options = ref([
+  //   {
+  //     key: "点源",
+  //     label: "点源",
+  //   },
+  //   {
+  //     key: "面源",
+  //     label: "面源",
+  //   },
+  //   {
+  //     key: "内源",
+  //     label: "内源",
+  //   },
+  // ]);
+  // 处理下拉框的勾选操作
+  // function handleSegment2Change(val) {
+  //   segment2Options.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment2.value[index] = true;
+  //     } else {
+  //       checkSegment2.value[index] = false;
+  //     }
+  //   });
+  // }
   
-  //下拉框的多选框
-  const checkSegment3 = ref({});
-  //应用领域查询条件
-  const segment3 = ref([]);
-  let segment3Options = ref([
-    {
-      key: "codsum",
-      label: "codsum",
-    },
-    {
-      key: "nh3sum",
-      label: "nh3sum",
-    },
-    {
-      key: "tpsum",
-      label: "tpsum",
-    },
-  ]);
+  // 下拉框的多选框
+  // const checkSegment3 = ref({});
+  // 应用领域查询条件
+  // const segment3 = ref([]);
+  // let segment3Options = ref([
+  //   {
+  //     key: "codsum",
+  //     label: "codsum",
+  //   },
+  //   {
+  //     key: "nh3sum",
+  //     label: "nh3sum",
+  //   },
+  //   {
+  //     key: "tpsum",
+  //     label: "tpsum",
+  //   },
+  // ]);
    
-  //处理下拉框的勾选操作
-  function handleSegment3Change(val) {
-    segment3Options.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment3.value[index] = true;
-      } else {
-        checkSegment3.value[index] = false;
-      }
-    });
-  }
+  // 处理下拉框的勾选操作
+  // function handleSegment3Change(val) {
+  //   segment3Options.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment3.value[index] = true;
+  //     } else {
+  //       checkSegment3.value[index] = false;
+  //     }
+  //   });
+  // }
   
   
-  //处理下拉框的勾选操作
-  function draintypeArrayChange(val) {
-    console.log(draintypeArray);
-    console.log(segment3Options);
-    draintypeArray.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment3.value[index] = true;
-      } else {
-        checkSegment3.value[index] = false;
-      }
-    });
-  }
+  // 处理下拉框的勾选操作
+  // function draintypeArrayChange(val) {
+  //   console.log(draintypeArray);
+  //   console.log(segment3Options);
+  //   draintypeArray.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment3.value[index] = true;
+  //     } else {
+  //       checkSegment3.value[index] = false;
+  //     }
+  //   });
+  // }
   
-  //下拉框的多选框
-  const checkSegment4 = ref({});
-  //应用领域查询条件
-  const segment4 = ref([]);
-  let segment4Options = ref([
-    {
-      key: "点源",
-      label: "点源",
-    },
-    {
-      key: "面源",
-      label: "面源",
-    },
-    {
-      key: "内源",
-      label: "内源",
-    },
-  ]);
+  // 下拉框的多选框
+  // const checkSegment4 = ref({});
+  // 应用领域查询条件
+  // const segment4 = ref([]);
+  // let segment4Options = ref([
+  //   {
+  //     key: "点源",
+  //     label: "点源",
+  //   },
+  //   {
+  //     key: "面源",
+  //     label: "面源",
+  //   },
+  //   {
+  //     key: "内源",
+  //     label: "内源",
+  //   },
+  // ]);
   
-  //处理下拉框的勾选操作
-  function handleSegment4Change(val) {
-    segment4Options.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment4.value[index] = true;
-      } else {
-        checkSegment4.value[index] = false;
-      }
-    });
-  }
-  //处理下拉框的勾选操作
-  function drainsubtypeArrayChange(val) {
-    console.log(drainsubtypeArray);
-    console.log(drainsubtypeArray);
-    drainsubtypeArray.value.forEach((item, index) => {
-      if (val && val.includes(item.key)) {
-        checkSegment4.value[index] = true;
-      } else {
-        checkSegment4.value[index] = false;
-      }
-    });
-  }
+  // 处理下拉框的勾选操作
+  // function handleSegment4Change(val) {
+  //   segment4Options.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment4.value[index] = true;
+  //     } else {
+  //       checkSegment4.value[index] = false;
+  //     }
+  //   });
+  // }
+  // 处理下拉框的勾选操作
+  // function drainsubtypeArrayChange(val) {
+  //   console.log(drainsubtypeArray);
+  //   console.log(drainsubtypeArray);
+  //   drainsubtypeArray.value.forEach((item, index) => {
+  //     if (val && val.includes(item.key)) {
+  //       checkSegment4.value[index] = true;
+  //     } else {
+  //       checkSegment4.value[index] = false;
+  //     }
+  //   });
+  // }
   const fenquTypeList=ref([]);
   const wryPropsList=ref([]);
   const WryPropsIndexList=ref([]);
@@ -675,58 +586,58 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   const pieChartShow=ref();
   const pieChartShow2=ref();
   const pieChartShow3=ref();
+
   onMounted(() => {
       nextTick(() => { //将图表操作放入nextTick中
-        initChart()
+        // initChart()
       })
     })
   
-    const initChart = () => { 
-      var myChart = (echarts as any).init(pieChart.value);
-      var option = {
-          series: [
-            {
-              type: 'pie',
-              data: [
-                {
-                  value: 335,
-                  name: '直接访问'
-                },
-                {
-                  value: 234,
-                  name: '联盟广告'
-                },
-                {
-                  value: 1548,
-                  name: '搜索引擎'
-                }
-              ]
-            }
-          ]
-        };
-      myChart.setOption(option);
-    }
-
-    const showChart = (showdata,showPieChart,titleText) => { 
-      var myChart = (echarts as any).init(showPieChart.value);
-      var option = {
-         title:{
-                text: titleText
+  const initChart = () => { 
+    var myChart = (echarts as any).init(pieChart.value);
+    var option = {
+        series: [
+          {
+            type: 'pie',
+            data: [
+              {
+                value: 335,
+                name: '直接访问'
               },
-          series: [
-            {
-              type: 'pie',
-              data: showdata
-            }
-          ]
-        };
-      myChart.setOption(option);
-    }
+              {
+                value: 234,
+                name: '联盟广告'
+              },
+              {
+                value: 1548,
+                name: '搜索引擎'
+              }
+            ]
+          }
+        ]
+      };
+    myChart.setOption(option);
+  }
+
+  const showChart = (showdata,showPieChart,titleText) => { 
+    var myChart = (echarts as any).init(showPieChart.value);
+    var option = {
+        title:{
+              text: titleText
+            },
+        series: [
+          {
+            type: 'pie',
+            data: showdata
+          }
+        ]
+      };
+    myChart.setOption(option);
+  }
+</script>
   
-  </script>
   
-  
-  <style scoped>
+<style scoped>
   .el-input {
     margin-right: 5px;
     width: 300px;
@@ -764,5 +675,15 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   font-size: 32px;
   font-weight: 400;
 }
+.AllButton{
+  font-size: 15px;
+  padding: 10px;
+}
 
+.custom-header {
+  .el-checkbox {
+    display: flex;
+    height: unset;
+  }
+}
   </style>
