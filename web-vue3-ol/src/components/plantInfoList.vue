@@ -14,7 +14,6 @@
     <el-icon><Download /></el-icon>shp下载
   </el-button>
 
-  <!-- <div class="mutiSearch"> -->
     <el-select v-model="selValue" placeholder="Select" style="width: 140px" clearable>
       <el-option
         v-for="item in showColumnNames"
@@ -194,7 +193,7 @@
   <!-- ------------------------------------------------------------------------------- -->
   <script setup lang="ts">
   import { ref,reactive,watch } from 'vue'
-  import { Search,Refresh,DataAnalysis,Download  } from '@element-plus/icons-vue';
+  import { Search, Refresh, Download, DataAnalysis } from '@element-plus/icons-vue';
   import axios from 'axios';
   import { ElTable } from 'element-plus'
   // 通过getCurrentInstance 获取
@@ -584,7 +583,7 @@ function getColumnName() {
 
   const searchValue=ref('');
   function MutiSearch(){
-    const seljson= {pageNum: currentPage4.value,pageSize: pageSize4.value,[selValue.value]:searchValue.value};
+    const seljson= {pageNum: currentPage4.value,pageSize: pageSize4.value,[selValue.value]:searchValue.value.trim()};
     console.log("MutiSearch:"+seljson);
     Post('/Pollution/MutiSearch',seljson).then((response) => {
       const { code, msg, rows,total,data: res } = response.data;
