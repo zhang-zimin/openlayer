@@ -1,200 +1,151 @@
 <template>
-  <!--{{ msg }}-
-    <h1 v-if="selData.hasOwnProperty('OBJECTID')">Vue is awesome! {{ selData }}</h1>
-    <h1 v-else>Oh no 😢</h1>-->
-    <!--<h3>{{ msg }}</h3>
-      <div class="text">信息列表</div>
-      <div class="flexbox">-->
-        <!--<el-input v-model="form.input" placeholder="请输入username" clearable style="width:150px;margin-right:15px;" />-->
-    <div>
-    <el-button type="primary" @click="calculation"><el-icon><DataAnalysis /></el-icon>计算</el-button>
-    <el-button type="primary" @click="UpdateWry"><el-icon><Refresh /></el-icon>更新</el-button>
-    <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">
-      <el-icon><Download /></el-icon>csv下载
-    </el-button>
-    <!-- <el-input type="file" @change="handleFileUpload" accept=".zip" ref="fileInput" /> -->
-    <el-button type="primary" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
-      <el-icon><Download /></el-icon>shp下载
-    </el-button>
-
-    <el-select v-model="selValue" placeholder="Select" style="width: 140px">
-      <el-option
-        v-for="item in showColumnNames"
-        :key="item.name"
-        :label="item.label"
-        :value="item.name"
-      />
-    </el-select>
-
-    <!-- 查询功能 -->
-    <el-input v-model="searchValue" placeholder="查询值" style="width: 100px"/>
-    <el-button type="primary" @click="query"> 
-      <el-icon><Search /></el-icon>查询
-    </el-button>
+  <div>
+  <el-button type="primary" plain @click="calculation" class="AllButton">
+    <el-icon><DataAnalysis /></el-icon>计算
+  </el-button>
+  <el-button type="primary" plain @click="UpdateWry" class="AllButton">
+    <el-icon><Refresh /></el-icon>更新
+  </el-button>
+  <el-button type="primary" plain class="AllButton" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">
+    <el-icon><Download /></el-icon>csv下载
+  </el-button>
+  <el-button type="primary" plain class="AllButton" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
+    <el-icon><Download /></el-icon>shp下载
+  </el-button>
   
-    <!-- </div>
-    <el-card>
-      <div class="query-input">
-        <el-input v-model="username" placeholder="请输入用户名"/>
-        <el-input v-model="email" placeholder="请输入邮箱"/>
-        <el-button type="primary" @click="query"> 
-          <el-icon><Search /></el-icon>查询
-        </el-button>
-        <el-button type="danger" @click="query2">
-          <el-icon><Refresh /></el-icon>重置
-        </el-button>
-      </div> 
-    </el-card>-->
-  
-    <!--
-    <el-card>
-      <el-table :data="tableData" stripe style="width: 100%">
-      <el-table-column prop="username" label="姓名" width="180" />
-      <el-table-column prop="sex" label="性别" width="180" />
-      <el-table-column prop="age" label="年龄" width="180" />
-      <el-table-column prop="email" label="邮箱" width="180" />
-      <el-table-column prop="phone" label="电话" width="180" />
-      <el-table-column prop="address" label="地址"  />
-      <el-table-column fixed="right" label="操作" width="180">
-        <template #default>
-          <el-button type="primary" size="small" >编辑</el-button>
-          <el-button type="danger" size="small">删除</el-button>
+  <el-select v-model="selValue" placeholder="Select" style="width: 140px">
+    <el-option
+      v-for="item in selOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+
+  <!-- 查询功能 -->
+  <el-input v-model="searchValue" placeholder="查询值" style="width: 100px"/>
+  <el-button type="primary" plain @click="query" class="AllButton"> 
+    <el-icon><Search /></el-icon>查询
+  </el-button>
+
+  <el-card style="margin-top:-15px; height: 550px">
+      <el-table 
+        :data="showrows"
+        stripe
+        style="width: 100%"
+        row-key="id"
+        :has-n-o="false"
+        height="400"
+        :cell-class-name="tableCellClassName"
+        @row-dblclick="dbclick"
+        @sort-change="handleSortChange"
+        ref="multipleTableRef"
+        @selection-change="handleSelectionChange"
+        fit="true"
+        :row-style="{height: '0'}"
+        :cell-style="{padding: '0'}"
+        >
+        <!-- v-loading="loading" -->
+      <el-table-column type="selection" width="40" />
+      <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
+      <el-table-column prop="id" label="id" width="80" sortable="custom"/>
+      <el-table-column prop="nextsurveyno3" label="下游编号" width="80" sortable="custom"/>
+      <el-table-column prop="draintype" label="面源类型" width="80" sortable="custom"/>
+      <el-table-column prop="drainsubtype" label="面源子类" width="80" sortable="custom"/>
+      <el-table-column prop="agriculturetype" label="农业类型" width="80" sortable="custom"/>
+      <el-table-column prop="username" label="对象名称" width="180" sortable="custom"/>
+      <el-table-column prop="useraddress" label="排水户地图地址" width="180" sortable="custom"/>
+      <el-table-column prop="codinflow" label="cod入流量" width="80" sortable="custom"/>
+      <el-table-column prop="codstandard" label="cod标准" width="80" editable sortable="custom">
+        <template v-slot="scope">
+          <el-input
+            v-if="scope.row.index + ',' + scope.column.index == currentCell"
+            :ref="scope.row.index + ',' + scope.column.index"
+            v-model="scope.row.codstandard"
+            @blur="hideInput(scope.row)"
+            @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+          />
+            <span v-else>{{ scope.row.codstandard }}</span>
         </template>
       </el-table-column>
-  
-    </el-table>
+      <el-table-column prop="nh3standard" label="nh3标准" width="80" editable sortable="custom">
+        <template v-slot="scope">
+          <el-input
+            v-if="scope.row.index + ',' + scope.column.index == currentCell"
+            :ref="scope.row.index + ',' + scope.column.index"
+            v-model="scope.row.nh3standard"
+            @blur="hideInput(scope.row)"
+            @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+          />
+          <span v-else>{{ scope.row.nh3standard }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="tpstandard" label="tp标准" width="180" editable sortable="custom">
+        <template v-slot="scope">
+          <el-input
+            v-if="scope.row.index + ',' + scope.column.index == currentCell"
+            :ref="scope.row.index + ',' + scope.column.index"
+            v-model="scope.row.tpstandard"
+            @blur="hideInput(scope.row)"
+            @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+          />
+          <span v-else>{{ scope.row.tpstandard }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="inflowcoefficient" label="入流系数" width="80" editable sortable="custom">
+        <template v-slot="scope">
+          <el-input
+            v-if="scope.row.index + ',' + scope.column.index == currentCell"
+            :ref="scope.row.index + ',' + scope.column.index"
+            v-model="scope.row.inflowcoefficient"
+            @blur="hideInput(scope.row)"
+            @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+          />
+          <span v-else>{{ scope.row.inflowcoefficient }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="coddischarge" label="cod排放量" width="180" sortable="custom"/>
+      <el-table-column prop="nh3discharge" label="nh3排放量" width="180" sortable="custom"/>
+      <el-table-column prop="tpdischarge" label="tp排放量" width="180" sortable="custom"/>
+      <el-table-column prop="nh3inflow" label="nh3入流量" width="180" sortable="custom"/>
+      <el-table-column prop="tpinflow" label="tp入流量" width="180" sortable="custom"/>
+      </el-table>
+
+        <!-- <div style="margin-top: 20px">
+        <el-button @click="toggleSelection()">Clear selection</el-button>
+      </div> -->
+    <!-- 分页功能组件 -->
     <div class="demo-pagination-block">
+
+      <!-- 清除当前选择 -->
+      <div style="margin-top: 0px; margin-right: 25px">
+        <el-button @click="toggleSelection()">清除选择</el-button>
+      </div>
+
       <el-pagination
         v-model:current-page="currentPage4"
         v-model:page-size="pageSize4"
-        :page-sizes="[100, 200, 300, 400]"
+        :page-sizes="[10, 20, 50, 100]"
         :small="small"
         :disabled="disabled"
         :background="background"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
+        :total="showtotal"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
     </div>
-    </el-card>-->
-    <!-- </div> -->
-    <!--@sort-change="sortChange"-->
-    <!-- <el-card style="margin-top:-15px; height: 600px"> -->
-    <el-card style="margin-top:-15px; height: 550px">
-        <el-table 
-          :data="showrows"
-          stripe
-          style="width: 100%"
-          row-key="id"
-          :has-n-o="false"
-          height="400"
-          :cell-class-name="tableCellClassName"
-          @row-dblclick="dbclick"
-          @sort-change="handleSortChange"
-          ref="multipleTableRef"
-          @selection-change="handleSelectionChange"
-          fit="true"
-          :row-style="{height: '0'}"
-          :cell-style="{padding: '0'}"
-          >
-          <!-- v-loading="loading" -->
-        <el-table-column type="selection" width="40" />
-        <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
-        <el-table-column prop="id" label="id" width="80" sortable="custom"/>
-        <el-table-column prop="nextsurveyno3" label="下游编号" width="80" sortable="custom"/>
-        <el-table-column prop="draintype" label="面源类型" width="80" sortable="custom"/>
-        <el-table-column prop="drainsubtype" label="面源子类" width="80" sortable="custom"/>
-        <el-table-column prop="agriculturetype" label="农业类型" width="80" sortable="custom"/>
-        <el-table-column prop="username" label="对象名称" width="180" sortable="custom"/>
-        <el-table-column prop="useraddress" label="排水户地图地址" width="180" sortable="custom"/>
-        <el-table-column prop="codinflow" label="cod入流量" width="80" sortable="custom"/>
-        <el-table-column prop="codstandard" label="cod标准" width="80" editable sortable="custom">
-          <template v-slot="scope">
-            <el-input
-              v-if="scope.row.index + ',' + scope.column.index == currentCell"
-              :ref="scope.row.index + ',' + scope.column.index"
-              v-model="scope.row.codstandard"
-              @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-            />
-              <span v-else>{{ scope.row.codstandard }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="nh3standard" label="nh3标准" width="80" editable sortable="custom">
-          <template v-slot="scope">
-            <el-input
-              v-if="scope.row.index + ',' + scope.column.index == currentCell"
-              :ref="scope.row.index + ',' + scope.column.index"
-              v-model="scope.row.nh3standard"
-              @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-            />
-            <span v-else>{{ scope.row.nh3standard }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="tpstandard" label="tp标准" width="180" editable sortable="custom">
-          <template v-slot="scope">
-            <el-input
-              v-if="scope.row.index + ',' + scope.column.index == currentCell"
-              :ref="scope.row.index + ',' + scope.column.index"
-              v-model="scope.row.tpstandard"
-              @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-            />
-            <span v-else>{{ scope.row.tpstandard }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="inflowcoefficient" label="入流系数" width="80" editable sortable="custom">
-          <template v-slot="scope">
-            <el-input
-              v-if="scope.row.index + ',' + scope.column.index == currentCell"
-              :ref="scope.row.index + ',' + scope.column.index"
-              v-model="scope.row.inflowcoefficient"
-              @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
-            />
-            <span v-else>{{ scope.row.inflowcoefficient }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="coddischarge" label="cod排放量" width="180" sortable="custom"/>
-        <el-table-column prop="nh3discharge" label="nh3排放量" width="180" sortable="custom"/>
-        <el-table-column prop="tpdischarge" label="tp排放量" width="180" sortable="custom"/>
-        <el-table-column prop="nh3inflow" label="nh3入流量" width="180" sortable="custom"/>
-        <el-table-column prop="tpinflow" label="tp入流量" width="180" sortable="custom"/>
-        </el-table>
-
-         <!-- <div style="margin-top: 20px">
-         <el-button @click="toggleSelection()">Clear selection</el-button>
-        </div> -->
-      <!-- 分页功能组件 -->
-      <div class="demo-pagination-block">
-
-        <!-- 清除当前选择 -->
-        <div style="margin-top: 0px; margin-right: 25px">
-         <el-button @click="toggleSelection()">清除选择</el-button>
-        </div>
-
-        <el-pagination
-          v-model:current-page="currentPage4"
-          v-model:page-size="pageSize4"
-          :page-sizes="[10, 20, 50, 100]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="showtotal"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-    </div>
-  </template>
+  </el-card>
+  </div>
+</template>
   
   <!-- ------------------------------------------------------------------------------- -->
   <script setup lang="ts">
-  import { ref,reactive,watch } from 'vue'
+  import { ref, reactive, watch } from 'vue'
+  // import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
+  // import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+  import { AgGridVue } from "ag-grid-vue3"; // AG Grid Component
+
   import { Search } from '@element-plus/icons-vue';
   import { Refresh } from '@element-plus/icons-vue';
   import axios from 'axios';
@@ -209,7 +160,20 @@
   const {proxy} = getCurrentInstance()
   console.log(proxy.$baseUrl)
   
-  
+  import { 
+  DArrowRight,
+  Connection,
+  DArrowLeft, 
+  Download, 
+  Upload, 
+  Delete, 
+  EditPen, 
+  Refresh, 
+  DataAnalysis,
+  Search,
+  SwitchButton,
+  Edit,TopRight,
+  } from '@element-plus/icons-vue';
   import { Get, Post,Put } from "../axios/api"; 
   const url=ref('/plantInfo/list')
   const loginForm = ref({
@@ -233,6 +197,7 @@
   address: string
 }
   const showrows=ref([])
+  const columnname=ref([])
   const showtotal = ref(0);
   const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<User[]>([])
@@ -353,7 +318,24 @@ const handleSelectionChange = (val: User[]) => {
   //   console.log(username.value)
   // }
   
-  
+  // 获取所有数据库列名
+  function getcolumnname(){
+    Get('/Pollution/getcolumnname',{ }).then((response) => {
+      const { code, msg, data } = response.data;
+      if (code === 200) {
+        columnname.value=data;
+        //showrows.value=data;
+        console.log(columnname.value);
+        //console.log(total);
+        // ElMessage.success(msg ?? "Submitted!!!");
+      } else {
+        // ElMessage.error(msg);
+      }
+    });
+  };
+  getcolumnname();  
+
+
   function calculation(){
     console.log("calculation");
     Post('/Pollution/calculation',{}).then((response) => {
@@ -638,5 +620,10 @@ function getColumnName() {
 
   .example-showcase .el-loading-mask {
   z-index: 9;
+}
+
+.AllButton{
+  font-size: 15px;
+  padding: 10px;
 }
   </style>
