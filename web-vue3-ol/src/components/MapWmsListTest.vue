@@ -1,7 +1,13 @@
 <template>
+  <div>
+    <TopCom class="zoomStyle" />
+  </div>
   <!-- 顶部工具栏 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
-  <div class="toptools">
-    <el-button type="primary" plain @click="drawPolygon" class="AllButton">
+  <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+    <el-tab-pane label="编辑" name="first">
+
+
+    <el-button type="primary" text='primary' @click="drawPolygon" class="AllButton">
       <el-icon><Edit /></el-icon>绘制多边形
     </el-button>
     <el-button type="primary" plain @click="cancelDraw" class="AllButton">
@@ -13,6 +19,10 @@
     <el-button type="primary" plain @click="getPolygon" class="AllButton">
       <el-icon><Connection /></el-icon>获取多边形数据
     </el-button>
+
+  </el-tab-pane>
+
+  <el-tab-pane label="共享" name="second">
     <el-button type="primary" plain @click="exportMapAsImage" class="AllButton">
       <el-icon><TopRight /></el-icon>地图导出
     </el-button>
@@ -36,7 +46,8 @@
         </el-button>
       </div>
     </el-upload>
-  </div>
+  </el-tab-pane>
+  </el-tabs>
   <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
   <!-- 页面内容 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
@@ -48,8 +59,9 @@
       <SplitItem class="vue-split-item">
         <div class="vue-split-content nested-content-1" id="layerControl">
           <div class="title layersItem">
-            <el-text class="layersItemText" size="large">图层列表</el-text>
+            图层列表
           </div>
+          <el-divider />
           <ul id="layerTree" class="layerTree"></ul>
         </div>
       </SplitItem>
@@ -131,6 +143,79 @@
                   />
                   </ol-tile-layer>
 
+                  
+                  <!-- 河流 -->
+                  <ol-tile-layer title="河流">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:River"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 374,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+                  <!-- 排口 -->
+                  <ol-tile-layer title="排口">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:outlet"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 374,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+                  <!-- 底泥监测 -->
+                  <ol-tile-layer title="底泥监测">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:Sediment_Monitoring"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 374,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>                  
+
                   <!-- 排水管线 -->
                   <ol-tile-layer title="排水管线">
                     <ol-source-tile-wms
@@ -154,6 +239,8 @@
                       }"
                     />
                   </ol-tile-layer>
+
+
 
                   <!-- 污染源地块 -->
                   <ol-vector-layer title="污染源地块">
@@ -229,7 +316,9 @@
 
 
 <script setup lang="ts"> 
+import TopCom from "@/components/TopCom.vue"
 import 'ol/ol.css';
+import { defaults as defaultControls, FullScreen } from "ol/control";
 import { ref, reactive, inject, onMounted  } from "vue";
 import { getCurrentInstance } from "vue";
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -333,7 +422,6 @@ const mapRightData = reactive({
   input: "",
   list: {},
 });
-  
 //const center = ref([40, 40]);
 const projection = ref("EPSG:3857");
 const zoom = ref(12);
@@ -402,7 +490,8 @@ const uploadFiles = ref([]);
 const map = ref(null);
 onMounted(() => {
   map.value.map.addLayer(vectorDraw);
-  const mapvalue = map.value;
+  // const mapvalue = map.value;
+  map.value.map.addControl(new FullScreen());
   /*console.log("onMounted map value:"+map.value); // 在组件挂载后也可以访问
   console.log("mapvalue map:"+mapvalue.map); 
   console.log("onMounted map:"+map.map); 
@@ -523,7 +612,9 @@ function showTreeLayers(){
       layerVisibility[i] = layer[i].getVisible();
 
       let eleLi = document.createElement('li');           //新增li元素，用来承载图层项
+      eleLi.setAttribute('style', 'font-size: 15px; margin-top: 6px;');
       var eleInput = document.createElement('input');     //创建复选框元素，用来控制图层开启关闭
+      eleInput.setAttribute('style', 'font-size: 15px; margin-right: 8px;');
       eleInput.type = "checkbox";
       eleInput.name = "layers"; 
       eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
@@ -1068,7 +1159,7 @@ function uploadZip(zipFile){
     color: rgb(0, 0, 0);
     text-align: center;
     font-size: 20px;
-    margin: 10px 0px;
+    margin: 0px 0px;
 }
 
 #layerControl li {
@@ -1121,6 +1212,9 @@ function uploadZip(zipFile){
   height: 100%;
 }
 
+.gutter .gutter-horizontal {
+  width: 20px;
+}
 .gutter {
   background-color: #ffffff;
   background-repeat: no-repeat;
@@ -1184,17 +1278,39 @@ function uploadZip(zipFile){
   // margin-top: 10px;
 }
 .AllButton{
-  font-size: 15px;
+  font-size: 12px;
   padding: 10px;
 }
 
-.layersItem{
+// 图层列表标题
+#layerControl .title{
+  font:700 12px/1.5 "Microsoft Yahei",Arial,Helvetica,sans-serif;
+  border-color: #79bbff;
+  background-color: #79bbff;
+  // border-style: solid;
+  // border-width: 1px;
+  // border-radius: 4px;
+  // background-color: #f4f4f5;
+  // color: #409EFF;
+  color: #ffffff;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 9px;
+  text-align: left;
+  // box-shadow: 10px 10px 5px -4px rgba(129, 129, 129, 0.603);
+  // boxShadow: Dark Shadow;
+  // box-shadow: 0 0 5px 0 #d9ecff;
+};
+  
+
+ul#layerTree.layerTree{
+  text-indent: -10px;
+  // background-color: aqua;
+  font-size: 12px;
+  margin-left: 16px;
+  margin-top: 14px;
+  color: #73767a;
   
 }
-.layerTree{
-  // text-indent: -10px;
-
-}
-
 
 </style>

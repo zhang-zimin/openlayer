@@ -1,5 +1,6 @@
 <template>
   <div>
+
   <el-button type="primary" plain @click="calculation" class="AllButton">
     <el-icon><DataAnalysis /></el-icon>计算
   </el-button>
@@ -13,7 +14,8 @@
     <el-icon><Download /></el-icon>shp下载
   </el-button>
 
-    <el-select v-model="selValue" placeholder="Select" style="width: 140px">
+  <!-- <div class="mutiSearch"> -->
+    <el-select v-model="selValue" placeholder="Select" style="width: 140px" clearable>
       <el-option
         v-for="item in showColumnNames"
         :key="item.name"
@@ -23,10 +25,11 @@
     </el-select>
 
     <!-- 查询功能 -->
-    <el-input v-model="searchValue" placeholder="查询值" style="width: 100px"/>
+    <el-input v-model="searchValue" placeholder="Input" style="width: 140px" clearable/>
     <el-button type="primary" plain @click="query" class="AllButton"> 
       <el-icon><Search /></el-icon>查询
     </el-button>
+  <!-- </div> -->
   
     <!-- </div>
     <el-card>
@@ -191,8 +194,7 @@
   <!-- ------------------------------------------------------------------------------- -->
   <script setup lang="ts">
   import { ref,reactive,watch } from 'vue'
-  import { Search } from '@element-plus/icons-vue';
-  import { Refresh } from '@element-plus/icons-vue';
+  import { Search,Refresh,DataAnalysis,Download  } from '@element-plus/icons-vue';
   import axios from 'axios';
   import { ElTable } from 'element-plus'
   // 通过getCurrentInstance 获取
@@ -639,5 +641,8 @@ function getColumnName() {
 .AllButton{
   font-size: 15px;
   padding: 10px;
+}
+.mutiSearch{
+  /* display: line; */
 }
   </style>

@@ -1,4 +1,6 @@
 <template>
+  <div class="titleSys">污染源统计分析</div>
+
   <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
     <el-tab-pane label="污染源负荷结构分析" name="first">
     <el-card>
@@ -14,9 +16,9 @@
       >
 
         <!--<el-table-column prop="id" label="id" width="40"/>-->
-        <el-table-column prop="codsum" label="COD总量"/>
-        <el-table-column prop="nh3sum" label="NH₃总量"/>
-        <el-table-column prop="tpsum" label="TP总量"/>
+        <el-table-column prop="codsum" label="COD"/>
+        <el-table-column prop="nh3sum" label="NH₃-N"/>
+        <el-table-column prop="tpsum" label="TP"/>
       </el-table>
     </el-card>
 
@@ -50,6 +52,18 @@
         <el-button type="primary" plain class="AllButton" @click="calculation">
           <el-icon><Histogram /></el-icon>统计
         </el-button>
+        <el-button type="primary" plain class="AllButton" @click="calculationFirst">
+          <el-icon><Histogram /></el-icon>一级
+        </el-button>
+        <el-button type="primary" plain class="AllButton" @click="calculationSecond">
+          <el-icon><Histogram /></el-icon>二级
+        </el-button>
+        <el-button type="primary" plain class="AllButton" @click="calculationThird">
+          <el-icon><Histogram /></el-icon>三级
+        </el-button>
+        <el-button type="primary" plain class="AllButton" @click="calculationExport">
+          <el-icon><Histogram /></el-icon>导出excel
+        </el-button>        
       </div>
 
       <!-- 饼图 -->
@@ -114,10 +128,70 @@
         {
           value: '工业',
           label: '工业',
+          children: [
+            {
+              value: '工业',
+              label: '工业',
+            },
+          ],
         },
         {
           value: '城镇生活源',
           label: '城镇生活源',
+          children: [
+            {
+              value: '居民生活',
+              label: '居民生活',
+            },
+            {
+              value: '餐饮',
+              label: '餐饮',
+            },
+            {
+              value: '垃圾转运站',
+              label: '垃圾转运站',
+            },
+            {
+              value: '美容美发',
+              label: '美容美发',
+            },
+            {
+              value: '农贸市场',
+              label: '农贸市场',
+            },
+            {
+              value: '汽修',
+              label: '汽修',
+            },
+            {
+              value: '洗衣',
+              label: '洗衣',
+            },
+            {
+              value: '医疗',
+              label: '医疗',
+            },
+            {
+              value: '住宿',
+              label: '住宿',
+            },
+            {
+              value: '足浴',
+              label: '足浴',
+            },
+            {
+              value: '商业',
+              label: '商业',
+            },
+            {
+              value: '公共机构',
+              label: '公共机构',
+            },
+            {
+              value: '施工工地',
+              label: '施工工地',
+            },
+          ],
         },
       ],
     },
@@ -128,6 +202,24 @@
         {
           value: '农业面源',
           label: '农业面源',
+          children: [
+            {
+              value: '畜禽养殖',
+              label: '畜禽养殖',
+            },
+            {
+              value: '水产养殖',
+              label: '水产养殖',
+            },
+            {
+              value: '农业种植',
+              label: '农业种植',
+            },
+            {
+              value: '屠宰场',
+              label: '屠宰场',
+            },
+          ],
         },
         {
           value: '地表径流',
@@ -579,6 +671,9 @@
       }
     });
   }
+
+  
+
   
   let pieChart = ref()
   let pieChart2 = ref()
@@ -676,14 +771,27 @@
   font-weight: 400;
 }
 .AllButton{
-  font-size: 15px;
+  font-size: 12px;
   padding: 10px;
 }
 
 .custom-header {
-  .el-checkbox {
+
+}
+
+.el-checkbox {
     display: flex;
     height: unset;
   }
-}
+
+  .titleSys{
+    text-align: center;
+    font-size: 15px;
+    font:700 12px/1.5 "Microsoft Yahei",Arial,Helvetica,sans-serif;
+    background-color: #79bbff;
+    color: #ffffff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 9px;
+  }
   </style>
