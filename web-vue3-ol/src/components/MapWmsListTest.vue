@@ -16,6 +16,14 @@
     <el-button type="primary" plain @click="exportMapAsImage" class="AllButton">
       <el-icon><TopRight /></el-icon>地图导出
     </el-button>
+    <!--
+    <el-button type="primary" plain @click="toggleFullScreen" class="AllButton">
+      <el-icon><TopRight /></el-icon>切换全屏
+    </el-button>
+    <el-button type="primary" plain @click="reloadPage" class="AllButton">
+      <el-icon><TopRight /></el-icon>刷新
+    </el-button>
+    -->
     <el-upload
       class="shapefile-upload"
       ref="upload"
@@ -281,9 +289,8 @@ import iconv from 'iconv-lite'
 //import {DBFFile} from 'dbffile';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
+
 const layerSwitcher = new LayerSwitcher();
-
-
 
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
@@ -409,6 +416,22 @@ onMounted(() => {
   console.log("onMounted map:"+map.id); 
   console.log("layers:"+mapvalue.layers);*/
   showTreeLayers();
+
+  console.log("onMounted end"); 
+  setTimeout(function() {
+    console.log('这段代码将在1秒后执行。');
+    var allElements = document.getElementsByTagName('div');
+    // var elements = [];
+    for(var i = 0; i < allElements.length; i++) {
+      if (allElements[i].classList.contains('gutter')) {
+        // 添加到结果数组中
+        // elements.push(allElements[i]);
+        allElements[i].setAttribute("style", "background-color: #e6dfdf; font-size: 20px;width: 10px;");
+        console.log("onMounted end"+i+" - "+allElements[i]); 
+      }
+    }
+  }, 1000);
+
 });
 
 const source = new VectorSource2({wrapX: false});
@@ -1027,13 +1050,64 @@ function uploadZip(zipFile){
 //     thismap.getView().setResolution(viewResolution / scaling);
 //   } 
 
+// 导出地图为PNG图片
+function exportMapAsImage() {
+  const mapCanvas = document.createElement('canvas');
+  // var canvas =   map.value.map.getCanvas();
+  var canvas =   mapCanvas;
+  var dataURL = canvas.toDataURL('image/png');
+  const ctx = canvas.getContext('2d');
+ 
+ // 绘制一些图形
+ ctx.fillStyle = 'red';
+ ctx.fillRect(0, 0, 100, 100);
+ 
+  // 创建一个a元素用于下载
+  var a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'map.png';
+  a.click();
+}
 
-
-
-
-
-
-
+function reloadPage() {
+    // 使用Vue Router的reload方法
+    // $router.go(0);
+ 
+    // 或者使用原生JavaScript
+    window.location.reload();
+  }
+  
+function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        enterFullScreen();
+      } else {
+        exitFullScreen();
+      }
+    }
+    function enterFullScreen() {
+      let element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) { /* Firefox */
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) { /* IE/Edge */
+        element.msRequestFullscreen();
+      }
+    }
+    function exitFullScreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE/Edge */
+        document.msExitFullscreen();
+      }
+    }
+  
 </script>
 
 
@@ -1120,23 +1194,31 @@ function uploadZip(zipFile){
 .vue-split.horizontal .vue-split-content {
   height: 100%;
 }
-
+/**/
 .gutter {
-  background-color: #ffffff;
+  // background-color: #ffffff;
+  background-color: #030303;
   background-repeat: no-repeat;
   background-position: 50%;
 }
 
 .gutter.gutter-horizontal {
-  // background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
   cursor: col-resize;
 }
 
 .gutter.gutter-vertical {
-  // background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
   cursor: row-resize;
 }
 
+/*
+.gutter {  background-color: #eee;  background-repeat: no-repeat;  background-position: 50%;
+  cursor: move;  cursor: grab;  cursor: -moz-grab;  cursor: -webkit-grab;
+}.gutter.gutter-horizontal {  background-image: url('grips/vertical.png');
+}.gutter.gutter-vertical {  background-image: url('grips/horizontal.png');
+}
+*/
 .vue-split-item {
   height: 100%;
   overflow: hidden;
@@ -1195,6 +1277,4 @@ function uploadZip(zipFile){
   // text-indent: -10px;
 
 }
-
-
 </style>
