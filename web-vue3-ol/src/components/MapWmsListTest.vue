@@ -903,12 +903,14 @@ function exportMapAsImage2() {
   const mapCanvas = document.createElement('canvas');
   // var canvas =   map.value.map.getCanvas();
   var canvas =   mapCanvas;
-  var dataURL = canvas.toDataURL('image/png');
+  // var dataURL = canvas.toDataURL('image/png');
  
+  // var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
+  var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
   // 创建一个a元素用于下载
   var a = document.createElement('a');
   a.href = dataURL;
-  a.download = 'map.png';
+  a.download = 'map.jpeg';
   a.click();
 }
 
@@ -943,7 +945,7 @@ function exportMapAsImage() {
     document.body.style.cursor = 'progress';
 
     const resolution=ref(72);
-    const dim = dims.a5;
+    const dim = dims.a2;
     const width = Math.round((dim[0] * resolution.value) / 25.4);
     const height = Math.round((dim[1] * resolution.value) / 25.4);
     const size = thismap.getSize();
@@ -980,7 +982,7 @@ function exportMapAsImage() {
       const pdf = new jspdf.jsPDF('landscape', undefined, format);
  
       var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
-      pdf.addImage(
+      /*pdf.addImage(
         //mapCanvas.toDataURL('image/jpeg'),
         dataURL,
         'JPEG',
@@ -994,7 +996,16 @@ function exportMapAsImage() {
       thismap.setSize(size);
       thismap.getView().setResolution(viewResolution);
        
-      document.body.style.cursor = 'auto';
+      document.body.style.cursor = 'auto';*/
+      pdf.text("Hello world!", 10, 10);
+      pdf.save("a4.pdf"); // will save the file in the current working directory
+
+      // 创建一个a元素用于下载
+  /*var a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'map.png';
+  a.click();*/
+
     });
 
     // Set print size

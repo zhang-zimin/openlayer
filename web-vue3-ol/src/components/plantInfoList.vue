@@ -19,15 +19,15 @@
 
     <el-select v-model="selValue" placeholder="Select" style="width: 140px">
       <el-option
-        v-for="item in selOptions"
-        :key="item.value"
+        v-for="item in showColumnNames"
+        :key="item.name"
         :label="item.label"
-        :value="item.value"
+        :value="item.name"
       />
     </el-select>
 
     <!-- 查询功能 -->
-    <el-input v-model="username" placeholder="查询值" style="width: 100px"/>
+    <el-input v-model="searchValue" placeholder="查询值" style="width: 100px"/>
     <el-button type="primary" @click="query"> 
       <el-icon><Search /></el-icon>查询
     </el-button>
@@ -345,9 +345,9 @@ const handleSelectionChange = (val: User[]) => {
   }
     GetAll();     
   
-  const query = () => {
+  /*const query = () => {
     GetAll();   
-  }
+  }*/
   // const query2 = () => {
   //   //console.log('2222:')
   //   console.log(username.value)
@@ -563,6 +563,58 @@ const handleSelectionChange = (val: User[]) => {
     label: 'Option5',
   },
 ]
+
+const showColumnNames=ref([])
+function getColumnName() {
+  //Pollution/GetAll
+  //plantInfo/list
+    // axios接口
+    Get('/Pollution/getcolumnname',{}).then((response) => {
+      const { code, msg, data: res } = response.data;
+      if (code === 200) {
+        showColumnNames.value=res;
+        
+        console.log("showColumnNames:"+showColumnNames.value);
+        // GetAll();  
+        // ElMessage.success(msg ?? "Submitted!");
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+  getColumnName() ;
+
+  const searchValue=ref('');
+  function MutiSearch(){
+    const seljson= {pageNum: currentPage4.value,pageSize: pageSize4.value,[selValue.value]:searchValue.value};
+    console.log("MutiSearch:"+seljson);
+    Post('/Pollution/MutiSearch',seljson).then((response) => {
+      const { code, msg, rows,total,data: res } = response.data;
+      if (code === 200) {
+        console.log("条件查询");
+        showrows.value=rows;
+        //showrows.value=data;
+        showtotal.value = total;
+        console.log(showrows.value);
+        ElMessage.success(msg ?? "Submitted!");
+        // GetAll();   
+  
+        /*localStorage.setItem("token", res.token);
+        ElMessage.success(msg ?? "Submitted!");
+        router.push({
+          path: "/", // HelloWorld.vue在路由配置文件中定义的路径
+          params: {
+            isLogged: true,
+          },
+        });*/
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+  function query(){
+    MutiSearch();
+  }
   </script>
   
   
