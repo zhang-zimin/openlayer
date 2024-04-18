@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="All">
 
   <el-button type="primary" plain @click="calculation" class="AllButton">
     <el-icon><DataAnalysis /></el-icon>计算
@@ -14,17 +14,18 @@
     <el-icon><Download /></el-icon>shp下载
   </el-button>
 
-    <el-select v-model="selValue" placeholder="Select" style="width: 140px" clearable>
+    <el-select v-model="selValue" style="width: 140px; font-size: 12px;" clearable>
       <el-option
         v-for="item in showColumnNames"
         :key="item.name"
         :label="item.label"
         :value="item.name"
+        style="font-size: 12px;"
       />
     </el-select>
 
     <!-- 查询功能 -->
-    <el-input v-model="searchValue" placeholder="Input" style="width: 140px" clearable/>
+    <el-input v-model="searchValue" placeholder="Input" style="width: 140px; font-size: 12px;" clearable/>
     <el-button type="primary" plain @click="query" class="AllButton"> 
       <el-icon><Search /></el-icon>查询
     </el-button>
@@ -79,11 +80,11 @@
     <!-- </div> -->
     <!--@sort-change="sortChange"-->
     <!-- <el-card style="margin-top:-15px; height: 600px"> -->
-    <el-card style="margin-top:-15px; height: 550px">
+    <el-card style="margin-top:-15px; height: 550px;">
         <el-table 
           :data="showrows"
           stripe
-          style="width: 100%"
+          style="width: 100%; font-size: 12px;"
           row-key="id"
           :has-n-o="false"
           height="400"
@@ -98,16 +99,16 @@
           >
           <!-- v-loading="loading" -->
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/>
-        <el-table-column prop="id" label="id" width="80" sortable="custom"/>
-        <el-table-column prop="nextsurveyno3" label="下游编号" width="80" sortable="custom"/>
-        <el-table-column prop="draintype" label="面源类型" width="80" sortable="custom"/>
-        <el-table-column prop="drainsubtype" label="面源子类" width="80" sortable="custom"/>
-        <el-table-column prop="agriculturetype" label="农业类型" width="80" sortable="custom"/>
+        <!-- <el-table-column prop="OBJECTID" label="OBJECTID" width="80" sortable="custom"/> -->
+        <!-- <el-table-column prop="id" label="id" width="80" sortable="custom"/> -->
+        <!-- <el-table-column prop="nextsurveyno3" label="下游编号" width="80" sortable="custom"/> -->
+        <el-table-column prop="draintype" label="面源类型" width="100" sortable="custom"/>
+        <el-table-column prop="drainsubtype" label="面源子类" width="100" sortable="custom"/>
+        <el-table-column prop="agriculturetype" label="农业类型" width="100" sortable="custom"/>
         <el-table-column prop="username" label="对象名称" width="180" sortable="custom"/>
         <el-table-column prop="useraddress" label="排水户地图地址" width="180" sortable="custom"/>
-        <el-table-column prop="codinflow" label="cod入流量" width="80" sortable="custom"/>
-        <el-table-column prop="codstandard" label="cod标准" width="80" editable sortable="custom">
+        <el-table-column prop="codinflow" label="cod入流量" width="120" sortable="custom"/>
+        <el-table-column prop="codstandard" label="cod标准" width="120" editable sortable="custom">
           <template v-slot="scope">
             <el-input
               v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -119,7 +120,7 @@
               <span v-else>{{ scope.row.codstandard }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="nh3standard" label="nh3标准" width="80" editable sortable="custom">
+        <el-table-column prop="nh3standard" label="nh3-n标准" width="120" editable sortable="custom">
           <template v-slot="scope">
             <el-input
               v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -143,7 +144,7 @@
             <span v-else>{{ scope.row.tpstandard }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="inflowcoefficient" label="入流系数" width="80" editable sortable="custom">
+        <el-table-column prop="inflowcoefficient" label="入流系数" width="100" editable sortable="custom">
           <template v-slot="scope">
             <el-input
               v-if="scope.row.index + ',' + scope.column.index == currentCell"
@@ -156,7 +157,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="coddischarge" label="cod排放量" width="180" sortable="custom"/>
-        <el-table-column prop="nh3discharge" label="nh3排放量" width="180" sortable="custom"/>
+        <el-table-column prop="nh3discharge" label="nh3-n排放量" width="180" sortable="custom"/>
         <el-table-column prop="tpdischarge" label="tp排放量" width="180" sortable="custom"/>
         <el-table-column prop="nh3inflow" label="nh3入流量" width="180" sortable="custom"/>
         <el-table-column prop="tpinflow" label="tp入流量" width="180" sortable="custom"/>
@@ -170,7 +171,7 @@
 
         <!-- 清除当前选择 -->
         <div style="margin-top: 0px; margin-right: 25px">
-         <el-button @click="toggleSelection()">清除选择</el-button>
+         <el-button @click="toggleSelection()" class="AllButton" type="primary" plain>清除选择</el-button>
         </div>
 
         <el-pagination
@@ -184,6 +185,7 @@
           :total="showtotal"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
+          style="font-size: 12px;"
         />
       </div>
     </el-card>
@@ -538,28 +540,28 @@ const handleSelectionChange = (val: User[]) => {
   }
 
   const selValue = ref('')
-  const selOptions = [
-  {
-    value: 'Option1',
-    label: 'Option1',
-  },
-  {
-    value: 'Option2',
-    label: 'Option2',
-  },
-  {
-    value: 'Option3',
-    label: 'Option3',
-  },
-  {
-    value: 'Option4',
-    label: 'Option4',
-  },
-  {
-    value: 'Option5',
-    label: 'Option5',
-  },
-]
+//   const selOptions = [
+//   {
+//     value: 'Option1',
+//     label: 'Option1',
+//   },
+//   {
+//     value: 'Option2',
+//     label: 'Option2',
+//   },
+//   {
+//     value: 'Option3',
+//     label: 'Option3',
+//   },
+//   {
+//     value: 'Option4',
+//     label: 'Option4',
+//   },
+//   {
+//     value: 'Option5',
+//     label: 'Option5',
+//   },
+// ]
 
 const showColumnNames=ref([])
 function getColumnName() {
@@ -585,7 +587,7 @@ function getColumnName() {
   function MutiSearch(){
     const seljson= {pageNum: currentPage4.value,pageSize: pageSize4.value,[selValue.value]:searchValue.value.trim()};
     console.log("MutiSearch:"+seljson);
-    Post('/Pollution/MutiSearch',seljson).then((response) => {
+    Get('/Pollution/MutiSearch',seljson).then((response) => {
       const { code, msg, rows,total,data: res } = response.data;
       if (code === 200) {
         console.log("条件查询");
@@ -626,11 +628,13 @@ function getColumnName() {
   }
   .el-card{
     margin-bottom: 10px;
+    font-size: 12px;
   }
   .demo-pagination-block{
     display: flex;
     justify-content: center;
     margin-top: 20px;
+    font-size: 12px;
   }
 
   .example-showcase .el-loading-mask {
@@ -638,10 +642,25 @@ function getColumnName() {
 }
 
 .AllButton{
-  font-size: 15px;
+  font-size: 12px;
   padding: 10px;
 }
-.mutiSearch{
-  /* display: line; */
-}
+
+
+.el-table th, .el-table td {
+     font-size: 12px; /* 替换为您希望的字体大小 */
+   }
+
+el-table.cell {
+     font-size: 12px !important;
+   }
+   span{
+    font-size: 12px;
+   }
+   .el-select__selection{
+    font-size: 12px;
+   }
+   .All{
+    font-size: 12px;
+   }
   </style>

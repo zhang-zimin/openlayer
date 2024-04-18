@@ -10,30 +10,30 @@
     <el-button type="primary" text='primary' @click="drawPolygon" class="AllButton">
       <el-icon><Edit /></el-icon>绘制多边形
     </el-button>
-    <el-button type="primary" plain @click="cancelDraw" class="AllButton">
+    <el-button type="primary" text='primary' @click="cancelDraw" class="AllButton">
       <el-icon><SwitchButton /></el-icon>结束绘制
     </el-button>
-    <el-button type="primary" plain @click="removeDrawLayer" class="AllButton">
+    <el-button type="primary" text='primary' @click="removeDrawLayer" class="AllButton">
       <el-icon><Delete /></el-icon>清除绘制
     </el-button>
-    <el-button type="primary" plain @click="getPolygon" class="AllButton">
+    <el-button type="primary" text='primary' @click="getPolygon" class="AllButton">
       <el-icon><Connection /></el-icon>获取多边形数据
     </el-button>
 
   </el-tab-pane>
 
   <el-tab-pane label="共享" name="second">
-    <el-button type="primary" plain @click="exportMapAsImage" class="AllButton">
+    <el-button type="primary" text='primary' @click="exportMapAsImage" class="AllButton">
       <el-icon><TopRight /></el-icon>地图导出
     </el-button>
-    <!--
-    <el-button type="primary" plain @click="toggleFullScreen" class="AllButton">
+    
+    <el-button type="primary" text='primary' @click="toggleFullScreen" class="AllButton">
       <el-icon><TopRight /></el-icon>切换全屏
     </el-button>
-    <el-button type="primary" plain @click="reloadPage" class="AllButton">
+    <el-button type="primary" text='primary' @click="reloadPage" class="AllButton">
       <el-icon><TopRight /></el-icon>刷新
     </el-button>
-    -->
+   
     <el-upload
       class="shapefile-upload"
       ref="upload"
@@ -46,7 +46,7 @@
     >
       <div>
         <el-button
-          type="primary" plain
+          type="primary" text='primary'
           slot='trigger'
           class="chaxuns fontSizes AllButton">
           <el-icon><Upload /></el-icon>
@@ -515,7 +515,7 @@ onMounted(() => {
       if (allElements[i].classList.contains('gutter')) {
         // 添加到结果数组中
         // elements.push(allElements[i]);
-        allElements[i].setAttribute("style", "background-color: #e6dfdf; font-size: 20px;width: 10px;");
+        allElements[i].setAttribute("style", "background-color: #ebebeb; font-size: 12px;width: 10px;");
         console.log("onMounted end"+i+" - "+allElements[i]); 
       }
     }
@@ -635,9 +635,9 @@ function showTreeLayers(){
       layerVisibility[i] = layer[i].getVisible();
 
       let eleLi = document.createElement('li');           //新增li元素，用来承载图层项
-      eleLi.setAttribute('style', 'font-size: 15px; margin-top: 6px;');
+      eleLi.setAttribute('style', 'font-size: 12px; margin-top: 4px;');
       var eleInput = document.createElement('input');     //创建复选框元素，用来控制图层开启关闭
-      eleInput.setAttribute('style', 'font-size: 15px; margin-right: 8px;');
+      eleInput.setAttribute('style', 'font-size: 12px; margin-right: 8px;');
       eleInput.type = "checkbox";
       eleInput.name = "layers"; 
       eleLi.appendChild(eleInput);                        //将复选框添加到li元素中
@@ -1232,7 +1232,7 @@ function toggleFullScreen() {
 #layerControl .title {
     color: rgb(0, 0, 0);
     text-align: center;
-    font-size: 20px;
+    font-size: 12px;
     margin: 0px 0px;
 }
 
@@ -1390,5 +1390,10 @@ ul#layerTree.layerTree{
   margin-top: 14px;
   color: #73767a;
   
+}
+
+.demo-tabs{
+  height: 80px;
+  width: 100%;
 }
 </style>

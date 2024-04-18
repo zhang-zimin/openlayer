@@ -38,6 +38,7 @@
         <div class="nav-right">
           <!-- 天气 -->
           <!-- <span id="Weathera"><Weather /></span> -->
+
           <!-- 时间 -->
           <span id="showTime">{{ nowTime }}</span>
           <!-- 用户 -->
@@ -87,6 +88,12 @@
               <Rank />
             </el-icon>
           </span>
+          <el-button type="primary" text='primary' @click="toggleFullScreen" class="AllButton">
+            <el-icon><FullScreen /></el-icon>切换全屏
+    </el-button>
+    <el-button type="primary" text='primary' @click="reloadPage" class="AllButton">
+      <el-icon><Refresh /></el-icon>刷新
+    </el-button>
         </div>
       </div>
     </div>
@@ -94,8 +101,10 @@
 </template>
 <script setup>
 import { useRouter } from "vue-router";
+
 // import Weather from "../home_detail/WeatherTop.vue";
 import { onMounted, ref } from "vue";
+import { Search, Refresh, DataAnalysis, Histogram, FullScreen} from '@element-plus/icons-vue';
 // import screenfull from "screenfull";
 // import { logout, getInfo } from "@/api/login";
 // import Cookies from "js-cookie";
@@ -192,12 +201,54 @@ onMounted(() => {
     nowTime.value = formatTime(new Date());
   });
 });
+
+
+
+function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        enterFullScreen();
+      } else {
+        exitFullScreen();
+      }
+    }
+
+    function enterFullScreen() {
+      let element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) { /* Firefox */
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) { /* IE/Edge */
+        element.msRequestFullscreen();
+      }
+    }
+    function exitFullScreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE/Edge */
+        document.msExitFullscreen();
+      }
+    }
+
+    function reloadPage() {
+    // 使用Vue Router的reload方法
+    // $router.go(0);
+ 
+    // 或者使用原生JavaScript
+    window.location.reload();
+  }
 </script>
 
 <style scoped>
 .top {
   width: 100%;
-  height: 60px;
+  height: 25px;
 
   opacity: 0.8;
   z-index: 999;
@@ -263,9 +314,9 @@ onMounted(() => {
   /* margin-right: 20px; */
   /* background-color: azure; */
   /* padding-top: 25px; */
-  text-align: center;
+  text-align:left;
   /* float: right; */
-  font-size: 18px;
+  font-size: 14px;
 }
 .nav-right {
   width: 500px;
@@ -297,7 +348,7 @@ a {
 
 .header-bar {
   position: absolute;
-  height: 50px;
+  height: 40px;
   width: 100%;
   top: 0;
   left: 0;
@@ -369,9 +420,10 @@ a {
   width: 100%;
   text-align: center;
   color: #f6f6f6;
-  font-size: 36px;
+  font-size: 27px;
   font-weight: 600;
   letter-spacing: 5px;
+  padding-top: 20px;
 }
 
 .home {

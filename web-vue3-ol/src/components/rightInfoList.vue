@@ -7,7 +7,7 @@
       <el-table 
       :data="showrows"
       stripe
-      style="width: 100%"
+      style="width: 100%; font-size: 12px;"
       row-key="id"
       :has-n-o="false"
       height="180px"
@@ -25,19 +25,29 @@
     <!-- 统计 -->
     <div class="select-el-form">
       <div class="m-4">分区选择
-        <el-cascader :options="fenquTypeArray" :props="propswry" v-model="fenquTypeList" clearable />
+        <el-cascader 
+        :options="fenquTypeArray" 
+        :props="propswry" 
+        collapse-tags 
+        v-model="fenquTypeList" 
+        clearable />
       </div>
 
       <div class="m-4">污染地块
-        <el-cascader :options="WryOptions" :props="WryProps" v-model="wryPropsList" clearable />
+        <el-cascader 
+        :options="WryOptions" 
+        :props="WryProps" 
+        collapse-tags 
+        v-model="wryPropsList" 
+        clearable />
       </div>
-
       <div class="m-4">污染指标
         <el-select
           v-model="WryPropsIndexList"
           multiple
           placeholder="Select"
-          style="width: 214px"
+          style="width: 214px; font-size: 12px;"
+          collapse-tags
         >
           <el-option
             v-for="item in optionindex"
@@ -47,6 +57,16 @@
           />
         </el-select>
       </div>
+      <!-- <div class="m-4">污染指标
+        <el-cascader
+          :options="optionindex"
+          :props="wryIndex"
+          collapse-tags
+          placeholder="Select"
+          v-model="WryPropsIndexList"
+          clearable
+        />
+      </div> -->
 
       <div class="raw">
         <el-button type="primary" plain class="AllButton" @click="calculation">
@@ -61,10 +81,11 @@
         <el-button type="primary" plain class="AllButton" @click="calculationThird">
           <el-icon><Histogram /></el-icon>三级
         </el-button>
-        <el-button type="primary" plain class="AllButton" @click="calculationExport">
-          <el-icon><Histogram /></el-icon>导出excel
-        </el-button>        
+               
       </div>
+      <el-button type="primary" plain class="AllButton" @click="calculationExport">
+          <el-icon><Histogram /></el-icon>导出excel
+        </el-button> 
 
       <!-- 饼图 -->
       <div ref="pieChart" class="pieChart" id="pieChart"></div>
@@ -241,7 +262,7 @@
     },
     {
       value: 'nh3sum',
-      label: 'NH₃',
+      label: 'NH₃-N',
     },
     {
       value: 'tpsum',
@@ -261,6 +282,7 @@
   const propswry = { multiple: true }
   const WryProps = { multiple: true }
   const wryIndex = { multiple: true }
+
   const checkAll = ref(false)
   const indeterminate = ref(false)
   const value = ref<CheckboxValueType[]>([])
@@ -750,7 +772,7 @@
     margin-top: 20px;
   }
   .select-el-form  {
-      
+      font-size: 12px;
   }
   .select-el-form .raw{
     display: flex;
@@ -767,7 +789,7 @@
   .demo-tabs > .el-tabs__content {
   padding: 32px;
   color: #6b778c;
-  font-size: 32px;
+  font-size: 12px;
   font-weight: 400;
 }
 .AllButton{
@@ -786,12 +808,18 @@
 
   .titleSys{
     text-align: center;
-    font-size: 15px;
+    font-size: 12px;
     font:700 12px/1.5 "Microsoft Yahei",Arial,Helvetica,sans-serif;
     background-color: #79bbff;
     color: #ffffff;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 9px;
+  }
+  .m-4{
+    font-size: 12px;
+    /* height: 40px; */
+    /* width: 320px; */
+
   }
   </style>
