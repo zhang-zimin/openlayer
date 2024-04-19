@@ -304,12 +304,14 @@ const handleSelectionChange = (val: User[]) => {
   const handleSizeChange = (val: number) => {
     pageSize4.value=val;
     console.log(`${val} items per page`)
-    GetAll();
+    //GetAll();
+    MutiSearch();
   }
   const handleCurrentChange = (val: number) => {
     currentPage4.value=val;
     console.log(`current page: ${val}`)
-    GetAll();
+    // GetAll();
+    MutiSearch();
   }
   
   let username = ref('')
@@ -587,6 +589,8 @@ function getColumnName() {
   function MutiSearch(){
     const seljson= {pageNum: currentPage4.value,pageSize: pageSize4.value,[selValue.value]:searchValue.value.trim()};
     console.log("MutiSearch:"+seljson);
+    const seljson2= {pageNum: currentPage4.value,pageSize: pageSize4.value,selName:selValue.value,selValue:searchValue.value.trim()};
+    console.log("MutiSearch:"+seljson);
     Get('/Pollution/MutiSearch',seljson).then((response) => {
       const { code, msg, rows,total,data: res } = response.data;
       if (code === 200) {
@@ -612,6 +616,7 @@ function getColumnName() {
     });
   }
   function query(){
+    currentPage4.value=1;
     MutiSearch();
   }
   </script>

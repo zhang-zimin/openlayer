@@ -69,7 +69,7 @@
       </div> -->
 
       <div class="raw">
-        <el-button type="primary" plain class="AllButton" @click="calculation">
+        <el-button type="primary" plain class="AllButton" @click="calculationThird">
           <el-icon><Histogram /></el-icon>统计
         </el-button>
         <el-button type="primary" plain class="AllButton" @click="calculationFirst">
@@ -157,7 +157,7 @@
           ],
         },
         {
-          value: '城镇生活源',
+          value: '生活',
           label: '城镇生活源',
           children: [
             {
@@ -221,7 +221,7 @@
       label: '面源',
       children: [
         {
-          value: '农业面源',
+          value: '农业',
           label: '农业面源',
           children: [
             {
@@ -694,8 +694,232 @@
     });
   }
 
-  
+  function calculationFirst(){
+    console.log("calculationFirst fenquTypeList:"+fenquTypeList.value);
+    console.log("calculationFirst wryPropsList:"+wryPropsList.value);
+    console.log("calculationFirst WryPropsIndexList:"+WryPropsIndexList.value);
+    const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
+    Post('/Pollution/PollutionSourceStatistics/third',geojson).then((response) => {
+      const { code, msg, data: res } = response.data;
+      if (code === 200) {
+        console.log("统计结果:"+res);
+        const codArray=[];
+        const nh3Array=[];
+        const tpArray=[];
 
+        //按二级分类统计
+        // const drainsArray=["工业","生活"];
+        const drainsArray=[];
+        for(var j=0;j<wryPropsList.value.length;j++){
+          if(drainsArray.indexOf(wryPropsList.value[j][0])==-1){
+            drainsArray.push(wryPropsList.value[j][0]);
+          }
+        }
+
+        for(var j=0;j<drainsArray.length;j++){
+          const codCount=ref(0);
+          const nh3Count=ref(0);
+          const tpCount=ref(0);
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].wrytype){
+              codCount.value=codCount.value+res[i].codsum;
+            }
+          }
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].wrytype){
+              nh3Count.value=nh3Count.value+res[i].nh3sum;
+            }
+          }
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].wrytype){
+              tpCount.value=tpCount.value+res[i].tpsum;
+            }
+          }
+          const codjson= {"value":codCount.value,"name":drainsArray[j]};
+          const nh3json= {"value":nh3Count.value,"name":drainsArray[j]};
+          const tpjson= {"value":tpCount.value,"name":drainsArray[j]};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }
+
+        //原统计所有
+        /*for(var i=0;i<res.length;i++){
+          const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }
+        */
+        showChart(codArray,pieChart,"codsum");
+        showChart(nh3Array,pieChart2,"nh3sum");
+        showChart(tpArray,pieChart3,"tpsum");
+
+        showrows.value=res;
+        showtotal.value = res.length;
+
+        document.getElementById("pieChart").style.display = "none";
+        document.getElementById("pieChart2").style.display = "none";
+        document.getElementById("pieChart3").style.display = "none";
+       if(WryPropsIndexList.value.includes("codsum")){
+        document.getElementById("pieChart").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("nh3sum")){
+        document.getElementById("pieChart2").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("tpsum")){
+        document.getElementById("pieChart3").style.display = "block";
+       }
+
+        ElMessage.success(msg ?? "Submitted!");
+        //画图
+        //GetAll();   
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+  
+  function calculationSecond(){
+    console.log("calculationSecond fenquTypeList:"+fenquTypeList.value);
+    console.log("calculationSecond wryPropsList:"+wryPropsList.value);
+    console.log("calculationSecond WryPropsIndexList:"+WryPropsIndexList.value);
+    const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
+    Post('/Pollution/PollutionSourceStatistics/second',geojson).then((response) => {
+      const { code, msg, data: res } = response.data;
+      if (code === 200) {
+        console.log("统计结果:"+res);
+        const codArray=[];
+        const nh3Array=[];
+        const tpArray=[];
+        for(var i=0;i<res.length;i++){
+          // const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
+          // const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
+          // const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+          const codjson= {"value":res[i].cod,"name":res[i].type};
+          const nh3json= {"value":res[i].nh3,"name":res[i].type};
+          const tpjson= {"value":res[i].tp,"name":res[i].type};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }
+        showChart(codArray,pieChart,"codsum");
+        showChart(nh3Array,pieChart2,"nh3sum");
+        showChart(tpArray,pieChart3,"tpsum");
+
+        showrows.value=res;
+        showtotal.value = res.length;
+
+        document.getElementById("pieChart").style.display = "none";
+        document.getElementById("pieChart2").style.display = "none";
+        document.getElementById("pieChart3").style.display = "none";
+       if(WryPropsIndexList.value.includes("codsum")){
+        document.getElementById("pieChart").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("nh3sum")){
+        document.getElementById("pieChart2").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("tpsum")){
+        document.getElementById("pieChart3").style.display = "block";
+       }
+
+        ElMessage.success(msg ?? "Submitted!");
+        //画图
+        //GetAll();   
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+
+  function calculationThird(){
+    console.log("calculationThird fenquTypeList:"+fenquTypeList.value);
+    console.log("calculationThird wryPropsList:"+wryPropsList.value);
+    console.log("calculationThird WryPropsIndexList:"+WryPropsIndexList.value);
+    const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
+    Post('/Pollution/PollutionSourceStatistics/third',geojson).then((response) => {
+      const { code, msg, data: res } = response.data;
+      if (code === 200) {
+        console.log("统计结果:"+res);
+        const codArray=[];
+        const nh3Array=[];
+        const tpArray=[];
+
+        //按二级分类统计
+        // const drainsArray=["工业","生活"];
+        /*const drainsArray=[];
+        for(var j=0;j<wryPropsList.value.length;j++){
+          if(drainsArray.indexOf(wryPropsList.value[j][1])==-1){
+            drainsArray.push(wryPropsList.value[j][1]);
+          }
+        }
+
+        for(var j=0;j<drainsArray.length;j++){
+          const codCount=ref(0);
+          const nh3Count=ref(0);
+          const tpCount=ref(0);
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].draintype){
+              codCount.value=codCount.value+res[i].codsum;
+            }
+          }
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].draintype){
+              nh3Count.value=nh3Count.value+res[i].nh3sum;
+            }
+          }
+          for(var i=0;i<res.length;i++){
+            if(drainsArray[j]==res[i].draintype){
+              tpCount.value=tpCount.value+res[i].tpsum;
+            }
+          }
+          const codjson= {"value":codCount.value,"name":drainsArray[j]};
+          const nh3json= {"value":nh3Count.value,"name":drainsArray[j]};
+          const tpjson= {"value":tpCount.value,"name":drainsArray[j]};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }*/
+
+        //原统计所有
+        for(var i=0;i<res.length;i++){
+          const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+          codArray.push(codjson);
+          nh3Array.push(nh3json);
+          tpArray.push(tpjson);
+        }
+        showChart(codArray,pieChart,"codsum");
+        //showChart(nh3Array,pieChart2,"nh3sum");
+        //showChart(tpArray,pieChart3,"tpsum");
+
+        showrows.value=res;
+        showtotal.value = res.length;
+
+        document.getElementById("pieChart").style.display = "none";
+        document.getElementById("pieChart2").style.display = "none";
+        document.getElementById("pieChart3").style.display = "none";
+       if(WryPropsIndexList.value.includes("codsum")){
+        document.getElementById("pieChart").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("nh3sum")){
+        document.getElementById("pieChart2").style.display = "block";
+       }
+       if(WryPropsIndexList.value.includes("tpsum")){
+        document.getElementById("pieChart3").style.display = "block";
+       }
+
+        ElMessage.success(msg ?? "Submitted!");
+        //画图
+        //GetAll();   
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
   
   let pieChart = ref()
   let pieChart2 = ref()
