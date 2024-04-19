@@ -16,6 +16,7 @@
       >
 
         <!--<el-table-column prop="id" label="id" width="40"/>-->
+        <el-table-column prop="type" label="分类"/>
         <el-table-column prop="codsum" label="COD"/>
         <el-table-column prop="nh3sum" label="NH₃-N"/>
         <el-table-column prop="tpsum" label="TP"/>
@@ -69,7 +70,7 @@
       </div> -->
 
       <div class="raw">
-        <el-button type="primary" plain class="AllButton" @click="calculationThird">
+        <el-button type="primary" plain class="AllButton" @click="calculation">
           <el-icon><Histogram /></el-icon>统计
         </el-button>
         <el-button type="primary" plain class="AllButton" @click="calculationFirst">
@@ -251,6 +252,17 @@
     {
       value: '内源',
       label: '内源',
+      children: [
+        {
+          value: '内源',
+          label: '内源',
+          children: [
+            {
+              value: '内源',
+              label: '内源',
+            }
+          ]
+        }]
     },
   ]
 
@@ -650,7 +662,7 @@
     console.log("calculation wryPropsList:"+wryPropsList.value);
     console.log("calculation WryPropsIndexList:"+WryPropsIndexList.value);
     const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
-    Post('/Pollution/PollutionSourceStatistics',geojson).then((response) => {
+    Post('/Pollution/PollutionSourceStatistics/statistics',geojson).then((response) => {
       const { code, msg, data: res } = response.data;
       if (code === 200) {
         console.log("统计结果:"+res);
@@ -699,7 +711,7 @@
     console.log("calculationFirst wryPropsList:"+wryPropsList.value);
     console.log("calculationFirst WryPropsIndexList:"+WryPropsIndexList.value);
     const geojson= {"fenqu":fenquTypeList.value,"wryProps":wryPropsList.value,"WryPropsIndex":WryPropsIndexList.value}
-    Post('/Pollution/PollutionSourceStatistics/third',geojson).then((response) => {
+    Post('/Pollution/PollutionSourceStatistics/first',geojson).then((response) => {
       const { code, msg, data: res } = response.data;
       if (code === 200) {
         console.log("统计结果:"+res);
@@ -709,7 +721,7 @@
 
         //按二级分类统计
         // const drainsArray=["工业","生活"];
-        const drainsArray=[];
+        /*const drainsArray=[];
         for(var j=0;j<wryPropsList.value.length;j++){
           if(drainsArray.indexOf(wryPropsList.value[j][0])==-1){
             drainsArray.push(wryPropsList.value[j][0]);
@@ -741,18 +753,18 @@
           codArray.push(codjson);
           nh3Array.push(nh3json);
           tpArray.push(tpjson);
-        }
+        }*/
 
         //原统计所有
-        /*for(var i=0;i<res.length;i++){
-          const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
-          const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
-          const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+        for(var i=0;i<res.length;i++){
+          const codjson= {"value":res[i].codsum,"name":res[i].type};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].type};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].type};
           codArray.push(codjson);
           nh3Array.push(nh3json);
           tpArray.push(tpjson);
         }
-        */
+        
         showChart(codArray,pieChart,"codsum");
         showChart(nh3Array,pieChart2,"nh3sum");
         showChart(tpArray,pieChart3,"tpsum");
@@ -798,9 +810,9 @@
           // const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
           // const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
           // const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
-          const codjson= {"value":res[i].cod,"name":res[i].type};
-          const nh3json= {"value":res[i].nh3,"name":res[i].type};
-          const tpjson= {"value":res[i].tp,"name":res[i].type};
+          const codjson= {"value":res[i].codsum,"name":res[i].type};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].type};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].type};
           codArray.push(codjson);
           nh3Array.push(nh3json);
           tpArray.push(tpjson);
@@ -885,16 +897,16 @@
 
         //原统计所有
         for(var i=0;i<res.length;i++){
-          const codjson= {"value":res[i].codsum,"name":res[i].drainsubtype};
-          const nh3json= {"value":res[i].nh3sum,"name":res[i].drainsubtype};
-          const tpjson= {"value":res[i].tpsum,"name":res[i].drainsubtype};
+          const codjson= {"value":res[i].codsum,"name":res[i].type};
+          const nh3json= {"value":res[i].nh3sum,"name":res[i].type};
+          const tpjson= {"value":res[i].tpsum,"name":res[i].type};
           codArray.push(codjson);
           nh3Array.push(nh3json);
           tpArray.push(tpjson);
         }
         showChart(codArray,pieChart,"codsum");
-        //showChart(nh3Array,pieChart2,"nh3sum");
-        //showChart(tpArray,pieChart3,"tpsum");
+        showChart(nh3Array,pieChart2,"nh3sum");
+        showChart(tpArray,pieChart3,"tpsum");
 
         showrows.value=res;
         showtotal.value = res.length;
