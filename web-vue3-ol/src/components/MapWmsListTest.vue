@@ -306,6 +306,13 @@
               </div> -->
 
             </div>
+            <!-- <ag-grid-vue
+              :rowData="rowData"
+              :columnDefs="colDefs"
+              style="height: 500px"
+              class="ag-theme-quartz"
+            >
+            </ag-grid-vue> -->
           </SplitItem>
         </SplitWrapper>
       </SplitItem>
@@ -349,6 +356,12 @@ import { Text } from "ol/style";
 import { Icon } from "ol/style";
 import { fromLonLat } from "ol/proj";
 import JSZip from 'jszip';
+import { createApp } from "vue";
+// import { ref } from "vue";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3";
+
 import * as shp from 'shpjs';
 //import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
@@ -395,6 +408,30 @@ const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕�
 const mapstyle=ref("width: "+(screenWidth.value-204)+"px;height: "+(screenHeight.value-350)+"px")
 
 // console.log(mapstyle.value)
+
+
+
+
+const rowData = ref([
+   { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+   { make: "Ford", model: "F-Series", price: 33850, electric: false },
+   { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+ ]);
+
+ // Column Definitions: Defines the columns to be displayed.
+ const colDefs = ref([
+   { field: "make" },
+   { field: "model" },
+   { field: "price" },
+   { field: "electric" }
+ ]);
+
+
+
+
+
+
+
 
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);

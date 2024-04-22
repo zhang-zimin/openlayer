@@ -2,9 +2,11 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { AgGridVue } from '@ag-grid-community/vue3';
-import '@ag-grid-community/styles/ag-grid.css';
-import "@ag-grid-community/styles/ag-theme-quartz.css";
+import { ref } from 'vue';
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+import { AgGridVue } from "ag-grid-vue3"; // AG Grid Component
+import { AgChartsVue } from "ag-charts-vue3";
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 
@@ -26,7 +28,13 @@ app.use(router)
 app.mount('#app')
 app.component('split-pane', splitPane);
 
-
+export default {
+  name: "App",
+  components: {
+    AgGridVue, // Add AG Grid Vue3 component
+  },
+  setup() {},
+ };
 // components:{
 //     splitPane
 // }
@@ -112,4 +120,4 @@ new Vue({
   const gridDiv = document.querySelector('#myGrid');
   
   createApp(VueExample)
-      .mount("#app")
+      .mount("#app")    

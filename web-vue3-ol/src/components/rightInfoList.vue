@@ -22,6 +22,14 @@
       </el-table>
     </el-card>
 
+    <ag-grid-vue
+              :rowData="showrows"
+              :columnDefs="colDefs"
+              style="height: 500px"
+              class="ag-theme-quartz"
+            >
+            </ag-grid-vue>
+
     <!-- 统计 -->
     <div class="select-el-form">
       <div class="m-4">分区选择
@@ -106,7 +114,12 @@
   import { Search, Refresh, DataAnalysis, Histogram } from '@element-plus/icons-vue';
   import axios from 'axios';
   import * as echarts from 'echarts';
-  
+
+  import { createApp } from "vue";
+// import { ref } from "vue";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3";
   // 通过getCurrentInstance 获取
   import { getCurrentInstance, onMounted,nextTick } from 'vue'
   const { baseURL } = getCurrentInstance().appContext.config.globalProperties
@@ -119,6 +132,15 @@
   
   
   import { Get, Post,Put } from "../axios/api"; 
+
+
+   const colDefs = ref([
+   { field: "codsum" },
+   { field: "nh3sum" },
+   { field: "tpsum" },
+ ]);
+
+
   const url=ref('/plantInfo/list')
   const loginForm = ref({
     username: 'admin',
@@ -328,6 +350,8 @@
       // showrows.value=childSelDataList.results;
       // showtotal.value = childSelDataList.results.length;
     showrows.value=childSelDataList;
+    console.log("right list:"+childSelDataList);
+    
     showtotal.value = childSelDataList.length;
     console.log("right list length:"+showtotal.value);
   /*

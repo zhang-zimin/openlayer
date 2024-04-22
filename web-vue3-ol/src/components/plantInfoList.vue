@@ -190,6 +190,21 @@
       </div>
     </el-card>
     </div>
+    <ag-grid-vue
+    :pagination="true"
+    :paginationPageSize="paginationPageSize"
+    :paginationPageSizeSelector="paginationPageSizeSelector"
+      :rowData="showrows"
+      :columnDefs="colDefs"
+      style="height: 500px"
+      class="ag-theme-quartz"
+      @grid-ready="onGridReady"
+      :defaultColDef="defaultColDef"
+      :rowSelection="rowSelection"
+      :suppressRowClickSelection="true"
+      
+    >
+    </ag-grid-vue>
   </template>
   
   <!-- ------------------------------------------------------------------------------- -->
@@ -198,6 +213,10 @@
   import { Search, Refresh, Download, DataAnalysis } from '@element-plus/icons-vue';
   import axios from 'axios';
   import { ElTable } from 'element-plus'
+  import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3";
+import "ag-grid-charts-enterprise";
   // 通过getCurrentInstance 获取
   import { getCurrentInstance, onMounted } from 'vue'
   const { baseURL } = getCurrentInstance().appContext.config.globalProperties
@@ -314,6 +333,53 @@ const handleSelectionChange = (val: User[]) => {
     MutiSearch();
   }
   
+  // const colDefs = ref([]);
+  const colDefs = ref([
+    { field: "draintype",  checkboxSelection: true, editable: true, filter: "agSetColumnFilter"},
+   { field: "drainsubtype", filter: "agSetColumnFilter" },
+   { field: "agriculturetype", filter: "agSetColumnFilter" },
+   { field: "username" , filter: "agSetColumnFilter"},
+   { field: "useraddress" },
+   { field: "codinflow" },
+   { field: "codstandard" },
+   { field: "nh3standard" },
+   { field: "tpstandard" },
+   { field: "inflowcoefficient" },
+   { field: "coddischarge" },
+   { field: "nh3discharge" },
+   { field: "tpdischarge" },
+   { field: "nh3inflow" },
+   { field: "tpinflow" },
+  ]);
+  const columnDefs = ref([
+      // { headerName: "Default", field: "animal", filter: "agSetColumnFilter" },
+      {
+        headerName: "Excel (Windows)",
+        field: "username",
+        filter: "agSetColumnFilter",
+        filterParams: { excelMode: "windows" },
+      },
+      // {
+      //   headerName: "Excel (Mac)",
+      //   field: "animal",
+      //   filter: "agSetColumnFilter",
+      //   filterParams: { excelMode: "mac" },
+      // },
+    ]);
+
+  const gridApi = ref();
+  const rowSelection = ref(null);
+  const paginationPageSize = ref(null);
+    const paginationPageSizeSelector = ref(null);
+
+    rowSelection.value = "multiple";
+      paginationPageSize.value = 10;
+      paginationPageSizeSelector.value = [10, 25, 50];
+      const onGridReady = (params) => {
+      gridApi.value = params.api;
+    };
+    const gridDiv = document.querySelector("#myGrid");
+
   let username = ref('')
   let email = ref('')
   
