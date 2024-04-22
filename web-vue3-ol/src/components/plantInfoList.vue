@@ -7,7 +7,8 @@
   <el-button type="primary" plain @click="UpdateWry" class="AllButton">
     <el-icon><Refresh /></el-icon>更新
   </el-button>
-  <el-button type="primary" plain class="AllButton" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))">
+  <!--downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=csv'))-->
+  <el-button type="primary" plain class="AllButton" @click="downloadFileCsv()">
     <el-icon><Download /></el-icon>csv下载
   </el-button>
   <el-button type="primary" plain class="AllButton" @click="downloadFile(proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=SHAPE-ZIP'))">
@@ -684,6 +685,19 @@ function getColumnName() {
   function query(){
     currentPage4.value=1;
     MutiSearch();
+  }
+
+  function downloadFileCsv(){
+    console.log("exportExcel");
+    Post('/exportExcel',{}).then((response) => {
+      const { code, msg, data,rows,total: res } = response.data;
+      if (code === 200) {
+        console.log("下载csv");
+        ElMessage.success(msg ?? "Submitted!");
+      } else {
+        ElMessage.error(msg);
+      }
+    });
   }
   </script>
   
