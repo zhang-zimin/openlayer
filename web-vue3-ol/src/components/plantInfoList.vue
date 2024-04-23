@@ -116,7 +116,7 @@
               :ref="scope.row.index + ',' + scope.column.index"
               v-model="scope.row.codstandard"
               @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              @change="alterTableData(scope.row.objectid, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
             />
               <span v-else>{{ scope.row.codstandard }}</span>
           </template>
@@ -128,7 +128,7 @@
               :ref="scope.row.index + ',' + scope.column.index"
               v-model="scope.row.nh3standard"
               @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              @change="alterTableData(scope.row.objectid, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
             />
             <span v-else>{{ scope.row.nh3standard }}</span>
           </template>
@@ -140,7 +140,7 @@
               :ref="scope.row.index + ',' + scope.column.index"
               v-model="scope.row.tpstandard"
               @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              @change="alterTableData(scope.row.objectid, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
             />
             <span v-else>{{ scope.row.tpstandard }}</span>
           </template>
@@ -152,7 +152,7 @@
               :ref="scope.row.index + ',' + scope.column.index"
               v-model="scope.row.inflowcoefficient"
               @blur="hideInput(scope.row)"
-              @change="alterTableData(scope.row.id, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
+              @change="alterTableData(scope.row.objectid, scope.row.codstandard,scope.row.nh3standard,scope.row.tpstandard,scope.row.inflowcoefficient)"
             />
             <span v-else>{{ scope.row.inflowcoefficient }}</span>
           </template>
@@ -203,7 +203,13 @@
       :defaultColDef="defaultColDef"
       :rowSelection="rowSelection"
       :suppressRowClickSelection="true"
-      
+      :enableCharts=true
+      :enableRangeSelection=true
+      :stopEditingWhenCellsLoseFocus="true"
+      :cellEditingStopped="cellEditingStopped"
+      @cell-value-changed="onCellValueChanged"
+      :autoGroupColumnDef="autoGroupColumnDef"
+      :sideBar="sideBar"
     >
     </ag-grid-vue>
   </template>
@@ -336,15 +342,17 @@ const handleSelectionChange = (val: User[]) => {
   
   // const colDefs = ref([]);
   const colDefs = ref([
-    { field: "draintype",  checkboxSelection: true, editable: true, filter: "agSetColumnFilter"},
-   { field: "drainsubtype", filter: "agSetColumnFilter" },
+    { field: "draintype",  checkboxSelection: true, editable: true, filter: "agSetColumnFilter", rowGroup: true, enableRowGroup: true},
+   { field: "drainsubtype", filter: "agSetColumnFilter",rowGroup: true,
+        enableRowGroup: true,
+        enablePivot: true},
    { field: "agriculturetype", filter: "agSetColumnFilter" },
    { field: "username" , filter: "agSetColumnFilter"},
    { field: "useraddress" },
    { field: "codinflow" },
-   { field: "codstandard" },
-   { field: "nh3standard" },
-   { field: "tpstandard" },
+   { field: "codstandard" , editable: true,stopEditing:(params) => {  console.log("stopEditing3");},aggFunc: "sum" },
+   { field: "nh3standard" , editable: true,aggFunc: "sum"},
+   { field: "tpstandard" , editable: true,aggFunc: "sum"},
    { field: "inflowcoefficient" },
    { field: "coddischarge" },
    { field: "nh3discharge" },
@@ -375,11 +383,78 @@ const handleSelectionChange = (val: User[]) => {
 
     rowSelection.value = "multiple";
       paginationPageSize.value = 10;
-      paginationPageSizeSelector.value = [10, 25, 50];
+      paginationPageSizeSelector.value = [10, 25, 50,10000];
       const onGridReady = (params) => {
       gridApi.value = params.api;
     };
     const gridDiv = document.querySelector("#myGrid");
+    const rowData = ref([]);
+    function GetAllRowData() {
+    // axios接口
+    Get('/Pollution/GetAllwithoutPagehelper',{}).then((response) => {
+      const { code, msg, rows,total,data: res } = response.data;
+      if (code === 200) {
+        rowData.value=res;
+        // console.log(rowData.value);
+        //console.log(total);
+        ElMessage.success(msg ?? "Submitted!");
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }  
+  //GetAllRowData();
+
+  function onBtWhich(){
+      var cellDefs = gridApi.value.getEditingCells();
+      if (cellDefs.length > 0) {
+        var cellDef = cellDefs[0];
+        console.log(
+          "editing cell is: row = " +
+            cellDef.rowIndex +
+            ", col = " +
+            cellDef.column.getId() +
+            ", floating = " +
+            cellDef.rowPinned,
+        );
+
+        cellDefs.forEach(cellDef => {
+          console.log(cellDef.rowIndex);
+          console.log(cellDef.column.getId());
+          console.log(cellDef.floating);
+        });
+
+      } else {
+        console.log("no cells are editing");
+      }
+    };
+
+    const stopEditing = (params) => {
+      console.log("stopEditing");
+    }
+    const startEditingCell = (params) => {
+      console.log("startEditingCell");
+    }
+    const cellEditingStopped=(event) => {
+      console.log("cellEditingStopped");
+    }
+
+    function onCellValueChanged(event) {
+     console.log(`New Cell Value: ${event.value}`);
+     console.log(`New Cell Value: ${event.rowIndex}-${showrows.value[event.rowIndex].codstandard}`);
+     console.log(`New Cell Value: ${event.column.colId}`);
+     alterTableData(showrows.value[event.rowIndex].objectid,showrows.value[event.rowIndex].codstandard,showrows.value[event.rowIndex].nh3standard,showrows.value[event.rowIndex].tpstandard,showrows.value[event.rowIndex].inflowcoefficient) ;
+   }
+
+   import {onBeforeMount} from "vue";
+   const autoGroupColumnDef = ref(null);
+    const sideBar = ref(null);
+    onBeforeMount(() => {
+      autoGroupColumnDef.value = {
+        minWidth: 250,
+      };
+      sideBar.value = "columns";
+    });
 
   let username = ref('')
   let email = ref('')
@@ -468,11 +543,11 @@ const handleSelectionChange = (val: User[]) => {
     });
   }
   
-  
-  function alterTableData(id,codstandard,nh3standard,tpstandard,inflowcoefficient) {
+  //原参数id改为objectid
+  function alterTableData(objectid,codstandard,nh3standard,tpstandard,inflowcoefficient) {
     console.log("alterTableData"+id+"-"+codstandard);
     if(id!=""){
-      Put('/Pollution/alterTableData',{"id":id,"codstandard":codstandard,"nh3standard":nh3standard,"tpstandard":tpstandard,"inflowcoefficient":inflowcoefficient}).then((response) => {
+      Put('/Pollution/alterTableData',{"objectid":objectid,"codstandard":codstandard,"nh3standard":nh3standard,"tpstandard":tpstandard,"inflowcoefficient":inflowcoefficient}).then((response) => {
         const { code, msg, data,rows,total: res } = response.data;
         if (code === 200) {
           //console.log("修改后重新获取数据");
