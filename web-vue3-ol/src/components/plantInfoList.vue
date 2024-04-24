@@ -195,7 +195,7 @@
     :pagination="true"
     :paginationPageSize="paginationPageSize"
     :paginationPageSizeSelector="paginationPageSizeSelector"
-      :rowData="showrows"
+      :rowData="rowData"
       :columnDefs="colDefs"
       style="height: 500px"
       class="ag-theme-quartz"
@@ -203,7 +203,8 @@
       :defaultColDef="defaultColDef"
       :rowSelection="rowSelection"
       :suppressRowClickSelection="true"
-      
+      :enableCharts=true
+      :enableRangeSelection=true
     >
     </ag-grid-vue>
   </template>
@@ -251,6 +252,7 @@ import "ag-grid-charts-enterprise";
   name: string
   address: string
 }
+  const rowData = ref([])
   const showrows=ref([])
   const showtotal = ref(0);
   const multipleTableRef = ref<InstanceType<typeof ElTable>>()
@@ -375,7 +377,7 @@ const handleSelectionChange = (val: User[]) => {
 
     rowSelection.value = "multiple";
       paginationPageSize.value = 10;
-      paginationPageSizeSelector.value = [10, 25, 50];
+      paginationPageSizeSelector.value = [10, 25, 50, 10000];
       const onGridReady = (params) => {
       gridApi.value = params.api;
     };
@@ -388,6 +390,8 @@ const handleSelectionChange = (val: User[]) => {
   //Pollution/GetAll
   //plantInfo/list
     // axios接口
+    // http://1.1.1.200:9602/Pollution/GetAllwithoutPagehelper
+    // /Pollution/GetAll
     Get('/Pollution/GetAll',{  pageNum: currentPage4.value,pageSize: pageSize4.value}).then((response) => {
       const { code, msg, rows,total,data: res } = response.data;
       if (code === 200) {
@@ -411,7 +415,32 @@ const handleSelectionChange = (val: User[]) => {
       }
     });
   }
-    GetAll();     
+
+  GetAll(); 
+
+
+  function GetAllwithoutPagehelper() {
+  //Pollution/GetAll
+  //plantInfo/list
+    // axios接口
+    // http://1.1.1.200:9602/Pollution/GetAllwithoutPagehelper
+    // /Pollution/GetAll
+    Get('/Pollution/GetAllwithoutPagehelper').then((response) => {
+      const { code, msg, data: res } = response.data;
+      if (code === 200) {
+        rowData.value=res;
+        //showrows.value=data;
+        // showtotal.value = total;
+        // console.log(rowData.value);
+        // console.log(total);
+
+        ElMessage.success(msg ?? "Submitted!");
+      } else {
+        ElMessage.error(msg);
+      }
+    });
+  }
+    GetAllwithoutPagehelper();     
   
   /*const query = () => {
     GetAll();   

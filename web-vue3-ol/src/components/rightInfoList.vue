@@ -13,6 +13,8 @@
       height="180px"
       :cell-class-name="tableCellClassName"
       @sort-change="handleSortChange"
+      :enableCharts=true
+      :enableRangeSelection=true
       >
 
         <!--<el-table-column prop="id" label="id" width="40"/>-->
@@ -28,6 +30,8 @@
               :columnDefs="colDefs"
               style="height: 500px"
               class="ag-theme-quartz"
+              :enableCharts=true
+      :enableRangeSelection=true
             >
             </ag-grid-vue>
 
@@ -136,10 +140,13 @@ import { AgGridVue } from "ag-grid-vue3";
 
 
    const colDefs = ref([
-   { field: "codsum" },
-   { field: "nh3sum" },
-   { field: "tpsum" },
+   { field: "type" , pivot: true , chartDataType: 'category', enableRowGroup: true},
+   { field: "codsum" , pivot: true, rowGroup: true,enablePivot: true,},
+   { field: "nh3sum", pivot: true },
+   { field: "tpsum", pivot: true , aggFunc: "sum"},
  ]);
+
+
 
 
   const url=ref('/plantInfo/list')
