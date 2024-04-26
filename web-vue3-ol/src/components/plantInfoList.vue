@@ -573,8 +573,8 @@ const handleSelectionChange = (val: User[]) => {
   
   //原参数id改为objectid
   function alterTableData(objectid,codstandard,nh3standard,tpstandard,inflowcoefficient) {
-    console.log("alterTableData"+id+"-"+codstandard);
-    if(id!=""){
+    console.log("alterTableData"+objectid+"-"+codstandard);
+    if(objectid!=""){
       Put('/Pollution/alterTableData',{"objectid":objectid,"codstandard":codstandard,"nh3standard":nh3standard,"tpstandard":tpstandard,"inflowcoefficient":inflowcoefficient}).then((response) => {
         const { code, msg, data,rows,total: res } = response.data;
         if (code === 200) {
