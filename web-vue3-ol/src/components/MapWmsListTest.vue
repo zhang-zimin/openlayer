@@ -170,17 +170,65 @@
                       exceptions: 'application/vnd.ogc.se_inimage',
                       CRS: 'EPSG:3857',
                       WIDTH: 768,
-                      HEIGHT: 374,
+                      HEIGHT: 371,
                       BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
                       }"
                     />
                   </ol-tile-layer>
 
+                  <!-- 边界 -->
+                  <ol-tile-layer title="边界">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:RiverBoundary"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 371,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+                  <!-- 中心 -->
+                  <!-- <ol-tile-layer title="中心">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:midriverline_3857"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 371,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer> -->
+
                   <!-- 排口 -->
                   <ol-tile-layer title="排口">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
-                      layers="zzmserver:outlet"
+                      layers="zzmserver:River_outlet"
                       serverType="geoserver"
                       :transition="0"
                       :params="{
