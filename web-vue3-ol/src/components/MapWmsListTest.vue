@@ -81,6 +81,12 @@
           <SplitItem class="vue-split-item map-container" >
             <div class="vue-split-content nested-content-2 map-container">
               <!-- map ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
+              <div id="popup" class="ol-popup">
+                <div id="popup-closer" class="ol-popup-closer">X</div>
+                <div id="popup-detail" class="ol-popup-detail">查看详情</div>
+                <div id="popup-content" class="popup-content">
+                </div>
+              </div>
               <!-- this.$refs.map -->
               <ol-map
                 ref="map" 
@@ -151,9 +157,28 @@
                   />
                   </ol-tile-layer>
 
-                  
+                  <!--河流wfs-->
+                   <!-- 污染源地块 -->
+                  <ol-vector-layer title="河流">
+                    <ol-source-vector
+                      ref="cities"
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3ARiver&maxFeatures=50&outputFormat=application%2Fjson')"
+                      :format="geoJson"
+                      :projection="projection"
+                    >
+                    </ol-source-vector>
+
+                    <ol-style>
+                      <ol-style-stroke color="red" :width="2"></ol-style-stroke>
+                      <ol-style-fill color="rgba(255,255,0,0.8)"></ol-style-fill>
+                      <ol-style-circle :radius="7">
+                        <ol-style-fill color="blue"></ol-style-fill>
+                      </ol-style-circle>
+                    </ol-style>
+                  </ol-vector-layer>
+                  <!--河流wfs-->
                   <!-- 河流 -->
-                  <ol-tile-layer title="河流">
+                  <!--<ol-tile-layer title="河流">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:River"
@@ -175,6 +200,7 @@
                       }"
                     />
                   </ol-tile-layer>
+                  -->
 
                   <!-- 排口 -->
                   <ol-tile-layer title="排口">
@@ -247,8 +273,6 @@
                       }"
                     />
                   </ol-tile-layer>
-
-
 
                   <!-- 污染源地块 -->
                   <ol-vector-layer title="污染源地块">
@@ -341,7 +365,7 @@ import type { Action } from 'element-plus';
 import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
-import { Feature, Map, View }from 'ol';
+import { Feature, Map, View, Overlay }from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { GeoJSON } from "ol/format";
@@ -558,6 +582,7 @@ onMounted(() => {
     }
   }, 1000);
 
+  addPopup(); //弹窗
 });
 
 const source = new VectorSource2({wrapX: false});
@@ -717,11 +742,6 @@ function addChangeEvent(element, layer) {
         }
     };
 }
-
-
-
-
-
 
 function doDownload (data, name) {
         if (!data) {
@@ -1236,6 +1256,59 @@ function toggleFullScreen() {
       }
     }
   
+    let overlay=ref(null);
+/**
+     * Popup 弹窗
+     */
+     const addPopup = () => {
+      // 使用变量存储弹窗所需的 DOM 对象
+      var container = document.getElementById("popup");
+      var closer = document.getElementById("popup-closer");
+      var content = document.getElementById("popup-content");
+      var detail = document.getElementById("popup-detail");
+      // 创建一个弹窗 Overlay 对象
+       overlay = new Overlay({
+        element: container, //绑定 Overlay 对象和 DOM 对象的
+        autoPan: true, // 定义弹出窗口在边缘点击时候可能不完整 设置自动平移效果
+        autoPanAnimation: {
+          duration: 250, //自动平移效果的动画时间 9毫秒
+        },
+      });
+      // 将弹窗添加到 map 地图中
+      map.value.map.addOverlay(overlay);
+      /**
+       * 添加单击响应函数来处理弹窗动作
+       */
+       map.value.map.on("click", function (evt) {
+        var feature = map.value.map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+          return feature;
+        });
+        if (feature) {
+          let value = feature.get("区域");
+         // console.log("feature 区域 value :"+value);
+            content.innerHTML = `
+            区域:${value}
+               `;
+            overlay.setPosition(evt.coordinate); //把 overlay 显示到指定的 x,y坐标
+           
+        } else {
+          overlay.setPosition(undefined);
+        }
+      });
+      /**
+       * 为弹窗添加一个响应关闭的函数
+       */
+      closer.onclick = function () {
+        overlay.setPosition(undefined);
+        closer.blur();
+        return false;
+      };
+      detail.onclick = function () {
+        modelSatus.status = true;
+        overlay.setPosition(undefined);
+      };
+    };
+
 </script>
 
 
@@ -1433,4 +1506,56 @@ ul#layerTree.layerTree{
   height: 80px;
   width: 100%;
 }
+
+  .ol-popup {
+    position: absolute;
+    background-color: white;
+    -webkit-filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+  }
+  .ol-popup:after,
+  .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  .ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+  }
+  .ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+  }
+  .ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    cursor: pointer;
+  }
+  .ol-popup-detail {
+    text-decoration: none;
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    cursor: pointer;
+  }
+  .popup-content {
+    width: 400px;
+  }
+ 
 </style>
