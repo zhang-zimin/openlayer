@@ -28,10 +28,16 @@
     <ag-grid-vue
               :rowData="showrows"
               :columnDefs="colDefs"
-              style="height: 500px"
+              style="height: 300px"
               class="ag-theme-quartz"
+              @grid-ready="onGridReady"
+              :defaultColDef="defaultColDef"
+              :rowSelection="rowSelection"
+      :suppressRowClickSelection="true"
               :enableCharts=true
       :enableRangeSelection=true
+      :autoGroupColumnDef="autoGroupColumnDef"
+      :sideBar="sideBar"
             >
             </ag-grid-vue>
 
@@ -140,8 +146,8 @@ import { AgGridVue } from "ag-grid-vue3";
 
 
    const colDefs = ref([
-   { field: "type" , pivot: true , chartDataType: 'category', enableRowGroup: true},
-   { field: "codsum" , pivot: true, rowGroup: true,enablePivot: true,},
+   { field: "type" , pivot: true , chartDataType: 'category', filter: "agSetColumnFilter",enableRowGroup: true,rowGroup: true,checkboxSelection: true,},
+   { field: "codsum" , pivot: true, enablePivot: true,},
    { field: "nh3sum", pivot: true },
    { field: "tpsum", pivot: true , aggFunc: "sum"},
  ]);
@@ -569,7 +575,7 @@ import { AgGridVue } from "ag-grid-vue3";
   //     }
   //   });
   // }
-  
+
   //下拉框的多选框
   // const checkSegment2 = ref({});
   // 应用领域查询条件
