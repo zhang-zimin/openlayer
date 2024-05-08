@@ -54,6 +54,28 @@
         </el-button>
       </div>
     </el-upload>
+
+    <el-upload
+        class="shapefile-upload"
+        ref="upload"
+        action="string"
+        :file-list="uploadFiles"
+        :auto-upload="true"
+        :on-progress="importSubmitXLSX"
+        multiple="multiple"
+        accept=".xlsx"
+      >
+        <div>
+          <el-button
+            type="primary" text='primary'
+            slot='trigger'
+            class="chaxuns fontSizes AllButton">
+            <el-icon><Upload /></el-icon>
+            上传EXCEL
+          </el-button>
+        </div>
+      </el-upload>
+
   </el-tab-pane>
   </el-tabs>
   <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
@@ -1357,6 +1379,90 @@ function toggleFullScreen() {
       };
     };
 
+    function importSubmitXLSX(e,filerow,fileList) {
+    
+    const file=filerow.raw;
+    uploadXLSX(file);
+  
+    //return;
+    // if (file && (file.type === 'application/xlsx'|| file.type === 'application/x-xlsx-compressed')){
+
+    // } else {
+    //   console.error('请选择类型为XLSX的文件进行上传。');
+    // }
+  }; 
+  import * as XLSX from 'xlsx';
+
+  function uploadXLSX3(xlsxFile){
+    console.log("xlsxFile dbffile:"+xlsxFile);
+    const formData=new FormData();
+    formData.append("file",xlsxFile);
+    
+    //http://localhost:9300/upload
+    PostFile('/upload',formData).then((response) => {
+      console.log("xlsxFile response.data:"+response.data);
+      const { code, msg,data: res } = response.data;
+      if (code === 200) {
+        console.log("success:"+msg+"xlsxFile 结束:"+res);
+        // rightChildRef.value.fenquSelMethod(res.geojson.list);
+        rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
+        ElMessage.success(msg ?? "Submitted!"); 
+      } else {
+        console.log("fail:"+msg);
+        //ElMessage.error(msg);
+        ElMessage.error("xlsxFile 失败");
+      }
+    });
+  }
+
+  function uploadXLSX(xlsxFile){
+    console.log("xlsxFile dbffile:"+xlsxFile);
+    const formData=new FormData();
+    formData.append("file",xlsxFile);
+    /*
+    //http://1.1.1.200:9602/Pollution/importData
+    //
+    PostFile('/Pollution/importData',formData).then((response) => {
+      console.log("xlsxFile response.data:"+response.data);
+      const { code, msg,data: res } = response.data;
+      if (code === 200) {
+        console.log("success:"+msg+"xlsxFile 结束:"+res);
+        // rightChildRef.value.fenquSelMethod(res.geojson.list);
+        rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
+        ElMessage.success(msg ?? "Submitted!"); 
+      } else {
+        console.log("fail:"+msg);
+        //ElMessage.error(msg);
+        ElMessage.error("xlsxFile 失败");
+      }
+    });*/
+      let excelData=null;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        console.log("xlsxFile excelData:"+excelData);
+        upExcelArray(excelData);
+      };
+      reader.readAsArrayBuffer(xlsxFile);
+}   
+function upExcelArray(excelDataArray){
+  Post('/Pollution/importData',{"type":"Polygon","test":excelDataArray}).then((response) => {
+    console.log("response.data:"+response.data);
+    const { code, msg,data: res } = response.data;
+    if (code === 200) {
+      console.log("upExcelArray结束:"+res);
+      ElMessage.success(msg ?? "Submitted!");
+        
+    } else {
+      //ElMessage.error(msg);
+      ElMessage.error("提交失败");
+    }
+  });
+}
 </script>
 
 
