@@ -1586,15 +1586,15 @@ chartInstance.on('mouseout', function (params){// 鼠标移出
 
 
   // 设置图表配置项
-  chartInstance.setOption(options)
+  // chartInstance.setOption(options)
 })
 
-onUnmounted(() => {
-  if (chartInstance) {
-    chartInstance.dispose()
-    chartInstance = null
-  }
-})
+// onUnmounted(() => {
+//   if (chartInstance) {
+//     chartInstance.dispose()
+//     chartInstance = null
+//   }
+// })
 
 // Echarts 高亮 ↑ ↑ ↑ ↑ ↑ ↑ 
 
