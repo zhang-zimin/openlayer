@@ -3,7 +3,6 @@
     <TopCom class="zoomStyle" />
   </div>
   <!-- 顶部工具栏 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
-  river
   <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
     <el-tab-pane label="编辑" name="first">
 
@@ -85,7 +84,7 @@
   <div class="vue-split-container" style="margin-top: 8px;">
 
     <!-- 分为15%左侧图层列表、65%地图展示+表格、20%分析结果 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
-    <SplitWrapper :sizes="[15, 65, 20]" :minSize="0" class="vue-split horizontal">
+    <SplitWrapper :sizes="[10, 65, 25]" :minSize="0" class="vue-split horizontal">
       <!-- 15%左侧图层列表 -->
       <SplitItem class="vue-split-item">
         <div class="vue-split-content nested-content-1" id="layerControl">
@@ -408,7 +407,15 @@
               class="ag-theme-quartz"
             >
             </ag-grid-vue> -->
+            
           </SplitItem>
+          
+
+        <!-- Echarts 高亮 -->
+        <div class="chart-container" ref="chartRef" style="height: 400px; width: 100%"></div>
+        <!-- Echarts 高亮 -->
+
+
         </SplitWrapper>
       </SplitItem>
       <!-- 65%:地图展示70%+表格30% ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
@@ -1464,6 +1471,134 @@ function upExcelArray(excelDataArray){
     }
   });
 }
+
+
+
+
+
+
+
+
+// Echarts 高亮
+
+// import echarts from 'echarts';
+import { onUnmounted } from 'vue'
+import * as echarts from 'echarts';
+const chartRef = ref(null)
+let chartInstance = null
+onMounted(() => {
+  chartInstance = echarts.init(chartRef.value)
+
+  // 模拟数据
+  const data = [
+    { name: 'A', value: 100 },
+    { name: 'B', value: 200 },
+    { name: 'C', value: 150 },
+    { name: 'D', value: 300 },
+    { name: 'E', value: 88 },
+    { name: 'F', value: 98 },
+    { name: 'G', value: 123 },
+    { name: 'H', value: 219 }
+  ]
+
+  // 配置项
+  const options = {
+    xAxis: {
+      type: 'category',
+      data: data.map((item) => item.name)
+    },
+    yAxis: {
+      type: 'value'
+    },
+    tooltip: {
+    trigger: 'item', // 触发类型为item，表示在圆点上触发显示
+    formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
+  },
+  dataZoom: [
+    {
+      type: 'inside', // 内置缩放组件
+      start: 0, // 默认缩放起始位置
+      end: 100, // 默认缩放结束位置
+    },
+    {
+      type: 'slider', // 滑动条缩放组件
+      start: 0, // 默认缩放起始位置
+      end: 100, // 默认缩放结束位置
+    },
+  ],
+    series: [
+      {
+        data: data.map((item) => item.value),
+        type: 'line',
+        // smooth: true, //设置成平滑的曲线
+        symbol: 'circle', // 设置为圆形
+        symbolSize: 8, // 设置圆形的大小
+        color: '#ff0000', //颜色
+        emphasis: {
+          // 设置选中状态下的样式
+          itemStyle: {
+            borderWidth: 6, // 边框宽度
+            borderColor: '#ff0000', // 边框颜色
+            shadowBlur: 10, // 阴影模糊度
+            shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
+          }
+        }
+      }
+    ]
+  }
+
+chartInstance.setOption(options);
+chartInstance.on('mouseover', function (params) {// 鼠标移入
+     // chartRef.dispatchAction({
+     //     type: 'highlight',
+     //     seriesName: params.seriesName,
+     // })
+ 
+     chartInstance.setOption({// 设置 鼠标移入后想要的样式
+         series: {
+             name: params.seriesName,
+             symbolSize: 4,
+             color: '#00FFFF', //颜色
+             lineStyle: {
+                 width: 4
+             }
+         }
+     })
+ })
+ 
+chartInstance.on('mouseout', function (params){// 鼠标移出
+    // chartRef.dispatchAction({
+    //     type: 'downplay',
+    //     seriesName: params.seriesName,
+    // })
+ 
+    chartInstance.setOption({// 将样式复原
+        series: {
+            name: params.seriesName,
+            symbolSize: 2,
+            lineStyle: {
+                width: 2
+            }
+        }
+    })
+})
+
+
+
+  // 设置图表配置项
+  chartInstance.setOption(options)
+})
+
+onUnmounted(() => {
+  if (chartInstance) {
+    chartInstance.dispose()
+    chartInstance = null
+  }
+})
+
+// Echarts 高亮 ↑ ↑ ↑ ↑ ↑ ↑ 
+
+
 </script>
 
 

@@ -84,7 +84,7 @@
   <div class="vue-split-container" style="margin-top: 8px;">
 
     <!-- 分为15%左侧图层列表、65%地图展示+表格、20%分析结果 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ -->
-    <SplitWrapper :sizes="[15, 65, 20]" :minSize="0" class="vue-split horizontal">
+    <SplitWrapper :sizes="[10, 65, 25]" :minSize="0" class="vue-split horizontal">
       <!-- 15%左侧图层列表 -->
       <SplitItem class="vue-split-item">
         <div class="vue-split-content nested-content-1" id="layerControl">
