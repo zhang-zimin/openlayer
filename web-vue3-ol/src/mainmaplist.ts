@@ -9,14 +9,14 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 
 // import App from './components/MapWmsList.vue'
-import App from './components/MapWmsListTest.vue'
+// import App from './components/MapWmsListTest.vue'
 // import App from './components/MapWmsListTest3.vue'
 
 //import App from './components/MapWms.vue'
 //import App from './components/HeNanMap.vue'
 //import App from './components/WmsEplus.vue'
 //import App from './components/MapDemo.vue'
-//import App from './App.vue'
+import App from './App.vue'
 import router from './router'
 
 //import OpenLayersMap from "vue3-openlayers";
@@ -28,7 +28,7 @@ import "vue3-openlayers/styles.css"; // vue3-openlayers version < 1.0.0-*
 const app = createApp(App)
 createSticky(app)
 app.use(createPinia())
-//app.use(router)
+app.use(router)
 
 //app.use(OpenLayersMap /* options */);
 /**/const options: Vue3OpenlayersGlobalOptions = {

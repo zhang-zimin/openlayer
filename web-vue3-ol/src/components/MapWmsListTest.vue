@@ -63,7 +63,7 @@
         :auto-upload="true"
         :on-progress="importSubmitXLSX"
         multiple="multiple"
-        accept=".xlsx"
+        accept=".xlsx,.zip"
       >
         <div>
           <el-button
@@ -1393,19 +1393,19 @@ function toggleFullScreen() {
   }; 
   import * as XLSX from 'xlsx';
 
-  function uploadXLSX3(xlsxFile){
+  function uploadXLSX(xlsxFile){
     console.log("xlsxFile dbffile:"+xlsxFile);
     const formData=new FormData();
     formData.append("file",xlsxFile);
     
     //http://localhost:9300/upload
-    PostFile('/upload',formData).then((response) => {
+    PostFile('/River/upload',formData).then((response) => {
       console.log("xlsxFile response.data:"+response.data);
       const { code, msg,data: res } = response.data;
       if (code === 200) {
         console.log("success:"+msg+"xlsxFile 结束:"+res);
         // rightChildRef.value.fenquSelMethod(res.geojson.list);
-        rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
+        //rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
         ElMessage.success(msg ?? "Submitted!"); 
       } else {
         console.log("fail:"+msg);
@@ -1415,7 +1415,7 @@ function toggleFullScreen() {
     });
   }
 
-  function uploadXLSX(xlsxFile){
+  function uploadXLSX1(xlsxFile){
     console.log("xlsxFile dbffile:"+xlsxFile);
     const formData=new FormData();
     formData.append("file",xlsxFile);

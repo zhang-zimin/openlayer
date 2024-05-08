@@ -9,7 +9,7 @@
         <div style="display: flex; overflow: hidden; max-width: 600px">
           <div class="nav-left">
             
-            <!-- <router-link
+            <router-link
               class="one"
               to="/home"
               :class="{ active: $route.path === '/home' }">
@@ -17,15 +17,15 @@
               </router-link>
             <router-link
               class="two"
-              to="/AuxiliaryView"
-              :class="{ active: $route.path === '/AuxiliaryView' }">
+              to="/map"
+              :class="{ active: $route.path === '/map' }">
               辅助分析
               </router-link>
             <router-link
               class="three"
-              to="/CalculateView"
-              :class="{ active: $route.path === '/CalculateView' }">总量控制计算
-            </router-link> -->
+              to="/about"
+              :class="{ active: $route.path === '/about' }">about
+            </router-link> 
           </div>
         </div>
 
