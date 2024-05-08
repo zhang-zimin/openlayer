@@ -35,3 +35,17 @@ web-vue3-ol
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
 5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+
+views:
+1.IndexView.vue
+    localhost:5173
+
+2.HomeView.vue
+    localhost:5173/home
+
+3.AnalysisView.vue
+    localhost:5173/analysis
+
+4.RiverView.vue
+    localhost:5173/river

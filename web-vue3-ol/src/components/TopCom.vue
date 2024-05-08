@@ -17,14 +17,15 @@
               </router-link>
             <router-link
               class="two"
-              to="/map"
-              :class="{ active: $route.path === '/map' }">
-              辅助分析
+              to="/analysis"
+              :class="{ active: $route.path === '/analysis' }">
+              总量分析
               </router-link>
             <router-link
               class="three"
-              to="/about"
-              :class="{ active: $route.path === '/about' }">about
+              to="/river"
+              :class="{ active: $route.path === '/river' }">
+              总量控制计算
             </router-link> 
           </div>
         </div>
