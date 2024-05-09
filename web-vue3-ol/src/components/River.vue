@@ -519,27 +519,6 @@ const mapstyle=ref("width: "+(screenWidth.value-204)+"px;height: "+(screenHeight
 
 
 
-const rowData = ref([
-   { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-   { make: "Ford", model: "F-Series", price: 33850, electric: false },
-   { make: "Toyota", model: "Corolla", price: 29600, electric: false },
- ]);
-
- // Column Definitions: Defines the columns to be displayed.
- const colDefs = ref([
-   { field: "make" },
-   { field: "model" },
-   { field: "price" },
-   { field: "electric" }
- ]);
-
-
-
-
-
-
-
-
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);
 const drawEnable = ref(false);
@@ -668,6 +647,8 @@ onMounted(() => {
   addPopup(); //弹窗
 });
 
+
+// 河流断面json ↓ ↓ ↓ ↓ ↓ ↓ 
 const image = new CircleStyle({
   radius: 5,
   fill: null,
@@ -741,164 +722,36 @@ const styles = {
 const styleFunction = function (feature) {
   return styles[feature.getGeometry().getType()];
 };
-const geojsonObject = {
-  'type': 'FeatureCollection',
-  'crs': {
-    'type': 'name',
-    'properties': {
-      'name': 'EPSG:3857',
-    },
-  },
-  'features': [
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'Point',
-        'coordinates': [0, 0],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'LineString',
-        'coordinates': [
-          [4e6, -2e6],
-          [8e6, 2e6],
-        ],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'LineString',
-        'coordinates': [
-          [4e6, 2e6],
-          [8e6, -2e6],
-        ],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'Polygon',
-        'coordinates': [
-          [
-            [-5e6, -1e6],
-            [-3e6, -1e6],
-            [-4e6, 1e6],
-            [-5e6, -1e6],
-          ],
-        ],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'MultiLineString',
-        'coordinates': [
-          [
-            [-1e6, -7.5e5],
-            [-1e6, 7.5e5],
-          ],
-          [
-            [1e6, -7.5e5],
-            [1e6, 7.5e5],
-          ],
-          [
-            [-7.5e5, -1e6],
-            [7.5e5, -1e6],
-          ],
-          [
-            [-7.5e5, 1e6],
-            [7.5e5, 1e6],
-          ],
-        ],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'MultiPolygon',
-        'coordinates': [
-          [
-            [
-              [-5e6, 6e6],
-              [-3e6, 6e6],
-              [-3e6, 8e6],
-              [-5e6, 8e6],
-              [-5e6, 6e6],
-            ],
-          ],
-          [
-            [
-              [-2e6, 6e6],
-              [0, 6e6],
-              [0, 8e6],
-              [-2e6, 8e6],
-              [-2e6, 6e6],
-            ],
-          ],
-          [
-            [
-              [1e6, 6e6],
-              [3e6, 6e6],
-              [3e6, 8e6],
-              [1e6, 8e6],
-              [1e6, 6e6],
-            ],
-          ],
-        ],
-      },
-    },
-    {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'GeometryCollection',
-        'geometries': [
-          {
-            'type': 'LineString',
-            'coordinates': [
-              [-5e6, -5e6],
-              [0, -5e6],
-            ],
-          },
-          {
-            'type': 'Point',
-            'coordinates': [4e6, -5e6],
-          },
-          {
-            'type': 'Polygon',
-            'coordinates': [
-              [
-                [1e6, -6e6],
-                [3e6, -6e6],
-                [2e6, -4e6],
-                [1e6, -6e6],
-              ],
-            ],
-          },
-        ],
-      },
-    },
-  ],
-};
+// const jsonsource = new VectorSource({
+//     // features: new GeoJSON().readFeatures(geojsonObject),
+//     features: new GeoJSON().readFeatures(testjson),
+//  });
 
-const jsonsource = new VectorSource({
-    // features: new GeoJSON().readFeatures(geojsonObject),
-    features: new GeoJSON().readFeatures(testjson),
- });
+//  jsonsource.addFeature(new Feature(new Circle([5e6, 7e6], 1e6)));
+
+//  const jsonview = new VectorLayer({
+//   source: jsonsource,
+//   style: styleFunction,
+//  })
+
+//  onMounted(() => {
+//   map.value.map.addLayer(jsonview);
+//  })
 
 
- jsonsource.addFeature(new Feature(new Circle([5e6, 7e6], 1e6)));
+const vectorLayer = new VectorLayer({
+  source: new VectorSource({
+      format: new GeoJSON(),
+      url: '../assets/1.geojson' 
+    }),
+    style: styleFunction,
+})
+onMounted(() => {
+map.value.map.addLayer(vectorLayer)
+})
 
- const jsonview = new VectorLayer({
-  source: jsonsource,
-  style: styleFunction,
- })
+// 河流断面json ↑ ↑ ↑ ↑ ↑ ↑ 
 
- onMounted(() => {
-  map.value.map.addLayer(jsonview);
- })
 
 
 
@@ -1029,9 +882,15 @@ function showTreeLayers(){
       setInnerText(eleLable, layerName[i]);                //在label中设置图层名称
       eleLi.appendChild(eleLable);                         //将label加入到li中
 
-      if (layerVisibility[i]) {                            //设置图层默认显示状态
-          eleInput.checked = true;
-      }
+
+      // 设置复选框状态与图层实际状态一致，但默认都设为不显示
+      eleInput.checked = false;
+      layer[i].setVisible(false); // 确保图层默认是不可见的
+
+      // if (layerVisibility[i]) {                            //设置图层默认显示状态
+      //     eleInput.checked = true;
+      // }
+
       addChangeEvent(eleInput, layer[i]);              //为checkbox添加变更事件
   };
 }
@@ -2093,5 +1952,4 @@ ul#layerTree.layerTree{
   .popup-content {
     width: 400px;
   }
- 
 </style>
