@@ -1543,18 +1543,24 @@ onMounted(() => {
             shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
           }
         }
+      },
+      {
+        name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      data: [120, 132, 101, 134, 90, 230, 210]
       }
     ]
   }
 
 chartInstance.setOption(options);
-chartInstance.on('mouseover', function (params) {// 鼠标移入
+chartInstance.on('click', function (params) {// 鼠标单击高亮
      // chartRef.dispatchAction({
      //     type: 'highlight',
      //     seriesName: params.seriesName,
      // })
  
-     chartInstance.setOption({// 设置 鼠标移入后想要的样式
+     chartInstance.setOption({// 设置 鼠标单击后想要的样式
          series: {
              name: params.seriesName,
              symbolSize: 4,
@@ -1566,7 +1572,7 @@ chartInstance.on('mouseover', function (params) {// 鼠标移入
      })
  })
  
-chartInstance.on('mouseout', function (params){// 鼠标移出
+chartInstance.on('dblclick', function (params){// 鼠标双击还原
     // chartRef.dispatchAction({
     //     type: 'downplay',
     //     seriesName: params.seriesName,
@@ -1576,6 +1582,7 @@ chartInstance.on('mouseout', function (params){// 鼠标移出
         series: {
             name: params.seriesName,
             symbolSize: 2,
+            color: '#ff0000',
             lineStyle: {
                 width: 2
             }
