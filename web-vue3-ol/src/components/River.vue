@@ -1267,7 +1267,7 @@ function toggleFullScreen() {
   };
 
       surfaceData.forEach((innerArray, seriesIndex) => {
-  const dPairs = innerArray.map(item => [item.d]);
+  const dPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2)]);
   // seriesDataX.push({
   //   name: `Series ${seriesIndex + 1}`,
   //   data: dPairs,
@@ -1278,21 +1278,29 @@ function toggleFullScreen() {
   const ZPairs = innerArray.map(item => [item.z]);
   seriesDataY.name.push(`Series ${seriesIndex + 1}`);
   seriesDataY.data.push(ZPairs);
-}
+});
 
-
-);
+console.log("seriesDataY: "+seriesDataY.data);
 
       if (code === 200) {
         console.log("success:"+msg+"xlsxFile 结束:"+res);
+        // let seriesArray=[];
+        // seriesDataY.data.forEach((innerArray, seriesIndex) => {
+        //     let seriseJson={type:'line',stack: 'x',data:innerArray};
+        //     seriesArray.push(seriseJson);
+        // });
 
+        let seriesArray=[];
+        let seriseJson={type:'line',data:seriesDataY.data[0]};
+        seriesArray.push(seriseJson);
+          console.log("seriesDataY.data[0]:"+seriesDataY.data[0]);
 let options = {
     xAxis: {
     type: 'category',
     // boundaryGap: false,
     // data: ["1","2","3","4","5","6","7"]
    // data: ["1","2","3","4","5","6","7"]
-   data:seriesDataX.data
+   data:seriesDataX.data[0]
   },
 
     yAxis: {
@@ -1317,7 +1325,7 @@ let options = {
   //     end: 100, // 默认缩放结束位置
   //   },
   // ],
-    series: 
+    series: //seriesArray
     [
       // {
       //   data: data.map((item) => item.value),
@@ -1341,7 +1349,8 @@ let options = {
       type: 'line',
       stack: 'Total',
       // data: [120, 132, 101, 134, 90, 230, 210]
-      data:seriesDataY.data
+      data: [3.19,3.304,3.493,2.849,1.35,0.91,0.81,0.54,0.444,0.409,0.3,0.25,0.092,-0.052,-0.288,-0.466,-0.641,-0.644,-0.8,-0.782,-0.763,-0.7,-0.77,-0.752,-0.76,-0.72,-0.58,-0.509,-0.409,-0.318,-0.13,0.087,0.232,0.74,1.254,1.3519999999999999,2.038,3.505,3.833,3.852,4.136,5.116,5.312,5.702,4.46,4.339,4.293,4.296,4.09]
+      // data:seriesDataY.data[0]
       },
       // {
       //   name: 'Dog',
