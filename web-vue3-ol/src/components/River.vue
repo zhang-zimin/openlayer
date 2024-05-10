@@ -498,7 +498,9 @@ import iconv from 'iconv-lite'
 //import {DBFFile} from 'dbffile';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
-
+// import echarts from 'echarts';
+import { onUnmounted } from 'vue'
+import * as echarts from 'echarts';
 const layerSwitcher = new LayerSwitcher();
 
 const {proxy} = getCurrentInstance()
@@ -1498,18 +1500,254 @@ function toggleFullScreen() {
     // }
   }; 
   import * as XLSX from 'xlsx';
-
   function uploadXLSX(xlsxFile){
-    console.log("xlsxFile dbffile:"+xlsxFile);
+    // console.log("xlsxFile dbffile:"+xlsxFile);
     const formData=new FormData();
     formData.append("file",xlsxFile);
     
     //http://localhost:9300/upload
     PostFile('/River/upload',formData).then((response) => {
-      console.log("xlsxFile response.data:"+response.data);
-      const { code, msg,data: res } = response.data;
+      // console.log("xlsxFile response.data: "+response.data);
+      const { code, msg,data:res } = response.data;
+
+    
+
+      // if (code === 200 && msg === "操作成功") {
+      // const rivers = res.data.array;
+      // const surfaces = rivers.map(river => river.river.surface);
+      // // surfaces现在是一个二维数组，每个子数组对应一个river的surface数据
+      // // 使用surfaces绘制折线图
+
+
+      const { data: { array } } = response.data;
+      const surfaceData = array[0].river.surface;
+      console.log("surfaceData: "+surfaceData);
+
+
+
+      const seriesDataX = {
+    name:  [],
+    data: [],
+  };
+      const seriesDataY = {
+    name: [],
+    data: [],
+  };
+
+      surfaceData.forEach((innerArray, seriesIndex) => {
+  const dPairs = innerArray.map(item => [item.d]);
+  // seriesDataX.push({
+  //   name: `Series ${seriesIndex + 1}`,
+  //   data: dPairs,
+  // });
+  seriesDataX.name.push(`Series ${seriesIndex + 1}`);
+  seriesDataX.data.push(dPairs);
+
+  const ZPairs = innerArray.map(item => [item.z]);
+  seriesDataY.name.push(`Series ${seriesIndex + 1}`);
+  seriesDataY.data.push(ZPairs);
+}
+
+
+);
+
       if (code === 200) {
         console.log("success:"+msg+"xlsxFile 结束:"+res);
+
+let options = {
+    xAxis: {
+    type: 'category',
+    // boundaryGap: false,
+    // data: ["1","2","3","4","5","6","7"]
+   // data: ["1","2","3","4","5","6","7"]
+   data:seriesDataX.data
+  },
+
+    yAxis: {
+      type: 'value'
+    },
+    
+  //   tooltip: {
+  //   trigger: 'item', // 触发类型为item，表示在圆点上触发显示
+  //   formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
+  // },
+
+  // 缩放
+  // dataZoom: [
+  //   {
+  //     type: 'inside', // 内置缩放组件
+  //     start: 0, // 默认缩放起始位置
+  //     end: 100, // 默认缩放结束位置
+  //   },
+  //   {
+  //     type: 'slider', // 滑动条缩放组件
+  //     start: 0, // 默认缩放起始位置
+  //     end: 100, // 默认缩放结束位置
+  //   },
+  // ],
+    series: 
+    [
+      // {
+      //   data: data.map((item) => item.value),
+      //   type: 'line',
+      //   // smooth: true, //设置成平滑的曲线
+      //   symbol: 'circle', // 设置为圆形
+      //   symbolSize: 8, // 设置圆形的大小
+      //   color: '#ff0000', //颜色
+      //   emphasis: {
+      //     // 设置选中状态下的样式
+      //     itemStyle: {
+      //       borderWidth: 6, // 边框宽度
+      //       borderColor: '#ff0000', // 边框颜色
+      //       shadowBlur: 10, // 阴影模糊度
+      //       shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
+      //     }
+      //   }
+      // },
+      {
+        // name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      // data: [120, 132, 101, 134, 90, 230, 210]
+      data:seriesDataY.data
+      },
+      // {
+      //   name: 'Dog',
+      // type: 'line',
+      // stack: 'Total',
+      // data: [180, 92, 151, 104, 140, 110, 110]
+      // }
+    ]
+  }
+
+          // 设置图表配置项
+        chartInstance.setOption(options)
+  /*      if (array && array.length > 0) {
+          
+          // lineChart()
+          // 现在你可以使用surfaceData进行绘图了
+
+
+          const chartRef = ref(null)
+      let chartInstance = null
+
+      onMounted(() => {
+  chartInstance = echarts.init(chartRef.value)
+
+  const options = {
+    // xAxis: {
+    //   type: 'category',
+    //   data: data.map((item) => item.name)
+    // },
+
+    xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    // data: ["1","2","3","4","5","6","7"]
+    data: dValues
+  },
+
+    yAxis: {
+      type: 'value',
+    },
+    
+    tooltip: {
+    trigger: 'item', // 触发类型为item，表示在圆点上触发显示
+    formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
+  },
+
+  // 缩放
+  dataZoom: [
+    {
+      type: 'inside', // 内置缩放组件
+      start: 0, // 默认缩放起始位置
+      end: 100, // 默认缩放结束位置
+    },
+    {
+      type: 'slider', // 滑动条缩放组件
+      start: 0, // 默认缩放起始位置
+      end: 100, // 默认缩放结束位置
+    },
+  ],
+    series: [
+      // {
+      //   data: data.map((item) => item.value),
+      //   type: 'line',
+      //   // smooth: true, //设置成平滑的曲线
+      //   symbol: 'circle', // 设置为圆形
+      //   symbolSize: 8, // 设置圆形的大小
+      //   color: '#ff0000', //颜色
+      //   emphasis: {
+      //     // 设置选中状态下的样式
+      //     itemStyle: {
+      //       borderWidth: 6, // 边框宽度
+      //       borderColor: '#ff0000', // 边框颜色
+      //       shadowBlur: 10, // 阴影模糊度
+      //       shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
+      //     }
+      //   }
+      // },
+      {
+        name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      data: zValues
+      },
+      // {
+      //   name: 'Dog',
+      // type: 'line',
+      // stack: 'Total',
+      // data: [180, 92, 151, 104, 140, 110, 110]
+      // }
+    ]
+  }
+
+chartInstance.setOption(options);
+chartInstance.on('click', function (params) {// 鼠标单击高亮
+     // chartRef.dispatchAction({
+     //     type: 'highlight',
+     //     seriesName: params.seriesName,
+     // })
+ 
+     chartInstance.setOption({// 设置 鼠标单击后想要的样式
+         series: {
+             name: params.seriesName,
+             symbolSize: 4,
+            //  color: '#00FFFF', //颜色
+             lineStyle: {
+                 width: 6
+             }
+         }
+     })
+ })
+ 
+chartInstance.on('dblclick', function (params){// 鼠标双击还原
+    // chartRef.dispatchAction({
+    //     type: 'downplay',
+    //     seriesName: params.seriesName,
+    // })
+ 
+    chartInstance.setOption({// 将样式复原
+        series: {
+            name: params.seriesName,
+            symbolSize: 2,
+            // color: '#ff0000',
+            lineStyle: {
+                width: 2
+            }
+        }
+    })
+})
+
+
+
+  // 设置图表配置项
+  // chartInstance.setOption(options)
+})
+
+
+
+        // }
         // rightChildRef.value.fenquSelMethod(res.geojson.list);
         //rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
         ElMessage.success(msg ?? "Submitted!"); 
@@ -1519,7 +1757,13 @@ function toggleFullScreen() {
         ElMessage.error("xlsxFile 失败");
       }
     });
-  }
+    */
+    }
+  });
+}
+
+
+
 
   function uploadXLSX1(xlsxFile){
     console.log("xlsxFile dbffile:"+xlsxFile);
@@ -1579,79 +1823,38 @@ function upExcelArray(excelDataArray){
 
 // Echarts 高亮
 
-// import echarts from 'echarts';
-import { onUnmounted } from 'vue'
-import * as echarts from 'echarts';
-const chartRef = ref(null)
+
+
+// function lineChart(){
+  let dValues = ref(null)
+  let zValues = ref(null)
+  const chartRef = ref(null)
 let chartInstance = null
+
 onMounted(() => {
   chartInstance = echarts.init(chartRef.value)
 
   // 模拟数据
-  const data = [
-    { name: 'A', value: 100 },
-    { name: 'B', value: 200 },
-    { name: 'C', value: 150 },
-    { name: 'D', value: 300 },
-    { name: 'E', value: 88 },
-    { name: 'F', value: 98 },
-    { name: 'G', value: 123 },
-    { name: 'H', value: 219 }
-  ]
+  // const data = [
+  //   { name: 'A', value: 100 },
+  //   { name: 'B', value: 200 },
+  //   { name: 'C', value: 150 },
+  //   { name: 'D', value: 300 },
+  //   { name: 'E', value: 88 },
+  //   { name: 'F', value: 98 },
+  //   { name: 'G', value: 123 },
+  //   { name: 'H', value: 219 }
+  // ]
 
   // 配置项
-  const options = {
-    xAxis: {
-      type: 'category',
-      data: data.map((item) => item.name)
-    },
-    yAxis: {
-      type: 'value'
-    },
-    tooltip: {
-    trigger: 'item', // 触发类型为item，表示在圆点上触发显示
-    formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
-  },
-  dataZoom: [
-    {
-      type: 'inside', // 内置缩放组件
-      start: 0, // 默认缩放起始位置
-      end: 100, // 默认缩放结束位置
-    },
-    {
-      type: 'slider', // 滑动条缩放组件
-      start: 0, // 默认缩放起始位置
-      end: 100, // 默认缩放结束位置
-    },
-  ],
-    series: [
-      {
-        data: data.map((item) => item.value),
-        type: 'line',
-        // smooth: true, //设置成平滑的曲线
-        symbol: 'circle', // 设置为圆形
-        symbolSize: 8, // 设置圆形的大小
-        color: '#ff0000', //颜色
-        emphasis: {
-          // 设置选中状态下的样式
-          itemStyle: {
-            borderWidth: 6, // 边框宽度
-            borderColor: '#ff0000', // 边框颜色
-            shadowBlur: 10, // 阴影模糊度
-            shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
-          }
-        }
-      },
-      {
-        name: 'Email',
-      type: 'line',
-      stack: 'Total',
-      data: [120, 132, 101, 134, 90, 230, 210]
-      }
-    ]
-  }
+  // const surfaceData = array[0].river.surface;
+  //         const data = surfaceData.map((_, index) => [index, _]);
+  // const { data: { array } } = this.responseData;
+  //     const { code, msg,data:res } = response.data;
+  //     const surfaceData = array[0].river.surface;
+   
 
-chartInstance.setOption(options);
+// chartInstance.setOption(options);
 chartInstance.on('click', function (params) {// 鼠标单击高亮
      // chartRef.dispatchAction({
      //     type: 'highlight',
@@ -1662,9 +1865,9 @@ chartInstance.on('click', function (params) {// 鼠标单击高亮
          series: {
              name: params.seriesName,
              symbolSize: 4,
-             color: '#00FFFF', //颜色
+            //  color: '#00FFFF', //颜色
              lineStyle: {
-                 width: 4
+                 width: 6
              }
          }
      })
@@ -1680,7 +1883,7 @@ chartInstance.on('dblclick', function (params){// 鼠标双击还原
         series: {
             name: params.seriesName,
             symbolSize: 2,
-            color: '#ff0000',
+            // color: '#ff0000',
             lineStyle: {
                 width: 2
             }
@@ -1700,6 +1903,8 @@ chartInstance.on('dblclick', function (params){// 鼠标双击还原
 //     chartInstance = null
 //   }
 // })
+// }
+
 
 // Echarts 高亮 ↑ ↑ ↑ ↑ ↑ ↑ 
 
