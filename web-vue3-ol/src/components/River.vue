@@ -6,7 +6,6 @@
   <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
     <el-tab-pane label="编辑" name="first">
 
-
     <el-button type="primary" text='primary' @click="drawPolygon" class="AllButton">
       <el-icon><Edit /></el-icon>绘制多边形
     </el-button>
@@ -19,10 +18,10 @@
     <el-button type="primary" text='primary' @click="getPolygon" class="AllButton">
       <el-icon><Connection /></el-icon>获取多边形数据
     </el-button>
-
   </el-tab-pane>
 
   <el-tab-pane label="共享" name="second">
+
     <el-button type="primary" text='primary' @click="exportMapAsImage" class="AllButton">
       <el-icon><TopRight /></el-icon>地图导出
     </el-button>
@@ -198,31 +197,6 @@
                       </ol-style-circle>
                     </ol-style>
                   </ol-vector-layer>
-                  <!--河流wfs-->
-                  <!-- 河流 -->
-                  <!--<ol-tile-layer title="河流">
-                    <ol-source-tile-wms
-                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
-                      layers="zzmserver:River"
-                      serverType="geoserver"
-                      :transition="0"
-                      :params="{
-                      SERVICE: 'WMS',
-                      VERSION: '1.1.0',
-                      REQUEST: 'GetMap',
-                      FORMAT: 'image/png',
-                      TRANSPARENT: true,
-                      tiled: true,
-                      STYLES: '',
-                      exceptions: 'application/vnd.ogc.se_inimage',
-                      CRS: 'EPSG:3857',
-                      WIDTH: 768,
-                      HEIGHT: 371,
-                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
-                      }"
-                    />
-                  </ol-tile-layer>
-                  -->
 
                   <!-- 边界 -->
                   <ol-tile-layer title="边界">
@@ -247,30 +221,6 @@
                       }"
                     />
                   </ol-tile-layer>
-
-                  <!-- 中心 -->
-                  <!-- <ol-tile-layer title="中心">
-                    <ol-source-tile-wms
-                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
-                      layers="zzmserver:midriverline_3857"
-                      serverType="geoserver"
-                      :transition="0"
-                      :params="{
-                      SERVICE: 'WMS',
-                      VERSION: '1.1.0',
-                      REQUEST: 'GetMap',
-                      FORMAT: 'image/png',
-                      TRANSPARENT: true,
-                      tiled: true,
-                      STYLES: '',
-                      exceptions: 'application/vnd.ogc.se_inimage',
-                      CRS: 'EPSG:3857',
-                      WIDTH: 768,
-                      HEIGHT: 371,
-                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
-                      }"
-                    />
-                  </ol-tile-layer> -->
 
                   <!-- 排口 -->
                   <ol-tile-layer title="排口">
@@ -400,6 +350,7 @@
               </div> -->
 
             </div>
+
             <!-- <ag-grid-vue
               :rowData="rowData"
               :columnDefs="colDefs"
@@ -411,9 +362,9 @@
           </SplitItem>
           
 
-        <!-- Echarts 高亮 -->
+        <!-- Echarts -->
         <div class="chart-container" ref="chartRef" style="height: 400px; width: 100%"></div>
-        <!-- Echarts 高亮 -->
+        <!-- Echarts -->
 
 
         </SplitWrapper>
@@ -433,7 +384,7 @@
 
 
 <script setup lang="ts"> 
-import testjson from "@/assets/1.geojson";
+import * as XLSX from 'xlsx';
 import TopCom from "@/components/TopCom.vue";
 import {Circle as CircleStyle, } from 'ol/style.js';
 import 'ol/ol.css';
@@ -466,9 +417,8 @@ import { createApp } from "vue";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridVue } from "ag-grid-vue3";
-
 import * as shp from 'shpjs';
-//import DBF from 'dbffile';
+// import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
 import { OSM, Vector as VectorSource2} from 'ol/source.js';
 import { Tile as TileLayer2, Vector as VectorLayer2 } from 'ol/layer.js';
@@ -513,13 +463,8 @@ console.log(proxy.$baseUrl)
 const screenWidth = ref(document.documentElement.clientWidth);//实时屏幕宽度
 const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕高度
 
-
 const mapstyle=ref("width: "+(screenWidth.value-204)+"px;height: "+(screenHeight.value-350)+"px")
-
 // console.log(mapstyle.value)
-
-
-
 
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);
@@ -564,15 +509,6 @@ const center =ref([12605523,2613832]);
 //const size = ref([12605523*2, 2613832*2]);
 //const extent = ref([0, 0, ...size.value]);
 const extent = inject("ol-extent");
-/*const projection = reactive({
-    code: "xkcd-image",
-    units: "pixels",
-    extent: extent,
-});*/
-//const imgUrl=ref("http://192.168.0.107:8010/geoserver/zzmserver/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS=zzmserver%3APS_LINE-3857&exceptions=application%2Fvnd.ogc.se_inimage&CRS=EPSG%3A3857&WIDTH=769&HEIGHT=470&BBOX=12594707.938873548%2C2600912.5162177263%2C12624026.899866581%2C2618855.1095337737");
-//const imgUrl = ref("https://imgs.xkcd.com/comics/online_communities.png");
-//const imgCopyright = ref('© <a href="http://xkcd.com/license.html">xkcd</a>');
-
 const featureSelected = (event) => {
   console.log(event);
   console.log(event.selected);
@@ -724,22 +660,6 @@ const styles = {
 const styleFunction = function (feature) {
   return styles[feature.getGeometry().getType()];
 };
-// const jsonsource = new VectorSource({
-//     // features: new GeoJSON().readFeatures(geojsonObject),
-//     features: new GeoJSON().readFeatures(testjson),
-//  });
-
-//  jsonsource.addFeature(new Feature(new Circle([5e6, 7e6], 1e6)));
-
-//  const jsonview = new VectorLayer({
-//   source: jsonsource,
-//   style: styleFunction,
-//  })
-
-//  onMounted(() => {
-//   map.value.map.addLayer(jsonview);
-//  })
-
 
 const vectorLayer = new VectorLayer({
   source: new VectorSource({
@@ -755,8 +675,7 @@ map.value.map.addLayer(vectorLayer)
 // 河流断面json ↑ ↑ ↑ ↑ ↑ ↑ 
 
 
-
-
+// 自由绘制 ↓ ↓ ↓ ↓ ↓ ↓
 const source = new VectorSource2({wrapX: false});
 
 const vectorDraw = new VectorLayer2({
@@ -856,6 +775,9 @@ onMounted(async () => {
  // ]);
 });
 
+// 自由绘制 ↑ ↑ ↑ ↑ ↑ ↑ 
+
+// 图层控制 ↓ ↓ ↓ ↓ ↓ ↓ 
 function showTreeLayers(){
   // 图层控制
   var layersContent = document.getElementById('layerTree');    
@@ -921,6 +843,10 @@ function addChangeEvent(element, layer) {
     };
 }
 
+
+// 图层控制 ↑ ↑ ↑ ↑ ↑ ↑ 
+
+
 function doDownload (data, name) {
         if (!data) {
           return
@@ -938,6 +864,7 @@ function doDownload (data, name) {
 //import { readFileSync } from 'fs'
 //import fs from "fs"
 
+// 上传zip ↓ ↓ ↓ ↓ ↓ ↓ 
 function importSubmit (e,filerow,fileList) {
  //const inputEl = fileInput.value!;
  //const file = (event.target as HTMLInputElement).files?.[0];
@@ -972,14 +899,6 @@ function importSubmit (e,filerow,fileList) {
                         });
 
                       } else {
-                        // ElMessage.error("此文件不是3857编码格式文件");
-                        // ElMessage({
-                        //   showClose: true,
-                        //   message: '该文件投影坐标系错误!请重新上传3857坐标文件',
-                        //   type: 'error',
-                        //   duration:0,
-                        // });
-
                         ElMessageBox.alert('该文件投影坐标系错误!请重新上传3857坐标文件', '错误', {
                         // if you want to disable its autofocus
                         // autofocus: false,
@@ -1007,73 +926,10 @@ function importSubmit (e,filerow,fileList) {
                                       // 获取文件内容
                                       const data = new Uint8Array(e.target.result);
                                       console.log("Uint8Array:"+data);
-                                      // const dbf=new DbfABC(data);
-                                      // const records=dbf.records;
-                                      //let buffer = readFileSync(dbfFileName);
-                                      /*DbfABC.parse(dbfFileName, (err, dbf) => {
-                                        if (err) {
-                                          console.log(err);
-                                        } else {
-                                          console.log(dbf);
-                                          // console.log(dbf.records);
-                                        }
-                                      });*/
-                                      // const Accessor = require('../dist');
 
-                                      // let {header, data2} = Accessor.read('./table-foxpro.dbf');
-
-                                      // console.log(header);
-                                      // console.log(data2);
-
-                                      // console.log('----');
-
-                                      // header = Accessor.header('./table-dbase4.dbf');
-
-                                      // console.log(header);
-                                     
-                                      // readDbf(e.target.result);
-                                      //readDbf(data);
-                                    // 创建一个shapefile对象
                                 }
                             })
                         } 
-
-                  // dbfBlob.then(res => {
-                  //     console.log("res:"+res);
-                  //     // const resBlob=new Blob([res]);
-                  //     const resBlob = { hello: "world" };
-                  //     const blob = new Blob([JSON.stringify(obj, null, 2)], {
-                  //       type: "application/json",
-                  //     });
-                  //     // readDbf(resBlob);
-                  //     const dbfReader = new FileReader();
-                       
-                  //     dbfReader.readAsArrayBuffer(resBlob);
-                  //     dbfReader.onload = function(event) {
-                  //       // event.target相当于reader
-                  //       console.log(event.target.result);
-                  //       readDbf(event.target.result);
-                  //     }
-                  // });
-                
-                  //  let dbf = DBFFile.open(dbfFileName);
-                  // console.log("bdf:"+dbf);
-                 /*const dbf=new Dbf(dbfFileName);
-                  const records=dbf.records;
-                  const fields=dbf.fields;
-                  const data=[];
-                  for(let i=0;i<records.length;i++){
-                      let record=records[i];
-                      let obj={};
-                      for(let j=0;j<fields.length;j++){
-                          let field=fields[j];
-                          obj[field.name]=record[j];
-                      }
-                      data.push(obj);
-                  }
-                  console.log(fields);
-                  console.log(data);
-*/
 
 
                     let shpBlob =  zip.file(filename).async('arraybuffer');
@@ -1118,8 +974,6 @@ function importSubmit (e,filerow,fileList) {
 
                   })
                   }
-
-                // }end for zip files
               })
             
 
@@ -1270,111 +1124,7 @@ function uploadZip(zipFile){
   });
 }
 
-// 导出地图为PNG图片
-// function exportMapAsImage2() {
-//   const mapCanvas = document.createElement('canvas');
-//   // var canvas =   map.value.map.getCanvas();
-//   var canvas =   mapCanvas;
-//   var dataURL = canvas.toDataURL('image/png');
- 
-//   // 创建一个a元素用于下载
-//   var a = document.createElement('a');
-//   a.href = dataURL;
-//   a.download = 'map.png';
-//   a.click();
-// }
 
-// /**
-//  *  todo 保存地图
-//  * @param {string} format - 格式，目前只支持图片
-//  */
-//  function exportMapAsImage3() {
-
-//     const thisMap = map.value.map;
-//     thisMap.once('postcompose', function (event) {
-//             var canvas = event.context.canvas;
-//             canvas.toBlob(function (blob) {
-//                 saveAs(blob, 'map.png');
-//             });
-//     });
-//     thisMap.renderSync();
-// }
-
-// const dims = {
-//   a0: [1189, 841],
-//   a1: [841, 594],
-//   a2: [594, 420],
-//   a3: [420, 297],
-//   a4: [297, 210],
-//   a5: [210, 148],
-// };
-
-// function exportMapAsImage() {
-//   const thismap=map.value.map;
- 
-//     document.body.style.cursor = 'progress';
-
-//     const resolution=ref(72);
-//     const dim = dims.a5;
-//     const width = Math.round((dim[0] * resolution.value) / 25.4);
-//     const height = Math.round((dim[1] * resolution.value) / 25.4);
-//     const size = thismap.getSize();
-//     const viewResolution = thismap.getView().getResolution();
-
-//     thismap.once('rendercomplete', function () {
-//       const mapCanvas = document.createElement('canvas');
-//       mapCanvas.width = width;
-//       mapCanvas.height = height;
-//       const mapContext = mapCanvas.getContext('2d');
-//       Array.prototype.forEach.call(
-//         document.querySelectorAll('.ol-layer canvas'),
-//         function (canvas) {
-//           if (canvas.width > 0) {
-//             const opacity = canvas.parentNode.style.opacity;
-//             mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-//             const transform = canvas.style.transform;
-//             // Get the transform parameters from the style's transform matrix
-//             const matrix = transform
-//               .match(/^matrix\(([^\(]*)\)$/)[1]
-//               .split(',')
-//               .map(Number);
-//             // Apply the transform to the export map context
-//             CanvasRenderingContext2D.prototype.setTransform.apply(
-//               mapContext,
-//               matrix
-//             );
-//             mapContext.drawImage(canvas, 0, 0);
-//           }
-//         }
-//       );
-//       mapContext.globalAlpha = 1;
-//       mapContext.setTransform(1, 0, 0, 1, 0, 0);
-//       const pdf = new jspdf.jsPDF('landscape', undefined, format);
- 
-//       var dataURL = document.createElement('canvas').toDataURL('image/jpeg');
-//       pdf.addImage(
-//         //mapCanvas.toDataURL('image/jpeg'),
-//         dataURL,
-//         'JPEG',
-//         0,
-//         0,
-//         dim[0],
-//         dim[1]
-//       );
-//       pdf.save('map.pdf');
-//       // Reset original map size
-//       thismap.setSize(size);
-//       thismap.getView().setResolution(viewResolution);
-       
-//       document.body.style.cursor = 'auto';
-//     });
-
-//     // Set print size
-//     const printSize = [width, height];
-//     thismap.setSize(printSize);
-//     const scaling = Math.min(width / size[0], height / size[1]);
-//     thismap.getView().setResolution(viewResolution / scaling);
-//   } 
 
 // 导出地图为PNG图片
 function exportMapAsImage() {
@@ -1396,10 +1146,6 @@ function exportMapAsImage() {
 }
 
 function reloadPage() {
-    // 使用Vue Router的reload方法
-    // $router.go(0);
- 
-    // 或者使用原生JavaScript
     window.location.reload();
   }
   
@@ -1487,19 +1233,15 @@ function toggleFullScreen() {
       };
     };
 
+
+    
     function importSubmitXLSX(e,filerow,fileList) {
     
     const file=filerow.raw;
     uploadXLSX(file);
   
-    //return;
-    // if (file && (file.type === 'application/xlsx'|| file.type === 'application/x-xlsx-compressed')){
-
-    // } else {
-    //   console.error('请选择类型为XLSX的文件进行上传。');
-    // }
   }; 
-  import * as XLSX from 'xlsx';
+
   function uploadXLSX(xlsxFile){
     // console.log("xlsxFile dbffile:"+xlsxFile);
     const formData=new FormData();
@@ -1508,17 +1250,7 @@ function toggleFullScreen() {
     //http://localhost:9300/upload
     PostFile('/River/upload',formData).then((response) => {
       // console.log("xlsxFile response.data: "+response.data);
-      const { code, msg,data:res } = response.data;
-
-    
-
-      // if (code === 200 && msg === "操作成功") {
-      // const rivers = res.data.array;
-      // const surfaces = rivers.map(river => river.river.surface);
-      // // surfaces现在是一个二维数组，每个子数组对应一个river的surface数据
-      // // 使用surfaces绘制折线图
-
-
+      const { code, msg, data:res } = response.data;
       const { data: { array } } = response.data;
       const surfaceData = array[0].river.surface;
       console.log("surfaceData: "+surfaceData);
