@@ -397,12 +397,8 @@ import markerIcon from "@/assets/marker.png";
 import PlantInfoList from '@/components/plantInfoList.vue';
 import RightInfoList from '@/components/rightInfoList.vue';
 import { Feature, Map, View, Overlay }from 'ol';
-// import VectorLayer from 'ol/layer/Vector';
-// import VectorSource from 'ol/source/Vector';
 import { GeoJSON } from "ol/format";
-// import GeoJSON from 'ol/format/GeoJSON.js';
 import { Polygon, MultiPolygon } from 'ol/geom';
-// import TileLayer from 'ol/layer/Tile';
 import { XYZ } from "ol/source";
 import { Fill } from "ol/style";
 import { Stroke } from "ol/style";
@@ -413,12 +409,10 @@ import { Icon } from "ol/style";
 import { fromLonLat } from "ol/proj";
 import JSZip from 'jszip';
 import { createApp } from "vue";
-// import { ref } from "vue";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridVue } from "ag-grid-vue3";
 import * as shp from 'shpjs';
-// import DBF from 'dbffile';
 import Draw from 'ol/interaction/Draw.js';
 import { OSM, Vector as VectorSource2} from 'ol/source.js';
 import { Tile as TileLayer2, Vector as VectorLayer2 } from 'ol/layer.js';
@@ -440,50 +434,33 @@ import {
   Edit,TopRight,
   } from '@element-plus/icons-vue';
 import { open } from 'shapefile'
-// const Split = require('split.js');
 import Split from 'split.js';
 import { SplitWrapper, SplitItem } from 'vue3-split';
 import DbfABC from 'dbf-js';
 import iconv from 'iconv-lite'
-//import {DBFFile} from 'dbffile';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
-// import echarts from 'echarts';
 import { onUnmounted } from 'vue'
 import * as echarts from 'echarts';
-const layerSwitcher = new LayerSwitcher();
 
+
+const layerSwitcher = new LayerSwitcher();
 const {proxy} = getCurrentInstance()
 console.log(proxy.$baseUrl)
-//console.log(proxy.$getFullUrl('/geoserver/zzmserver/wms')) 
-//const wmsUrl=proxy.$getFullUrl('/geoserver/zzmserver/wms')
-
-//const screenWidth = ref(window.innerWidth);
-//const screenHeight = ref(window.innerHeight);
 const screenWidth = ref(document.documentElement.clientWidth);//实时屏幕宽度
 const screenHeight = ref(document.documentElement.clientHeight);//实时屏幕高度
-
 const mapstyle=ref("width: "+(screenWidth.value-204)+"px;height: "+(screenHeight.value-350)+"px")
-// console.log(mapstyle.value)
-
 const selectedCityName = ref("");
 const selectedCityPosition = ref([]);
 const drawEnable = ref(false);
-
 const format = inject("ol-format");
 const geoJson = new format.GeoJSON();
-
 const selectConditions = inject("ol-selectconditions");
 const selectCondition = selectConditions.pointerMove;
-
-//const selectConditions = inject("ol-events-conditions");
-//const selectCondition = selectConditions.singleClick;
-
 const selectInteactionFilter = (feature) => {
   console.log(feature);
   return feature.values_.burytype != undefined;
 };
-
 const modelSatus = reactive({
   status: true,
 });
@@ -499,7 +476,6 @@ const mapRightData = reactive({
   input: "",
   list: {},
 });
-//const center = ref([40, 40]);
 const projection = ref("EPSG:3857");
 const zoom = ref(12);
 const rotation = ref(0);
@@ -522,9 +498,10 @@ const featureSelected = (event) => {
     selectedCityName.value = "";
   }
 };
-
 const zone_name=ref("");
 const childRef = ref(null);
+
+
 
 function featureClicked(event) {
   console.log("featureClicked");
@@ -553,7 +530,6 @@ function mapclick(event){
    } 
 }
 
-// const shapefile = require("shapefile");
 const uploadFiles = ref([]);
 const map = ref(null);
 onMounted(() => {
@@ -931,7 +907,6 @@ function importSubmit (e,filerow,fileList) {
                             })
                         } 
 
-
                     let shpBlob =  zip.file(filename).async('arraybuffer');
                     shpBlob.then(res => {
                       //console.log(res);
@@ -971,19 +946,13 @@ function importSubmit (e,filerow,fileList) {
                                 }))
                             .catch(error => console.error(error.stack));
                     }
-
                   })
                   }
               })
-            
-
   } else {
     console.error('请选择类型为ZIP的文件进行上传。');
   }
 };
-
-
-
 
 const rightChildRef = ref(null);
 //http://192.168.0.102:9602/Pollution/storeGeoJSON
@@ -1004,7 +973,6 @@ function storeGeoJSON(coordinates) {
   pointArray=stringsArray.join('');
   console.log("pointArray:"+pointArray);
   let stringsArray1 = [];
-
 
   Post('/Pollution/storeGeoJSON',{"type":"Polygon","coordinates":pointArray}).then((response) => {
     console.log("response.data:"+response.data);
@@ -1034,7 +1002,6 @@ function showFeaturesMap(features) {
           if (map) {
             map.value.map.addLayer(vectorLayer);
           }
-       
 }
 
 function uploadShpGeoJSON(geometryArray) {
@@ -1123,8 +1090,6 @@ function uploadZip(zipFile){
     }
   });
 }
-
-
 
 // 导出地图为PNG图片
 function exportMapAsImage() {
@@ -1233,13 +1198,10 @@ function toggleFullScreen() {
       };
     };
 
-
-    
     function importSubmitXLSX(e,filerow,fileList) {
     
     const file=filerow.raw;
     uploadXLSX(file);
-  
   }; 
 
   function uploadXLSX(xlsxFile){
@@ -1254,8 +1216,8 @@ function toggleFullScreen() {
       const { data: { array } } = response.data;
       const surfaceData = array[0].river.surface;
       console.log("surfaceData: "+surfaceData);
-
-
+      if (code === 200) {
+        console.log("success:"+msg+"xlsxFile 结束:"+res);
 
       const seriesDataX = {
     name:  [],
@@ -1266,40 +1228,24 @@ function toggleFullScreen() {
     data: [],
   };
 
-      surfaceData.forEach((innerArray, seriesIndex) => {
-  const dPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2)]);
-  // seriesDataX.push({
-  //   name: `Series ${seriesIndex + 1}`,
-  //   data: dPairs,
-  // });
+surfaceData.forEach((innerArray, seriesIndex) => {
+  const dataPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2), item.z]);
+
   seriesDataX.name.push(`Series ${seriesIndex + 1}`);
-  seriesDataX.data.push(dPairs);
+  seriesDataX.data.push(dataPairs.map(pair => pair[0]));
 
-  const ZPairs = innerArray.map(item => [item.z]);
   seriesDataY.name.push(`Series ${seriesIndex + 1}`);
-  seriesDataY.data.push(ZPairs);
+  seriesDataY.data.push(dataPairs.map(pair => pair[1]));
 });
-
 console.log("seriesDataY: "+seriesDataY.data);
-
-      if (code === 200) {
-        console.log("success:"+msg+"xlsxFile 结束:"+res);
-        // let seriesArray=[];
-        // seriesDataY.data.forEach((innerArray, seriesIndex) => {
-        //     let seriseJson={type:'line',stack: 'x',data:innerArray};
-        //     seriesArray.push(seriseJson);
-        // });
-
-        let seriesArray=[];
-        let seriseJson={type:'line',data:seriesDataY.data[0]};
-        seriesArray.push(seriseJson);
-          console.log("seriesDataY.data[0]:"+seriesDataY.data[0]);
+console.log("seriesDataY0000: "+seriesDataY.data[0]);
 let options = {
     xAxis: {
     type: 'category',
     // boundaryGap: false,
     // data: ["1","2","3","4","5","6","7"]
    // data: ["1","2","3","4","5","6","7"]
+  //  data:seriesDataX.data[0],
    data:seriesDataX.data[0]
   },
 
@@ -1307,91 +1253,17 @@ let options = {
       type: 'value'
     },
     
-  //   tooltip: {
-  //   trigger: 'item', // 触发类型为item，表示在圆点上触发显示
-  //   formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
-  // },
-
-  // 缩放
-  // dataZoom: [
-  //   {
-  //     type: 'inside', // 内置缩放组件
-  //     start: 0, // 默认缩放起始位置
-  //     end: 100, // 默认缩放结束位置
-  //   },
-  //   {
-  //     type: 'slider', // 滑动条缩放组件
-  //     start: 0, // 默认缩放起始位置
-  //     end: 100, // 默认缩放结束位置
-  //   },
-  // ],
+    
     series: //seriesArray
     [
-      // {
-      //   data: data.map((item) => item.value),
-      //   type: 'line',
-      //   // smooth: true, //设置成平滑的曲线
-      //   symbol: 'circle', // 设置为圆形
-      //   symbolSize: 8, // 设置圆形的大小
-      //   color: '#ff0000', //颜色
-      //   emphasis: {
-      //     // 设置选中状态下的样式
-      //     itemStyle: {
-      //       borderWidth: 6, // 边框宽度
-      //       borderColor: '#ff0000', // 边框颜色
-      //       shadowBlur: 10, // 阴影模糊度
-      //       shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
-      //     }
-      //   }
-      // },
       {
-        // name: 'Email',
       type: 'line',
       stack: 'Total',
-      // data: [120, 132, 101, 134, 90, 230, 210]
-      data: [3.19,3.304,3.493,2.849,1.35,0.91,0.81,0.54,0.444,0.409,0.3,0.25,0.092,-0.052,-0.288,-0.466,-0.641,-0.644,-0.8,-0.782,-0.763,-0.7,-0.77,-0.752,-0.76,-0.72,-0.58,-0.509,-0.409,-0.318,-0.13,0.087,0.232,0.74,1.254,1.3519999999999999,2.038,3.505,3.833,3.852,4.136,5.116,5.312,5.702,4.46,4.339,4.293,4.296,4.09]
-      // data:seriesDataY.data[0]
-      },
-      // {
-      //   name: 'Dog',
-      // type: 'line',
-      // stack: 'Total',
-      // data: [180, 92, 151, 104, 140, 110, 110]
-      // }
-    ]
-  }
-
-          // 设置图表配置项
-        chartInstance.setOption(options)
-  /*      if (array && array.length > 0) {
-          
-          // lineChart()
-          // 现在你可以使用surfaceData进行绘图了
-
-
-          const chartRef = ref(null)
-      let chartInstance = null
-
-      onMounted(() => {
-  chartInstance = echarts.init(chartRef.value)
-
-  const options = {
-    // xAxis: {
-    //   type: 'category',
-    //   data: data.map((item) => item.name)
-    // },
-
-    xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    // data: ["1","2","3","4","5","6","7"]
-    data: dValues
+      data:seriesDataY.data[0]
   },
+      
+    ],
 
-    yAxis: {
-      type: 'value',
-    },
-    
     tooltip: {
     trigger: 'item', // 触发类型为item，表示在圆点上触发显示
     formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
@@ -1410,136 +1282,16 @@ let options = {
       end: 100, // 默认缩放结束位置
     },
   ],
-    series: [
-      // {
-      //   data: data.map((item) => item.value),
-      //   type: 'line',
-      //   // smooth: true, //设置成平滑的曲线
-      //   symbol: 'circle', // 设置为圆形
-      //   symbolSize: 8, // 设置圆形的大小
-      //   color: '#ff0000', //颜色
-      //   emphasis: {
-      //     // 设置选中状态下的样式
-      //     itemStyle: {
-      //       borderWidth: 6, // 边框宽度
-      //       borderColor: '#ff0000', // 边框颜色
-      //       shadowBlur: 10, // 阴影模糊度
-      //       shadowColor: 'rgba(0, 0, 0, 0.3)' // 阴影颜色
-      //     }
-      //   }
-      // },
-      {
-        name: 'Email',
-      type: 'line',
-      stack: 'Total',
-      data: zValues
-      },
-      // {
-      //   name: 'Dog',
-      // type: 'line',
-      // stack: 'Total',
-      // data: [180, 92, 151, 104, 140, 110, 110]
-      // }
-    ]
   }
 
-chartInstance.setOption(options);
-chartInstance.on('click', function (params) {// 鼠标单击高亮
-     // chartRef.dispatchAction({
-     //     type: 'highlight',
-     //     seriesName: params.seriesName,
-     // })
- 
-     chartInstance.setOption({// 设置 鼠标单击后想要的样式
-         series: {
-             name: params.seriesName,
-             symbolSize: 4,
-            //  color: '#00FFFF', //颜色
-             lineStyle: {
-                 width: 6
-             }
-         }
-     })
- })
- 
-chartInstance.on('dblclick', function (params){// 鼠标双击还原
-    // chartRef.dispatchAction({
-    //     type: 'downplay',
-    //     seriesName: params.seriesName,
-    // })
- 
-    chartInstance.setOption({// 将样式复原
-        series: {
-            name: params.seriesName,
-            symbolSize: 2,
-            // color: '#ff0000',
-            lineStyle: {
-                width: 2
-            }
-        }
-    })
-})
-
-
-
-  // 设置图表配置项
-  // chartInstance.setOption(options)
-})
-
-
-
-        // }
-        // rightChildRef.value.fenquSelMethod(res.geojson.list);
-        //rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
-        ElMessage.success(msg ?? "Submitted!"); 
-      } else {
-        console.log("fail:"+msg);
-        //ElMessage.error(msg);
-        ElMessage.error("xlsxFile 失败");
-      }
-    });
-    */
+          // 设置图表配置项
+        chartInstance.setOption(options)
+  
     }
   });
 }
 
 
-
-
-  function uploadXLSX1(xlsxFile){
-    console.log("xlsxFile dbffile:"+xlsxFile);
-    const formData=new FormData();
-    formData.append("file",xlsxFile);
-    /*
-    //http://1.1.1.200:9602/Pollution/importData
-    //
-    PostFile('/Pollution/importData',formData).then((response) => {
-      console.log("xlsxFile response.data:"+response.data);
-      const { code, msg,data: res } = response.data;
-      if (code === 200) {
-        console.log("success:"+msg+"xlsxFile 结束:"+res);
-        // rightChildRef.value.fenquSelMethod(res.geojson.list);
-        rightChildRef.value.fenquMapMethod(res.fenquMap.fenquList);
-        ElMessage.success(msg ?? "Submitted!"); 
-      } else {
-        console.log("fail:"+msg);
-        //ElMessage.error(msg);
-        ElMessage.error("xlsxFile 失败");
-      }
-    });*/
-      let excelData=null;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        console.log("xlsxFile excelData:"+excelData);
-        upExcelArray(excelData);
-      };
-      reader.readAsArrayBuffer(xlsxFile);
-}   
 function upExcelArray(excelDataArray){
   Post('/Pollution/importData',{"type":"Polygon","test":excelDataArray}).then((response) => {
     console.log("response.data:"+response.data);
