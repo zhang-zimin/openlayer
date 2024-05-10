@@ -1239,6 +1239,20 @@ surfaceData.forEach((innerArray, seriesIndex) => {
 });
 console.log("seriesDataY: "+seriesDataY.data);
 console.log("seriesDataY0000: "+seriesDataY.data[0]);
+
+
+
+// const seriesArray = [];
+// for (let i = 0; i < seriesDataY.data.length; i++) {
+//   seriesArray.push({
+//     type: 'line',
+//     name: `Series ${i + 1}`,
+//     stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
+//     data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
+//   });
+// }
+
+
 let options = {
     xAxis: {
     type: 'category',
