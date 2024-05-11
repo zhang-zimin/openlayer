@@ -1216,48 +1216,64 @@ function toggleFullScreen() {
       const { data: { array } } = response.data;
       const surfaceData = array[0].river.surface;
       console.log("surfaceData: "+surfaceData);
+      
+
       if (code === 200) {
         console.log("success:"+msg+"xlsxFile 结束:"+res);
 
-            const seriesDataX = {
-          name:  [],
-          data: [],
-        };
-            const seriesDataY = {
-          name: [],
-          data: [],
-        };
+        //     const seriesDataX = {
+        //   name:  [],
+        //   data: [],
+        // };
+        //     const seriesDataY = {
+        //   name: [],
+        //   data: [],
+        // };
 
-        surfaceData.forEach((innerArray, seriesIndex) => {
-          const dataPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2), item.z]);
 
-          seriesDataX.name.push(`Series ${seriesIndex + 1}`);
-          seriesDataX.data.push(dataPairs.map(pair => pair[0]));
 
-          seriesDataY.name.push(`Series ${seriesIndex + 1}`);
-          seriesDataY.data.push(dataPairs.map(pair => pair[1]));
-        });
-        console.log("seriesDataY: "+seriesDataY.data);
-        console.log("seriesDataY0000: "+seriesDataY.data[0]);
 
-        const seriesArray = [];
-        for (let i = 0; i < seriesDataY.data.length; i++) {
-          seriesArray.push({
-            type: 'line',
-            // name: `Series ${i + 1}`,
-            stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
-            // data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
-            data: seriesDataY.data[i]
-          });
-        }
+
+
+const seriesArrayDZ = [];
+surfaceData.forEach((innerArray, seriesIndex) => {
+  const dataPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2), item.z]);
+
+  // seriesDataX.name.push(`Series ${seriesIndex + 1}`);
+  // seriesDataX.data.push(dataPairs.map(pair => pair[0]));
+
+  // seriesDataY.name.push(`Series ${seriesIndex + 1}`);
+  // seriesDataY.data.push(dataPairs.map(pair => pair[1]));
+
+  seriesArrayDZ.push({
+    type: 'line',
+    // name: `Series ${i + 1}`,
+    // stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
+    // data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
+    data: dataPairs
+  });
+});
+
+// const seriesArray = [];
+// for (let i = 0; i < seriesDataY.data.length; i++) {
+//   seriesArray.push({
+//     type: 'line',
+//     // name: `Series ${i + 1}`,
+//     stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
+//     // data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
+//     data: seriesDataY.data[i]
+//   });
+// }
 
 
 let options = {
     xAxis: {
-    type: 'category',
+    type: 'value',
     // boundaryGap: false,
     // data: ["1","2","3","4","5","6","7"]
-   data:seriesDataX.data[0]
+  //  data:seriesDataX.data[0]
+  //  data:uniqueDValues
+  //  data:xAxisData
   },
 
     yAxis: {
@@ -1265,7 +1281,8 @@ let options = {
     },
     
     
-    series: seriesArray,
+    series: seriesArrayDZ,
+    // series: [],
     // [
     //   {
     //   type: 'line',
@@ -1277,7 +1294,7 @@ let options = {
 
     tooltip: {
     trigger: 'item', // 触发类型为item，表示在圆点上触发显示
-    formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
+    // formatter: '{b}: {c}', // 显示的格式，{b}表示类目值，{c}表示数值
   },
 
   // 缩放
@@ -1294,6 +1311,20 @@ let options = {
     },
   ],
   }
+
+
+  // 根据映射后的数据创建折线
+// for (let i = 0; i < seriesDataY.data.length; i++) {
+//   options.series.push({
+//     type: 'line',
+//     name: `Series ${i + 1}`,
+//     stack: 'Total',
+//     data: seriesDataY.data[i].map((yValue, index) => [
+//       xAxisData[index],
+//       yValue
+//     ])
+//   });
+// }
 
           // 设置图表配置项
         chartInstance.setOption(options)
