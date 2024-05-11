@@ -1219,38 +1219,37 @@ function toggleFullScreen() {
       if (code === 200) {
         console.log("success:"+msg+"xlsxFile 结束:"+res);
 
-      const seriesDataX = {
-    name:  [],
-    data: [],
-  };
-      const seriesDataY = {
-    name: [],
-    data: [],
-  };
+            const seriesDataX = {
+          name:  [],
+          data: [],
+        };
+            const seriesDataY = {
+          name: [],
+          data: [],
+        };
 
-surfaceData.forEach((innerArray, seriesIndex) => {
-  const dataPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2), item.z]);
+        surfaceData.forEach((innerArray, seriesIndex) => {
+          const dataPairs = innerArray.map(item => [parseFloat(item.d).toFixed(2), item.z]);
 
-  seriesDataX.name.push(`Series ${seriesIndex + 1}`);
-  seriesDataX.data.push(dataPairs.map(pair => pair[0]));
+          seriesDataX.name.push(`Series ${seriesIndex + 1}`);
+          seriesDataX.data.push(dataPairs.map(pair => pair[0]));
 
-  seriesDataY.name.push(`Series ${seriesIndex + 1}`);
-  seriesDataY.data.push(dataPairs.map(pair => pair[1]));
-});
-console.log("seriesDataY: "+seriesDataY.data);
-console.log("seriesDataY0000: "+seriesDataY.data[0]);
+          seriesDataY.name.push(`Series ${seriesIndex + 1}`);
+          seriesDataY.data.push(dataPairs.map(pair => pair[1]));
+        });
+        console.log("seriesDataY: "+seriesDataY.data);
+        console.log("seriesDataY0000: "+seriesDataY.data[0]);
 
-
-
-// const seriesArray = [];
-// for (let i = 0; i < seriesDataY.data.length; i++) {
-//   seriesArray.push({
-//     type: 'line',
-//     name: `Series ${i + 1}`,
-//     stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
-//     data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
-//   });
-// }
+        const seriesArray = [];
+        for (let i = 0; i < seriesDataY.data.length; i++) {
+          seriesArray.push({
+            type: 'line',
+            // name: `Series ${i + 1}`,
+            stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
+            // data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
+            data: seriesDataY.data[i]
+          });
+        }
 
 
 let options = {
@@ -1258,8 +1257,6 @@ let options = {
     type: 'category',
     // boundaryGap: false,
     // data: ["1","2","3","4","5","6","7"]
-   // data: ["1","2","3","4","5","6","7"]
-  //  data:seriesDataX.data[0],
    data:seriesDataX.data[0]
   },
 
@@ -1268,15 +1265,15 @@ let options = {
     },
     
     
-    series: //seriesArray
-    [
-      {
-      type: 'line',
-      stack: 'Total',
-      data:seriesDataY.data[0]
-  },
-      
-    ],
+    series: seriesArray,
+    // [
+    //   {
+    //   type: 'line',
+    //   stack: 'Total',
+    //   data:seriesDataY.data[0]
+    //   // data: [120, 200, 150],
+    //   }
+    // ],
 
     tooltip: {
     trigger: 'item', // 触发类型为item，表示在圆点上触发显示
