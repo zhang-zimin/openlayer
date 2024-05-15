@@ -179,8 +179,7 @@
                   </ol-tile-layer>
 
                   <!--河流wfs-->
-                   <!-- 污染源地块 -->
-                  <ol-vector-layer title="河流">
+                  <!-- <ol-vector-layer title="河流">
                     <ol-source-vector
                       ref="cities"
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3ARiver&maxFeatures=50&outputFormat=application%2Fjson')"
@@ -196,7 +195,34 @@
                         <ol-style-fill color="blue"></ol-style-fill>
                       </ol-style-circle>
                     </ol-style>
-                  </ol-vector-layer>
+                  </ol-vector-layer> -->
+
+
+                  <ol-tile-layer title="河流">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:river"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.3.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 769,
+                      HEIGHT: 470,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+
+
 
                   <!-- 边界 -->
                   <ol-tile-layer title="边界">
@@ -1250,7 +1276,11 @@ surfaceData.forEach((innerArray, seriesIndex) => {
     // name: `Series ${i + 1}`,
     // stack: 'Total', // 如果需要堆叠效果，否则可以删除或替换为其他属性
     // data: seriesDataY.data[i].map((yValue, index) => [seriesDataX.data[i][index], yValue])
-    data: dataPairs
+    data: dataPairs,
+    // areaStyle: {
+    //     color: '#ff0',
+    //     opacity: 0.5
+    //   }
   });
 });
 
