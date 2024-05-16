@@ -1,4 +1,27 @@
 <template>
+<!-- <template>
+  Scroll down to see the bottom-right button.
+  <el-backtop :right="100" :bottom="100" />
+</template> -->
+<!-- <template>
+  Scroll down to see the bottom-right button.
+  <el-backtop :bottom="100">
+    <div
+      style="
+        height: 100%;
+        width: 100%;
+        background-color: var(--el-bg-color-overlay);
+        box-shadow: var(--el-box-shadow-lighter);
+        text-align: center;
+        line-height: 40px;
+        color: #1989fa;
+      "
+    >
+      UP
+    </div>
+  </el-backtop>
+</template> -->
+
   <div>
     <TopCom class="zoomStyle" />
   </div>
@@ -21,6 +44,19 @@
     </el-button>
 
   </el-tab-pane>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <el-tab-pane label="共享" name="second">
     <el-button type="primary" text='primary' @click="exportMapAsImage" class="AllButton">
@@ -77,6 +113,28 @@
       </el-upload>
 
   </el-tab-pane>
+
+
+
+  <el-tab-pane label="统计" name="third">
+
+
+<!-- <el-button type="primary" text='primary' @click="drawPolygon" class="AllButton">
+  <el-icon><Edit /></el-icon>绘制多边形
+</el-button>
+<el-button type="primary" text='primary' @click="cancelDraw" class="AllButton">
+  <el-icon><SwitchButton /></el-icon>结束绘制
+</el-button>
+<el-button type="primary" text='primary' @click="removeDrawLayer" class="AllButton">
+  <el-icon><Delete /></el-icon>清除绘制
+</el-button>
+<el-button type="primary" text='primary' @click="getPolygon" class="AllButton">
+  <el-icon><Connection /></el-icon>获取多边形数据
+</el-button> -->
+
+</el-tab-pane>
+
+
   </el-tabs>
   <!-- 顶部工具栏 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
@@ -180,8 +238,7 @@
                   </ol-tile-layer>
 
                   <!--河流wfs-->
-                   <!-- 污染源地块 -->
-                  <ol-vector-layer title="河流">
+                  <!-- <ol-vector-layer title="河流">
                     <ol-source-vector
                       ref="cities"
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3ARiver&maxFeatures=50&outputFormat=application%2Fjson')"
@@ -197,7 +254,7 @@
                         <ol-style-fill color="blue"></ol-style-fill>
                       </ol-style-circle>
                     </ol-style>
-                  </ol-vector-layer>
+                  </ol-vector-layer> -->
                   <!--河流wfs-->
                   <!-- 河流 -->
                   <!--<ol-tile-layer title="河流">
@@ -223,6 +280,32 @@
                     />
                   </ol-tile-layer>
                   -->
+
+                                <!-- 河流 -->
+                    <ol-tile-layer title="河流">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:River"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 374,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+
 
                   <!-- 边界 -->
                   <ol-tile-layer title="边界">
@@ -321,7 +404,7 @@
                   </ol-tile-layer>                  
 
                   <!-- 排水管线 -->
-                  <ol-tile-layer title="排水管线">
+                  <!-- <ol-tile-layer title="排水管线">
                     <ol-source-tile-wms
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
                       layers="zzmserver:PS_LINE-3857"
@@ -342,10 +425,10 @@
                       BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
                       }"
                     />
-                  </ol-tile-layer>
+                  </ol-tile-layer> -->
 
                   <!-- 污染源地块 -->
-                  <ol-vector-layer title="污染源地块">
+                  <!-- <ol-vector-layer title="污染源地块">
                     <ol-source-vector
                       ref="cities"
                       :url="proxy.$getFullUrl('/geoserver/zzmserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zzmserver%3Asource_nonepoint_3857&maxFeatures=50&outputFormat=application%2Fjson')"
@@ -361,7 +444,85 @@
                         <ol-style-fill color="blue"></ol-style-fill>
                       </ol-style-circle>
                     </ol-style>
-                  </ol-vector-layer>
+                  </ol-vector-layer> -->
+
+               <ol-tile-layer title="污染源地块">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:source_nonepoint"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 371,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+
+                  <ol-tile-layer title="村界">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:village"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 371,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer>
+
+
+
+
+                  <!-- <ol-tile-layer title="县界">
+                    <ol-source-tile-wms
+                      :url="proxy.$getFullUrl('/geoserver/zzmserver/wms')"
+                      layers="zzmserver:xian"
+                      serverType="geoserver"
+                      :transition="0"
+                      :params="{
+                      SERVICE: 'WMS',
+                      VERSION: '1.1.0',
+                      REQUEST: 'GetMap',
+                      FORMAT: 'image/png',
+                      TRANSPARENT: true,
+                      tiled: true,
+                      STYLES: '',
+                      exceptions: 'application/vnd.ogc.se_inimage',
+                      CRS: 'EPSG:3857',
+                      WIDTH: 768,
+                      HEIGHT: 371,
+                      BBOX: '726703.59375,2524902.890625,727783.59375,2525573.671875'
+                      }"
+                    />
+                  </ol-tile-layer> -->
+
+
+
+
+
                 </ol-layer-group>
 
                 <ol-overlay
@@ -374,6 +535,7 @@
                     </div>
                   </template>
                 </ol-overlay>
+                
               </ol-map>
               <!-- map ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ -->
 
